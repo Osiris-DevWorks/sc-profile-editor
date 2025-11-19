@@ -1046,7 +1046,8 @@ class MainWindow(QMainWindow):
         # Show RemapDialog with the current binding
         from gui.remap_dialog import RemapDialog
 
-        dialog = RemapDialog(binding.input_code, self.current_profile, self)
+        # Open in single action mode (hides "Add New Action" section)
+        dialog = RemapDialog(binding.input_code, self.current_profile, self, single_action_mode=True)
         dialog.bindings_changed.connect(self.on_bindings_changed_from_table)
         dialog.exec()
 

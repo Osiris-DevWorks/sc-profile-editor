@@ -188,12 +188,13 @@ class RemapDialog(QDialog):
     # Signal emitted when bindings are changed
     bindings_changed = pyqtSignal(list)  # List of modified bindings
 
-    def __init__(self, input_code: str, profile: ControlProfile, parent=None):
-        logger.info(f"RemapDialog.__init__ called with input_code={input_code}")
+    def __init__(self, input_code: str, profile: ControlProfile, parent=None, single_action_mode: bool = False):
+        logger.info(f"RemapDialog.__init__ called with input_code={input_code}, single_action_mode={single_action_mode}")
         try:
             super().__init__(parent)
             self.input_code = input_code
             self.profile = profile
+            self.single_action_mode = single_action_mode  # Hide "Add New Action" section when editing from table
             logger.debug(f"Finding bindings for input_code: {input_code}")
             self.bindings_for_input = self.find_bindings_by_input_code(input_code)
             self.deleted_bindings = []  # Track bindings to be deleted
@@ -390,12 +391,21 @@ class RemapDialog(QDialog):
         add_btn_layout.addWidget(self.add_action_btn)
         add_layout.addLayout(add_btn_layout)
 
+        # Hide "Add New Action" section when editing from table (single action mode)
+        if self.single_action_mode:
+            add_group.hide()
+
         layout.addWidget(add_group)
 
         # Info message
         info_label = QLabel("You can add multiple actions to the same button, or delete existing ones.")
         info_label.setStyleSheet("color: #888; font-size: 10px; font-style: italic;")
         info_label.setWordWrap(True)
+
+        # Hide info message when in single action mode
+        if self.single_action_mode:
+            info_label.hide()
+
         layout.addWidget(info_label)
 
         # Dialog buttons
