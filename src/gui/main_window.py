@@ -894,7 +894,7 @@ class MainWindow(QMainWindow):
 
         # Check if user is currently editing a cell
         current_item = self.controls_table.currentItem()
-        if current_item and current_item.column() == 2:  # Action (Override) column
+        if current_item and current_item.column() == 2:  # Label column
             # Check if there's an active editor widget
             editor = self.controls_table.cellWidget(current_item.row(), current_item.column())
             if not editor:
@@ -1104,7 +1104,7 @@ class MainWindow(QMainWindow):
 
     def on_item_double_clicked(self, item):
         """Handle double-click - prepare for editing"""
-        if item.column() == 2:  # Action (Override) column
+        if item.column() == 2:  # Label column
             # Get the binding data to store the default label for comparison
             binding_data = item.data(Qt.ItemDataRole.UserRole)
             if binding_data:
@@ -1130,8 +1130,8 @@ class MainWindow(QMainWindow):
                 self._editing_default_text = None
 
     def on_cell_edited(self, item):
-        """Handle cell editing (only column 2: Action Override is editable)"""
-        if item.column() != 2:  # Only Action (Override) column is editable
+        """Handle cell editing (only column 2: Label is editable)"""
+        if item.column() != 2:  # Only Label column is editable
             return
 
         # Get the new text from the editor
