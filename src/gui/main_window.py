@@ -717,16 +717,27 @@ class MainWindow(QMainWindow):
             label_item.setData(Qt.ItemDataRole.UserRole, (action_map_name, binding))
             self.controls_table.setItem(row, 2, label_item)
 
+            # Check if this is an unmapped action (input code ends with underscore)
+            is_unmapped = binding.input_code.rstrip().endswith('_')
+
             # Column 3: Input (human-readable with raw code in tooltip)
-            input_label = LabelGenerator.generate_input_label(binding.input_code)
-            input_item = QTableWidgetItem(input_label)
-            input_item.setToolTip(binding.input_code)  # Show raw code in tooltip
+            if is_unmapped:
+                # For unmapped actions, show blank
+                input_item = QTableWidgetItem("")
+            else:
+                input_label = LabelGenerator.generate_input_label(binding.input_code)
+                input_item = QTableWidgetItem(input_label)
+                input_item.setToolTip(binding.input_code)  # Show raw code in tooltip
             input_item.setFlags(input_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             self.controls_table.setItem(row, 3, input_item)
 
             # Column 4: Device (parsed from input code)
-            device = self.parse_device_from_input(binding.input_code)
-            device_item = QTableWidgetItem(device)
+            if is_unmapped:
+                # For unmapped actions, show blank
+                device_item = QTableWidgetItem("")
+            else:
+                device = self.parse_device_from_input(binding.input_code)
+                device_item = QTableWidgetItem(device)
             device_item.setFlags(device_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             self.controls_table.setItem(row, 4, device_item)
 
