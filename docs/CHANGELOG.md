@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-11-19
+
+### Added
+- **Table-based input binding** - Direct input editing from Controls Table view:
+  - New "Label" column for editable action labels (double-click to edit)
+  - New "Input" column showing human-readable input descriptions with raw codes in tooltip
+  - New "Edit" column with pencil icon buttons for each row
+  - Click Edit button to open RemapDialog for that specific input/action
+  - Supports full multi-action button editing from table interface
+- **Enhanced RemapDialog with input selection**:
+  - "Change Input Binding" group box at top of dialog
+  - "Detect Input" button for automatic input detection
+  - Searchable dropdown with all available inputs organized by device type
+  - Manual input code selection from comprehensive list of keyboard, mouse, and joystick inputs
+  - Automatically updates Device column when input binding changes
+- **Device Configuration Tab** (new "Config" tab):
+  - View all connected devices with type, product name, and instance number
+  - "Refresh Devices" button to re-detect connected devices
+  - Configure device-to-joystick mappings (js1, js2, js3, etc.)
+  - "Save Configuration" button to persist device mappings to QSettings
+  - Helps maintain consistent bindings when devices connect in different order
+- **New Profile button**:
+  - Quick create new profile from blank.xml without file dialog
+  - Useful for starting fresh profiles with all 621 available actions
+  - Default filename pattern suggested for new profiles
+- **Device configuration persistence**:
+  - New settings methods: get_device_config(), set_device_config(), clear_device_config()
+  - Device mappings stored in QSettings for persistence across sessions
+
+### Changed
+- **Table column restructure**:
+  - Renamed "Action Map" column to "Action Category"
+  - Consolidated input display: removed separate "Input Code" and "Input Label" columns
+  - New single "Input" column shows human-readable text with raw code in tooltip
+  - Default view now includes: Action Category, Label, Input, Device, Edit (5 columns)
+  - Detailed view adds original "Action" column (6 columns)
+- **RemapDialog improvements**:
+  - Now accepts input_code string parameter instead of binding object
+  - Uses bindings_changed signal (plural) for consistency with multi-action support
+  - Context menu updated to use new RemapDialog API
+- **Main window toolbar**:
+  - "New Profile" button added between "Import Profile XML" and export buttons
+
+### Fixed
+- **Context menu remapping** - Updated to use bindings_changed signal from RemapDialog
+
+### Technical
+- All input code dropdown items generated dynamically from available devices
+- Input codes include: keyboard (99 keys), mouse (7 buttons), joystick buttons/axes/hats
+- Device auto-update works automatically when UI refreshes after input change
+
+---
+
 ## [0.5.1] - 2025-11-18
 
 ### Added
