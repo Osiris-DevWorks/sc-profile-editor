@@ -254,13 +254,31 @@ class RemapDialog(QDialog):
                     bindings.append(binding)
         return bindings
 
+    def _get_current_input_display(self) -> str:
+        """Get display text for current input binding"""
+        # Check if input code is unmapped (ends with underscore)
+        if self.input_code.rstrip().endswith('_'):
+            return "none"
+        else:
+            return InputValidator.get_input_description(self.input_code)
+
     def setup_ui(self):
         """Set up the user interface"""
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        # Header - show button info
-        header_label = QLabel(f"<b>Editing Button:</b> {self.input_code}")
+        # Header - show action being edited
+        # Get the first binding's action name if available
+        action_name = ""
+        if self.bindings_for_input:
+            action_name = self.bindings_for_input[0].action_name
+
+        if action_name:
+            header_text = f"<b>Editing Action:</b> {action_name}"
+        else:
+            header_text = "<b>Editing Action:</b> (unmapped)"
+
+        header_label = QLabel(header_text)
         header_font = QFont()
         header_font.setPointSize(11)
         header_label.setFont(header_font)
@@ -272,33 +290,33 @@ class RemapDialog(QDialog):
         change_input_group.setLayout(change_input_layout)
 
         # Show current input
-        input_desc_layout = QHBoxLayout()
-        input_desc = InputValidator.get_input_description(self.input_code)
-        desc_label = QLabel(f"Current: {input_desc}")
-        desc_label.setStyleSheet("color: #666; font-size: 10px;")
+        current_input_text = self._get_current_input_display()
+        desc_label = QLabel(f"<b>Current:</b> {current_input_text}")
+        desc_label.setStyleSheet("color: #333; font-size: 10px;")
         self.desc_label = desc_label
-        input_desc_layout.addWidget(desc_label)
-        input_desc_layout.addStretch()
+        change_input_layout.addWidget(desc_label)
 
+        # Input selection layout with detect button and dropdown
+        input_selection_layout = QHBoxLayout()
+
+        # Detect input button (left side)
         self.detect_input_btn = QPushButton("Detect Input")
-        self.detect_input_btn.setMaximumWidth(150)
+        self.detect_input_btn.setMaximumWidth(120)
         self.detect_input_btn.clicked.connect(self.on_detect_input_clicked)
-        input_desc_layout.addWidget(self.detect_input_btn)
+        input_selection_layout.addWidget(self.detect_input_btn)
 
-        change_input_layout.addLayout(input_desc_layout)
+        # Or label
+        or_label = QLabel("or select manually:")
+        input_selection_layout.addWidget(or_label)
 
-        # Input code dropdown for manual selection
-        input_dropdown_layout = QHBoxLayout()
-        input_dropdown_layout.addWidget(QLabel("Or select manually:"))
-
+        # Input code dropdown
         self.input_code_combo = SearchableComboBox()
         self.input_code_combo.addItem("-- Select Input Code --", None)
         self._populate_input_codes()
         self.input_code_combo.currentIndexChanged.connect(self.on_input_code_selected)
-        input_dropdown_layout.addWidget(self.input_code_combo)
-        input_dropdown_layout.addStretch()
+        input_selection_layout.addWidget(self.input_code_combo, 1)  # Make dropdown stretch
 
-        change_input_layout.addLayout(input_dropdown_layout)
+        change_input_layout.addLayout(input_selection_layout)
 
         layout.addWidget(change_input_group)
         layout.addSpacing(10)
@@ -585,8 +603,9 @@ class RemapDialog(QDialog):
         # Update the stored input code
         self.input_code = input_code
 
-        # Update the UI
-        self.desc_label.setText(f"Input: {description}")
+        # Update the UI with proper formatting
+        current_display = self._get_current_input_display()
+        self.desc_label.setText(f"<b>Current:</b> {current_display}")
 
         # Stop detection and re-enable controls
         self.detecting_input = False
@@ -725,9 +744,9 @@ class RemapDialog(QDialog):
         old_input_code = self.input_code
         self.input_code = new_input_code
 
-        # Update the description
-        input_desc = InputValidator.get_input_description(new_input_code)
-        self.desc_label.setText(f"Current: {input_desc}")
+        # Update the description using consistent formatting
+        current_display = self._get_current_input_display()
+        self.desc_label.setText(f"<b>Current:</b> {current_display}")
 
         logger.info(f"Input code changed: {old_input_code} → {new_input_code}")
 
