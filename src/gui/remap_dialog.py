@@ -242,8 +242,12 @@ class RemapDialog(QDialog):
         return ' '.join(word.capitalize() for word in words)
 
     def find_bindings_by_input_code(self, input_code: str) -> list:
-        """Find all bindings for an input code"""
+        """Find all bindings for an input code (excluding unmapped/unbound actions)"""
         bindings = []
+        # Don't search for unmapped input codes (those ending with underscore)
+        if input_code.rstrip().endswith('_'):
+            return bindings
+
         for action_map in self.profile.action_maps:
             for binding in action_map.actions:
                 if binding.input_code == input_code:
