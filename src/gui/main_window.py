@@ -869,21 +869,14 @@ class MainWindow(QMainWindow):
                 if actionmap_item and actionmap_item.text() != actionmap_filter:
                     show_row = False
 
-            # Unmapped keys filter - check if input_code == input_label (after stripping)
-            # or if the label indicates an empty/unmapped binding
+            # Unmapped keys filter - check if input code is empty
+            # Column 6 contains the raw input code (hidden column)
             if show_row and hide_unmapped:
-                input_code_item = self.controls_table.item(row, 3)  # Input Code is now column 3
-                input_label_item = self.controls_table.item(row, 4)  # Input Label is now column 4
-                if input_code_item and input_label_item:
+                input_code_item = self.controls_table.item(row, 6)  # Raw input code is now column 6
+                if input_code_item:
                     input_code = input_code_item.text().strip()
-                    input_label = input_label_item.text().strip()
-
-                    # Check if they're the same after stripping
-                    if input_code == input_label:
-                        show_row = False
-                    # Also check for patterns that indicate unmapped keys
-                    # e.g., "Keyboard: ", "Joystick 1: ", "Mouse: " with nothing after
-                    elif input_label.endswith(': ') or input_label.endswith(':'):
+                    # Hide rows where input code is empty
+                    if not input_code:
                         show_row = False
 
             self.controls_table.setRowHidden(row, not show_row)
