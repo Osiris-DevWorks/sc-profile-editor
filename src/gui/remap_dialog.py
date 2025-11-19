@@ -262,10 +262,15 @@ class RemapDialog(QDialog):
         header_label.setFont(header_font)
         layout.addWidget(header_label)
 
-        # Show input description with detect button
+        # === CHANGE INPUT SECTION ===
+        change_input_group = QGroupBox("Change Input Binding")
+        change_input_layout = QVBoxLayout()
+        change_input_group.setLayout(change_input_layout)
+
+        # Show current input
         input_desc_layout = QHBoxLayout()
         input_desc = InputValidator.get_input_description(self.input_code)
-        desc_label = QLabel(f"Input: {input_desc}")
+        desc_label = QLabel(f"Current: {input_desc}")
         desc_label.setStyleSheet("color: #666; font-size: 10px;")
         self.desc_label = desc_label
         input_desc_layout.addWidget(desc_label)
@@ -276,7 +281,22 @@ class RemapDialog(QDialog):
         self.detect_input_btn.clicked.connect(self.on_detect_input_clicked)
         input_desc_layout.addWidget(self.detect_input_btn)
 
-        layout.addLayout(input_desc_layout)
+        change_input_layout.addLayout(input_desc_layout)
+
+        # Input code dropdown for manual selection
+        input_dropdown_layout = QHBoxLayout()
+        input_dropdown_layout.addWidget(QLabel("Or select manually:"))
+
+        self.input_code_combo = SearchableComboBox()
+        self.input_code_combo.addItem("-- Select Input Code --", None)
+        self._populate_input_codes()
+        self.input_code_combo.currentIndexChanged.connect(self.on_input_code_selected)
+        input_dropdown_layout.addWidget(self.input_code_combo)
+        input_dropdown_layout.addStretch()
+
+        change_input_layout.addLayout(input_dropdown_layout)
+
+        layout.addWidget(change_input_group)
         layout.addSpacing(10)
 
         # === CURRENT ACTIONS SECTION ===
@@ -588,6 +608,126 @@ class RemapDialog(QDialog):
         self.action_map_combo.setEnabled(not disable)
         self.action_combo.setEnabled(not disable)
         self.add_action_btn.setEnabled(not disable)
+        self.input_code_combo.setEnabled(not disable)
         for child in self.findChildren(QPushButton):
             if child != self.detect_input_btn:
                 child.setEnabled(not disable)
+
+    def _populate_input_codes(self):
+        """Populate the input code dropdown with available inputs"""
+        try:
+            # Get list of available devices
+            devices = InputDetector.get_available_devices()
+
+            # Group inputs by device type
+            inputs_by_device = {}
+
+            # Add joystick inputs
+            for device in devices:
+                if device.get('type') == 'joystick':
+                    instance = device.get('instance', 0)
+                    product_name = device.get('name', f"Joystick {instance}")
+                    device_label = f"Joystick {instance}: {product_name}"
+
+                    if device_label not in inputs_by_device:
+                        inputs_by_device[device_label] = []
+
+                    # Add buttons (1-128)
+                    for btn in range(1, 129):
+                        code = f"js{instance}_button{btn}"
+                        inputs_by_device[device_label].append((code, f"Button {btn}"))
+
+                    # Add axes
+                    for axis in ['x', 'y', 'z', 'rotx', 'roty', 'rotz', 'slider1', 'slider2']:
+                        code = f"js{instance}_{axis}"
+                        inputs_by_device[device_label].append((code, f"Axis {axis.upper()}"))
+
+                    # Add POV/hat switches
+                    for hat in range(1, 5):
+                        for direction in ['up', 'down', 'left', 'right']:
+                            code = f"js{instance}_hat{hat}_{direction}"
+                            inputs_by_device[device_label].append((code, f"Hat {hat} {direction.capitalize()}"))
+
+            # Add keyboard inputs
+            keyboard_inputs = [
+                ('kb1_escape', 'ESC'), ('kb1_1', '1'), ('kb1_2', '2'), ('kb1_3', '3'),
+                ('kb1_4', '4'), ('kb1_5', '5'), ('kb1_6', '6'), ('kb1_7', '7'),
+                ('kb1_8', '8'), ('kb1_9', '9'), ('kb1_0', '0'), ('kb1_minus', 'Minus'),
+                ('kb1_equal', 'Equal'), ('kb1_backspace', 'Backspace'),
+                ('kb1_tab', 'Tab'), ('kb1_q', 'Q'), ('kb1_w', 'W'), ('kb1_e', 'E'),
+                ('kb1_r', 'R'), ('kb1_t', 'T'), ('kb1_y', 'Y'), ('kb1_u', 'U'),
+                ('kb1_i', 'I'), ('kb1_o', 'O'), ('kb1_p', 'P'), ('kb1_lbracket', '['),
+                ('kb1_rbracket', ']'), ('kb1_enter', 'Enter'),
+                ('kb1_lctrl', 'L Ctrl'), ('kb1_a', 'A'), ('kb1_s', 'S'), ('kb1_d', 'D'),
+                ('kb1_f', 'F'), ('kb1_g', 'G'), ('kb1_h', 'H'), ('kb1_j', 'J'),
+                ('kb1_k', 'K'), ('kb1_l', 'L'), ('kb1_semicolon', ';'), ('kb1_apostrophe', "'"),
+                ('kb1_grave', '`'), ('kb1_lshift', 'L Shift'), ('kb1_backslash', '\\'),
+                ('kb1_z', 'Z'), ('kb1_x', 'X'), ('kb1_c', 'C'), ('kb1_v', 'V'),
+                ('kb1_b', 'B'), ('kb1_n', 'N'), ('kb1_m', 'M'), ('kb1_comma', ','),
+                ('kb1_period', '.'), ('kb1_slash', '/'), ('kb1_rshift', 'R Shift'),
+                ('kb1_multiply', 'Numpad *'), ('kb1_lalt', 'L Alt'), ('kb1_space', 'Space'),
+                ('kb1_capslock', 'Caps Lock'), ('kb1_f1', 'F1'), ('kb1_f2', 'F2'),
+                ('kb1_f3', 'F3'), ('kb1_f4', 'F4'), ('kb1_f5', 'F5'), ('kb1_f6', 'F6'),
+                ('kb1_f7', 'F7'), ('kb1_f8', 'F8'), ('kb1_f9', 'F9'), ('kb1_f10', 'F10'),
+                ('kb1_numlock', 'Num Lock'), ('kb1_scrolllock', 'Scroll Lock'),
+                ('kb1_numpad7', 'Numpad 7'), ('kb1_numpad8', 'Numpad 8'),
+                ('kb1_numpad9', 'Numpad 9'), ('kb1_subtract', 'Numpad -'),
+                ('kb1_numpad4', 'Numpad 4'), ('kb1_numpad5', 'Numpad 5'),
+                ('kb1_numpad6', 'Numpad 6'), ('kb1_add', 'Numpad +'),
+                ('kb1_numpad1', 'Numpad 1'), ('kb1_numpad2', 'Numpad 2'),
+                ('kb1_numpad3', 'Numpad 3'), ('kb1_numpad0', 'Numpad 0'),
+                ('kb1_decimal', 'Numpad .'), ('kb1_f11', 'F11'), ('kb1_f12', 'F12'),
+                ('kb1_divide', 'Numpad /'), ('kb1_rctrl', 'R Ctrl'),
+                ('kb1_up', 'Up'), ('kb1_down', 'Down'), ('kb1_left', 'Left'),
+                ('kb1_right', 'Right'), ('kb1_home', 'Home'), ('kb1_end', 'End'),
+                ('kb1_pageup', 'Page Up'), ('kb1_pagedown', 'Page Down'),
+                ('kb1_insert', 'Insert'), ('kb1_delete', 'Delete'),
+                ('kb1_ralt', 'R Alt'), ('kb1_pause', 'Pause'), ('kb1_print', 'Print'),
+            ]
+            inputs_by_device['Keyboard'] = keyboard_inputs
+
+            # Add mouse inputs
+            mouse_inputs = [
+                ('mouse1', 'Left Click'),
+                ('mouse2', 'Right Click'),
+                ('mouse3', 'Middle Click'),
+                ('mouse4', 'Button 4'),
+                ('mouse5', 'Button 5'),
+                ('mwheel_up', 'Wheel Up'),
+                ('mwheel_down', 'Wheel Down'),
+            ]
+            inputs_by_device['Mouse'] = mouse_inputs
+
+            # Add items to combo box, grouped by device
+            for device_label in sorted(inputs_by_device.keys()):
+                for input_code, label in sorted(inputs_by_device[device_label], key=lambda x: x[1]):
+                    display_text = f"{device_label} - {label}"
+                    self.input_code_combo.addItem(display_text, input_code)
+
+            logger.debug(f"Populated input codes dropdown with {self.input_code_combo.count()} items")
+        except Exception as e:
+            logger.error(f"Error populating input codes: {e}", exc_info=True)
+
+    def on_input_code_selected(self, index: int):
+        """Handle input code selection from dropdown"""
+        if index <= 0:
+            return
+
+        new_input_code = self.input_code_combo.currentData()
+        if not new_input_code:
+            return
+
+        # Update the stored input code
+        old_input_code = self.input_code
+        self.input_code = new_input_code
+
+        # Update the description
+        input_desc = InputValidator.get_input_description(new_input_code)
+        self.desc_label.setText(f"Current: {input_desc}")
+
+        logger.info(f"Input code changed: {old_input_code} → {new_input_code}")
+
+        # Reset dropdown to show "(Select Input Code)"
+        self.input_code_combo.blockSignals(True)
+        self.input_code_combo.setCurrentIndex(0)
+        self.input_code_combo.blockSignals(False)

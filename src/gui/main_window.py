@@ -240,9 +240,9 @@ class MainWindow(QMainWindow):
 
         # Controls table
         self.controls_table = QTableWidget()
-        self.controls_table.setColumnCount(6)  # Max columns for detailed view
+        self.controls_table.setColumnCount(7)  # Max columns for detailed view
         self.controls_table.setHorizontalHeaderLabels([
-            "Action Map", "Action", "Action (Override)", "Input Code", "Input Label", "Device"
+            "Action Category", "Action", "Label", "Input", "Device", "Edit", ""
         ])
         self.controls_table.horizontalHeader().setStretchLastSection(False)
         self.controls_table.setAlternatingRowColors(True)
@@ -255,7 +255,7 @@ class MainWindow(QMainWindow):
         self.controls_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.controls_table.customContextMenuRequested.connect(self.show_table_context_menu)
 
-        # Set custom delegate for column 2 to handle text selection
+        # Set custom delegate for column 2 (Label) to handle text selection
         delegate = SelectAllDelegate(self.controls_table, self)
         self.controls_table.setItemDelegateForColumn(2, delegate)
 
@@ -265,8 +265,8 @@ class MainWindow(QMainWindow):
         self._editing_item = None
         self._editing_default_text = None  # Stores the default label (without custom override)
 
-        # Track editable columns (column 2 is Action Override, editable only in detailed view)
-        self.editable_columns = {2}  # Column 2: Action (Override)
+        # Track editable columns (column 2 is Label, editable in both views)
+        self.editable_columns = {2}  # Column 2: Label
 
         splitter.setStretchFactor(0, 1)
         splitter.setStretchFactor(1, 3)
@@ -643,23 +643,19 @@ class MainWindow(QMainWindow):
 
         # Configure column visibility based on view mode
         if is_detailed:
-            # Detailed view: Show all 6 columns
-            # 0: Action Map, 1: Action (original), 2: Action (Override), 3: Input Code, 4: Input Label, 5: Device
+            # Detailed view: Show columns 0, 1, 2, 3, 4, 5
+            # 0: Action Category, 1: Action (original), 2: Label, 3: Input, 4: Device, 5: Edit
             self.controls_table.setColumnHidden(1, False)
-            self.controls_table.setColumnHidden(2, False)
-            self.controls_table.setColumnHidden(3, False)
-            self.controls_table.setColumnHidden(4, False)
+            self.controls_table.setColumnHidden(6, True)   # Hide raw input code column
         else:
-            # Default view: Show 4 columns (0: Action Map, 2: Action, 4: Input Label, 5: Device)
-            # Hide columns 1, 3
-            self.controls_table.setColumnHidden(1, True)
-            self.controls_table.setColumnHidden(3, True)
-            self.controls_table.setColumnHidden(4, False)  # Show Input Label
-            self.controls_table.setColumnHidden(2, False)  # Show override column (as "Action")
+            # Default view: Show columns 0, 2, 3, 4, 5
+            # 0: Action Category, 2: Label, 3: Input, 4: Device, 5: Edit
+            self.controls_table.setColumnHidden(1, True)   # Hide original Action
+            self.controls_table.setColumnHidden(6, True)   # Hide raw input code column
 
         # Populate table
         for row, (action_map_name, binding) in enumerate(self.all_bindings):
-            # Column 0: Action Map
+            # Column 0: Action Category
             action_map_label = LabelGenerator.generate_actionmap_label(action_map_name)
             action_map_item = QTableWidgetItem(action_map_label)
             action_map_item.setFlags(action_map_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
@@ -671,29 +667,36 @@ class MainWindow(QMainWindow):
             action_original_item.setFlags(action_original_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             self.controls_table.setItem(row, 1, action_original_item)
 
-            # Column 2: Action (with override) - editable, visible in both views
+            # Column 2: Label (editable custom label) - visible in both views
             action_label_override = LabelGenerator.get_action_label(binding.action_name, binding)
-            action_override_item = QTableWidgetItem(action_label_override)
+            label_item = QTableWidgetItem(action_label_override)
             # Store binding reference in the item for later retrieval during editing
-            action_override_item.setData(Qt.ItemDataRole.UserRole, (action_map_name, binding))
-            self.controls_table.setItem(row, 2, action_override_item)
+            label_item.setData(Qt.ItemDataRole.UserRole, (action_map_name, binding))
+            self.controls_table.setItem(row, 2, label_item)
 
-            # Column 3: Input Code (raw) - only visible in detailed view
-            input_code_item = QTableWidgetItem(binding.input_code)
-            input_code_item.setFlags(input_code_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            self.controls_table.setItem(row, 3, input_code_item)
-
-            # Column 4: Input Label (human-readable) - only visible in detailed view
+            # Column 3: Input (human-readable with raw code in tooltip)
             input_label = LabelGenerator.generate_input_label(binding.input_code)
-            input_label_item = QTableWidgetItem(input_label)
-            input_label_item.setFlags(input_label_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            self.controls_table.setItem(row, 4, input_label_item)
+            input_item = QTableWidgetItem(input_label)
+            input_item.setToolTip(binding.input_code)  # Show raw code in tooltip
+            input_item.setFlags(input_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            self.controls_table.setItem(row, 3, input_item)
 
-            # Column 5: Device (parsed from input code)
+            # Column 4: Device (parsed from input code)
             device = self.parse_device_from_input(binding.input_code)
             device_item = QTableWidgetItem(device)
             device_item.setFlags(device_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            self.controls_table.setItem(row, 5, device_item)
+            self.controls_table.setItem(row, 4, device_item)
+
+            # Column 5: Edit button
+            edit_btn = QPushButton("✏️")
+            edit_btn.setMaximumWidth(40)
+            edit_btn.clicked.connect(lambda checked, r=row: self.on_edit_input_clicked(r))
+            self.controls_table.setCellWidget(row, 5, edit_btn)
+
+            # Column 6: Raw input code (hidden, for reference)
+            input_code_item = QTableWidgetItem(binding.input_code)
+            input_code_item.setFlags(input_code_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            self.controls_table.setItem(row, 6, input_code_item)
 
         # Re-enable signals
         self.controls_table.blockSignals(False)
@@ -706,17 +709,18 @@ class MainWindow(QMainWindow):
 
         # Set column widths based on view mode
         if is_detailed:
-            self.controls_table.setColumnWidth(0, 200)  # Action Map
+            self.controls_table.setColumnWidth(0, 150)  # Action Category
             self.controls_table.setColumnWidth(1, 200)  # Action (Original)
-            self.controls_table.setColumnWidth(2, 200)  # Action (Override)
-            self.controls_table.setColumnWidth(3, 150)  # Input Code
-            self.controls_table.setColumnWidth(4, 200)  # Input Label
-            self.controls_table.setColumnWidth(5, 150)  # Device
+            self.controls_table.setColumnWidth(2, 200)  # Label
+            self.controls_table.setColumnWidth(3, 200)  # Input
+            self.controls_table.setColumnWidth(4, 120)  # Device
+            self.controls_table.setColumnWidth(5, 50)   # Edit button
         else:
-            self.controls_table.setColumnWidth(0, 200)  # Action Map
-            self.controls_table.setColumnWidth(2, 250)  # Action (Override)
-            self.controls_table.setColumnWidth(4, 200)  # Input Label
-            self.controls_table.setColumnWidth(5, 150)  # Device
+            self.controls_table.setColumnWidth(0, 150)  # Action Category
+            self.controls_table.setColumnWidth(2, 200)  # Label
+            self.controls_table.setColumnWidth(3, 200)  # Input
+            self.controls_table.setColumnWidth(4, 120)  # Device
+            self.controls_table.setColumnWidth(5, 50)   # Edit button
 
     def parse_device_from_input(self, input_code: str) -> str:
         """Parse device type from input code"""
@@ -939,12 +943,8 @@ class MainWindow(QMainWindow):
 
         from gui.remap_dialog import RemapDialog
 
-        dialog = RemapDialog(binding, self.current_profile, self)
-        dialog.binding_changed.connect(
-            lambda new_input, new_label, new_mode: self.on_binding_remapped(
-                binding, new_input, new_label, new_mode
-            )
-        )
+        dialog = RemapDialog(binding.input_code, self.current_profile, self)
+        dialog.bindings_changed.connect(self.on_bindings_changed_from_table)
         dialog.exec()
 
     def on_binding_remapped(self, binding, new_input_code: str, new_label: str, new_activation_mode: str):
@@ -986,6 +986,40 @@ class MainWindow(QMainWindow):
         self.on_profile_modified()
 
         logger.info(f"Remapped binding: {binding.action_name} to {new_input_code}")
+
+    def on_edit_input_clicked(self, row):
+        """Handle Edit button click from table"""
+        if not self.current_profile or row >= len(self.all_bindings):
+            return
+
+        # Get binding data from the row
+        action_map_name, binding = self.all_bindings[row]
+
+        # Show RemapDialog with the current binding
+        from gui.remap_dialog import RemapDialog
+
+        dialog = RemapDialog(binding.input_code, self.current_profile, self)
+        dialog.bindings_changed.connect(self.on_bindings_changed_from_table)
+        dialog.exec()
+
+    def on_bindings_changed_from_table(self, bindings: list):
+        """Handle binding changes from RemapDialog opened via table Edit button"""
+        # Bindings are already modified by RemapDialog, just refresh UI
+
+        # Mark profile as modified
+        if self.current_profile:
+            self.current_profile.mark_modified()
+
+        # Reload override manager cache
+        try:
+            from utils.label_overrides import get_override_manager
+            override_manager = get_override_manager()
+            override_manager.reload()
+        except Exception as e:
+            logger.error(f"Error reloading override manager: {e}", exc_info=True)
+
+        # Refresh UI
+        self.on_profile_modified()
 
     def edit_label_from_context(self, binding):
         """Edit label from context menu (simpler than full remap dialog)"""
