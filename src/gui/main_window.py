@@ -131,6 +131,12 @@ class MainWindow(QMainWindow):
         import_btn.clicked.connect(self.import_profile)
         header_layout.addWidget(import_btn)
 
+        # New Profile button
+        new_profile_btn = QPushButton("New Profile")
+        new_profile_btn.setStyleSheet("padding: 10px 20px; font-size: 14px; background-color: #2196F3; color: white;")
+        new_profile_btn.clicked.connect(self.create_new_profile)
+        header_layout.addWidget(new_profile_btn)
+
         # Export buttons
         self.export_csv_btn = QPushButton("Export CSV")
         self.export_csv_btn.setStyleSheet("padding: 10px 20px; font-size: 14px;")
@@ -284,7 +290,12 @@ class MainWindow(QMainWindow):
             self.pdf_device_widget = None
             logger.warning("Device View tab disabled - no PDF widget available")
 
-        # Tab 3: About
+        # Tab 3: Config (Device Configuration)
+        from gui.config_tab import ConfigTab
+        self.config_tab = ConfigTab()
+        self.tab_widget.addTab(self.config_tab, "Config")
+
+        # Tab 4: About
         about_tab = QWidget()
         about_layout = QVBoxLayout()
         about_tab.setLayout(about_layout)
@@ -574,6 +585,38 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Error", f"An unexpected error occurred:\n{str(e)}")
             self.statusBar().showMessage("Error loading profile")
             logger.error(f"Error loading profile: {e}", exc_info=True)
+
+    def create_new_profile(self):
+        """Create a new profile from blank.xml without file dialog"""
+        try:
+            # Find blank.xml in example-profiles directory
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+            blank_profile_path = os.path.join(project_root, "example-profiles", "blank.xml")
+
+            if not os.path.exists(blank_profile_path):
+                QMessageBox.critical(
+                    self,
+                    "Error",
+                    f"Blank profile not found at {blank_profile_path}\n\n"
+                    "Please ensure blank.xml exists in the example-profiles directory."
+                )
+                logger.error(f"Blank profile not found: {blank_profile_path}")
+                return
+
+            # Load the blank profile
+            self.load_profile_from_path(blank_profile_path)
+
+            # Set a default filename for save
+            from datetime import datetime
+            default_name = f"new_profile_{datetime.now().strftime('%Y%m%d')}.xml"
+            self.current_profile_path = None  # Force "Save As" dialog on first save
+            self.statusBar().showMessage(f"New profile created. Use 'Save Profile' to save with filename like '{default_name}'")
+
+            logger.info("New profile created from blank.xml")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to create new profile:\n{str(e)}")
+            logger.error(f"Error creating new profile: {e}", exc_info=True)
 
     def display_profile(self):
         """Display the loaded profile data"""

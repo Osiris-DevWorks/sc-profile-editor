@@ -65,3 +65,37 @@ class AppSettings:
         """Save window state"""
         self.settings.setValue("window_state", state)
         self.settings.sync()
+
+    def get_device_config(self) -> dict:
+        """
+        Get the device-to-joystick mapping configuration
+
+        Returns:
+            Dictionary mapping device names to js slots, e.g.:
+            {
+                "js1": "VKBsim Gladiator EVO R",
+                "js2": "Thrustmaster TWCS Throttle",
+                "js3": None
+            }
+        """
+        # Get the raw setting value (stored as a dictionary in QSettings)
+        device_config = self.settings.value("device_config", {}, type=dict)
+        logger.debug(f"Retrieved device config: {device_config}")
+        return device_config
+
+    def set_device_config(self, config: dict):
+        """
+        Save the device-to-joystick mapping configuration
+
+        Args:
+            config: Dictionary mapping js slots to device names
+        """
+        self.settings.setValue("device_config", config)
+        self.settings.sync()
+        logger.info(f"Saved device config: {config}")
+
+    def clear_device_config(self):
+        """Clear the device configuration"""
+        self.settings.remove("device_config")
+        self.settings.sync()
+        logger.info("Cleared device configuration")
