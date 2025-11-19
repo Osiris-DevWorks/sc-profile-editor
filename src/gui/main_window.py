@@ -869,14 +869,15 @@ class MainWindow(QMainWindow):
                 if actionmap_item and actionmap_item.text() != actionmap_filter:
                     show_row = False
 
-            # Unmapped keys filter - check if input code is empty
+            # Unmapped keys filter - check if input code ends with underscore
+            # Unmapped keys are stored as "js1_ ", "kb1_", "mouse_", etc. (ending with underscore+space or just underscore)
             # Column 6 contains the raw input code (hidden column)
             if show_row and hide_unmapped:
                 input_code_item = self.controls_table.item(row, 6)  # Raw input code is now column 6
                 if input_code_item:
                     input_code = input_code_item.text().strip()
-                    # Hide rows where input code is empty
-                    if not input_code:
+                    # Hide rows where input code is empty or ends with underscore (unmapped)
+                    if not input_code or input_code.endswith('_'):
                         show_row = False
 
             self.controls_table.setRowHidden(row, not show_row)
