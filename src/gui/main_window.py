@@ -846,10 +846,10 @@ class MainWindow(QMainWindow):
         for row in range(self.controls_table.rowCount()):
             show_row = True
 
-            # Search filter - check all columns
+            # Search filter - check all columns except Edit button (5) and hidden raw input code (6)
             if search_text:
                 row_text = ""
-                for col in range(self.controls_table.columnCount()):
+                for col in [0, 1, 2, 3, 4]:  # Skip columns 5 (Edit button) and 6 (hidden input code)
                     item = self.controls_table.item(row, col)
                     if item:
                         row_text += item.text().lower() + " "
@@ -859,7 +859,7 @@ class MainWindow(QMainWindow):
 
             # Device filter
             if show_row and device_filter != "All Devices":
-                device_item = self.controls_table.item(row, 5)  # Device is now column 5
+                device_item = self.controls_table.item(row, 4)  # Device is now column 4
                 if device_item and device_item.text() != device_filter:
                     show_row = False
 
