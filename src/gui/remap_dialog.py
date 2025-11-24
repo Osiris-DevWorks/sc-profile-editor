@@ -486,10 +486,18 @@ class RemapDialog(QDialog):
 
         if map_name == "ALL":
             all_actions = []
+            seen_action_names = set()  # Track which actions we've already added
+
             for actions in self.actions_by_map.values():
                 all_actions.extend(actions)
 
+            # Sort and deduplicate by action name
             for action_binding in sorted(all_actions, key=lambda b: LabelGenerator.get_action_label(b.action_name, b)):
+                # Skip if we've already added this action name
+                if action_binding.action_name in seen_action_names:
+                    continue
+
+                seen_action_names.add(action_binding.action_name)
                 action_label = LabelGenerator.get_action_label(action_binding.action_name, action_binding)
                 display_text = f"{action_label} ({action_binding.action_name})"
                 self.action_combo.addItem(display_text, action_binding)
