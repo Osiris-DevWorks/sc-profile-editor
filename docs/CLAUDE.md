@@ -8,9 +8,9 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 
 ## Current Status
 
-**Version:** 0.5.1 (released November 18, 2025)
-**Current Branch:** v0.5.1-fixes (active development)
-**Status:** Stable release with searchable dropdowns, enhanced BLANK profile, and improved stability
+**Version:** 0.6.0 (in development)
+**Current Branch:** v0.6.0-profile-editing (active development)
+**Status:** Table-based input editing, keyboard modifiers, device view improvements, and action management enhancements
 **Platform:** Windows (PyInstaller executable)
 
 ## Implemented Features
@@ -48,8 +48,11 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 - ✅ "Detect Input" button in RemapDialog for automatic input binding
 - ✅ Joystick button detection via python-dinput
 - ✅ Joystick axis and POV/hat switch detection
-- ✅ Keyboard key detection via pynput
-- ✅ Mouse button click detection via pynput
+- ✅ Keyboard key detection via pynput with modifier support
+- ✅ **Keyboard modifiers:** Ctrl, Alt, Shift (left and right variants) with automatic detection
+- ✅ Mouse button click detection via pynput (supports 5-button mice)
+- ✅ Correct handling of Ctrl+letter combinations (maps control characters back to letters)
+- ✅ Support for AltGr (Right Alt) on non-US keyboards
 - ✅ 10-second timeout with cancel option
 - ✅ Thread-safe implementation with Qt signals
 
@@ -275,7 +278,22 @@ cmd //c scripts\build\build_all.bat
 12. Add device to template_registry.json
 13. Test button mapping and form field population in Device View
 
-### Recent Important Changes (v0.2.0 - v0.4.0)
+### Recent Important Changes
+
+#### v0.6.0 (In Development)
+- **Keyboard modifier support**: Full support for Ctrl, Alt, Shift modifiers with left/right distinction
+- **Table-based input editing**: Edit inputs directly from Controls Table with Edit button
+- **Device view improvements**: Hide "Change Input Binding" section when editing from Device View
+- **Action rebinding dialog**: Move, Duplicate, or Cancel options when rebinding already-mapped actions
+- **Duplicate action deduplication**: Remove duplicate actions from dropdowns (both ALL and category views)
+- **Enhanced RemapDialog**: Single-action mode for table edits, support for duplicate bindings
+
+#### v0.5.0 - v0.5.1
+- **Searchable dropdowns**: Substring-based filtering in action selection dropdowns
+- **Enhanced BLANK profile**: Full 621 actions with proper categorization
+- **Input detection**: Automatic joystick, keyboard, and mouse input detection
+
+#### v0.2.0 - v0.4.0
 - **Multi-device mapping support**: Buttons can now map to multiple devices (v0.2.1)
 - **Filter persistence**: Device and action map filters preserved when toggling views (v0.2.1)
 - **Device splitter**: Use `device_splitter.py` for composite devices like stick+SEM
