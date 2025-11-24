@@ -296,6 +296,18 @@ class InputDetectorThread(QThread):
                 Key.shift_r: "rshift",
             }
 
+            # Handle AltGr (Right Alt on non-US keyboards) - treat it as ralt
+            # pynput reports it as Key.alt_gr on some systems
+            alt_gr_key = None
+            try:
+                alt_gr_key = Key.alt_gr
+            except AttributeError:
+                pass  # Key.alt_gr not available on this system
+
+            if alt_gr_key and key == alt_gr_key:
+                self.active_modifiers["ralt"] = True
+                return True  # Continue listening
+
             # If this is a modifier key being pressed, track it and continue listening
             if key in modifier_key_map:
                 self.active_modifiers[modifier_key_map[key]] = True
@@ -397,6 +409,17 @@ class InputDetectorThread(QThread):
                 Key.shift_l: "lshift",
                 Key.shift_r: "rshift",
             }
+
+            # Handle AltGr (Right Alt on non-US keyboards) - treat it as ralt
+            alt_gr_key = None
+            try:
+                alt_gr_key = Key.alt_gr
+            except AttributeError:
+                pass  # Key.alt_gr not available on this system
+
+            if alt_gr_key and key == alt_gr_key:
+                self.active_modifiers["ralt"] = False
+                return True  # Continue listening
 
             if key in modifier_key_map:
                 self.active_modifiers[modifier_key_map[key]] = False
