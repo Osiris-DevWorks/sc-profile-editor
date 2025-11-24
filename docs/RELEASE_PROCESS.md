@@ -91,13 +91,15 @@ git tag -a vX.Y.Z -m "Release vX.Y.Z - <Brief Description>"
 git push origin vX.Y.Z
 ```
 
-### 9. Build Installer (Optional)
+### 9. Build Installer
 
 ```bash
 cmd /c build_all.bat
 ```
 
 This creates: `installer_output/SCProfileEditor-vX.Y.Z-Setup.exe`
+
+**⚠️ IMPORTANT:** The installer is a required release artifact and must be built and included in all releases.
 
 ### 10. Create GitHub Release
 
@@ -183,9 +185,25 @@ The script will:
 - Windows 10 or later (64-bit)
 - No additional dependencies required
 
+## 🎮 Devices Supported
+
+[List all supported device types and specific models]
+
+**Examples:**
+- VKB Gladiator (EVO, SCG variants)
+- VKB Gunfighter (MCG, SCG variants)
+- VKB Space Sim Module (SEM)
+- VPC MongoosT-50CM3
+- Thrustmaster TWCS Throttle
+- Keyboard, Mouse, Joystick
+
 ## 🐛 Known Issues
 
-[List any known issues or limitations]
+[List any known issues, limitations, or workarounds]
+
+## 🧪 Testing Focus
+
+[Areas the community should focus testing on for this release]
 
 ## 📝 Full Changelog
 
