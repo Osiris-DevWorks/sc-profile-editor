@@ -16,10 +16,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Support for AltGr (Right Alt) on non-US keyboards
   - Input codes format: `kb1_{modifier}+{key}` (e.g., `kb1_lctrl+a`)
   - Human-readable display: "Keyboard Left Ctrl+A", "Keyboard Right Alt+P", etc.
+- **Device View UX improvements**:
+  - Hide "Change Input Binding" section when editing from Device View (input already determined by button clicked)
+  - Cleaner, more focused dialog for managing actions on a specific button
+- **Action rebinding dialog enhancements**:
+  - Three-option dialog: Move, Duplicate, or Cancel
+  - Move: Remove action from original button and bind to new one
+  - Duplicate: Keep action on original button and add to new one (supports Star Citizen's multi-button mappings)
+  - Makes it clear what action is being taken when rebinding
+- **Duplicate action deduplication**:
+  - Remove duplicate actions from "ALL" category dropdown
+  - Remove duplicate actions from individual category dropdowns
+  - Same action appearing in multiple maps or with multiple bindings now shown only once
+  - Cleaner action selection experience with 585 unique actions instead of 621
 
 ### Fixed
 - Fixed Ctrl+letter modifier detection that was mapping to control characters (showing as squares/rectangles)
 - Fixed AltGr (Right Alt on non-US keyboards) blocking regular key input detection
+- Fixed duplicate actions appearing in "ALL" and category action dropdowns
 
 ## [0.6.0] - 2025-11-19
 
