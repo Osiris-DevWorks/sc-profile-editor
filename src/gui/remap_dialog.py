@@ -188,13 +188,14 @@ class RemapDialog(QDialog):
     # Signal emitted when bindings are changed
     bindings_changed = pyqtSignal(list)  # List of modified bindings
 
-    def __init__(self, input_code: str, profile: ControlProfile, parent=None, single_action_mode: bool = False, binding: 'ActionBinding' = None):
-        logger.info(f"RemapDialog.__init__ called with input_code={input_code}, single_action_mode={single_action_mode}, binding={binding is not None}")
+    def __init__(self, input_code: str, profile: ControlProfile, parent=None, single_action_mode: bool = False, binding: 'ActionBinding' = None, show_input_binding: bool = True):
+        logger.info(f"RemapDialog.__init__ called with input_code={input_code}, single_action_mode={single_action_mode}, binding={binding is not None}, show_input_binding={show_input_binding}")
         try:
             super().__init__(parent)
             self.input_code = input_code
             self.profile = profile
             self.single_action_mode = single_action_mode  # Hide "Add New Action" section when editing from table
+            self.show_input_binding = show_input_binding  # Hide "Change Input Binding" section when editing from device view
 
             # If a specific binding is provided (e.g., from table edit), use it directly
             # Otherwise, search for bindings by input code
@@ -328,6 +329,11 @@ class RemapDialog(QDialog):
         change_input_layout.addLayout(input_selection_layout)
 
         layout.addWidget(change_input_group)
+
+        # Hide "Change Input Binding" section when editing from device view
+        if not self.show_input_binding:
+            change_input_group.hide()
+
         layout.addSpacing(10)
 
         # === CURRENT ACTIONS SECTION ===

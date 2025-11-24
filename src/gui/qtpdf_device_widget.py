@@ -788,10 +788,11 @@ class QtPdfDeviceWidget(QWidget):
     def on_field_clicked(self, input_code: str, current_value: str):
         """Handle click on a PDF form field"""
         # Show remapping dialog with multi-action support
+        # Hide "Change Input Binding" section since input is already determined by the button clicked
         try:
             from gui.remap_dialog import RemapDialog
 
-            dialog = RemapDialog(input_code, self.current_profile, self)
+            dialog = RemapDialog(input_code, self.current_profile, self, show_input_binding=False)
             dialog.bindings_changed.connect(self.on_bindings_changed)
             dialog.exec()
         except Exception as e:
