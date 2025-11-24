@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Keyboard modifier support** - Full support for Ctrl, Alt, and Shift key modifiers:
+  - Detect and generate modifier key combinations (Ctrl+A, Alt+P, Shift+Down, etc.)
+  - Support for left and right modifier keys (lctrl, rctrl, lalt, ralt, lshift, rshift)
+  - Automatic detection when using "Detect Input" button in RemapDialog
+  - Correct handling of Ctrl+letter combinations (maps control characters back to letters)
+  - Support for AltGr (Right Alt) on non-US keyboards
+  - Input codes format: `kb1_{modifier}+{key}` (e.g., `kb1_lctrl+a`)
+  - Human-readable display: "Keyboard Left Ctrl+A", "Keyboard Right Alt+P", etc.
+
+### Fixed
+- Fixed Ctrl+letter modifier detection that was mapping to control characters (showing as squares/rectangles)
+- Fixed AltGr (Right Alt on non-US keyboards) blocking regular key input detection
+
 ## [0.6.0] - 2025-11-19
 
 ### Added
