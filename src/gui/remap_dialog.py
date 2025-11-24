@@ -538,18 +538,42 @@ class RemapDialog(QDialog):
         # Only show rebind warning if the action is bound to a different input
         # Unbound actions have input ending with underscore (e.g., "js1_ " or "js1_")
         is_bound = selected_binding.input_code and not selected_binding.input_code.rstrip().endswith('_')
+        action_was_moved = False
+
         if is_bound and selected_binding.input_code != self.input_code:
-            reply = QMessageBox.question(
-                self,
-                "Rebind Action",
-                f"The action '{selected_binding.action_name}' is currently bound to:\n"
+            # Create dialog with three button options: Move, Duplicate, Cancel
+            msg_box = QMessageBox(self)
+            msg_box.setWindowTitle("Action Already Mapped")
+            msg_box.setText(f"The action '{selected_binding.action_name}' is currently bound to:")
+            msg_box.setInformativeText(
                 f"  {selected_binding.input_code} ({InputValidator.get_input_description(selected_binding.input_code)})\n\n"
-                f"Do you want to move it to:\n"
-                f"  {self.input_code} ({InputValidator.get_input_description(self.input_code)})?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                f"What would you like to do?"
             )
 
-            if reply == QMessageBox.StandardButton.No:
+            # Add three custom buttons
+            move_btn = msg_box.addButton("Move", QMessageBox.ButtonRole.AcceptRole)
+            duplicate_btn = msg_box.addButton("Duplicate", QMessageBox.ButtonRole.ApplyRole)
+            cancel_btn = msg_box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+
+            msg_box.exec()
+
+            clicked_btn = msg_box.clickedButton()
+
+            if clicked_btn == cancel_btn:
+                return
+            elif clicked_btn == move_btn:
+                # Move: remove from old input and bind to new one
+                action_was_moved = True
+            elif clicked_btn == duplicate_btn:
+                # Duplicate: keep the action bound to the old input and add to new one
+                # Create a copy of the binding for the new input
+                selected_binding = ActionBinding(
+                    action_name=selected_binding.action_name,
+                    input_code=self.input_code,
+                    custom_label=selected_binding.custom_label
+                )
+                action_was_moved = False
+            else:
                 return
 
         # Bind the action to this button
