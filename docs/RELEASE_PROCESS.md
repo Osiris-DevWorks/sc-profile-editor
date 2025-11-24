@@ -230,7 +230,10 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 - [ ] Verify GitHub release is published
 - [ ] Test installer download and installation
-- [ ] Announce release (see step 11 for Discord webhook, or post manually to social media)
+- [ ] **Post to Discord** (see step 11 - this is REQUIRED, not optional):
+  ```bash
+  .venv\Scripts\python.exe scripts/discord_notify.py vX.Y.Z https://github.com/Osiris-RK/sc-profile-editor/releases/tag/vX.Y.Z
+  ```
 - [ ] Create new development branch for next version (if needed)
 - [ ] Update docs/CHANGELOG.md with new `[Unreleased]` section
 
