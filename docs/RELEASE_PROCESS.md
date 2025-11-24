@@ -118,6 +118,10 @@ This creates: `installer_output/SCProfileEditor-vX.Y.Z-Setup.exe`
    - Upload `dist/SCProfileEditor.exe` (optional, as standalone)
 
 4. **Publish Release**
+      - Look at previous release notes to make sure you're including sections included before
+      - Before officially publishing the release, review the release notes with the user. 
+      - Ask the user what the testing focus should be for the release.
+      - Publish the release when user gives approval
 
 5. **Verify Release is Live:**
    - Visit the release URL to confirm it's accessible

@@ -6,7 +6,7 @@ import sys
 import os
 import logging
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLabel, QPushButton,
-                              QComboBox, QTableWidget, QTableWidgetItem, QMessageBox)
+                              QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLineEdit, QFileDialog)
 from PyQt6.QtCore import Qt
 
 # Add parent directory to path
@@ -69,7 +69,7 @@ class ConfigTab(QWidget):
             "Map physical devices to joystick slots (js1, js2, js3, etc.).\n"
             "This helps keep your profile working when devices are connected in different order."
         )
-        instructions.setStyleSheet("color: #666; font-size: 10px; font-style: italic;")
+        instructions.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
         instructions.setWordWrap(True)
         mapping_layout.addWidget(instructions)
         mapping_layout.addSpacing(10)
@@ -101,6 +101,48 @@ class ConfigTab(QWidget):
         mapping_layout.addLayout(save_layout)
 
         layout.addWidget(mapping_group)
+
+        # === STAR CITIZEN PROFILES DIRECTORY SECTION ===
+        sc_dir_group = QGroupBox("Star Citizen Profiles Directory")
+        sc_dir_layout = QVBoxLayout()
+        sc_dir_group.setLayout(sc_dir_layout)
+
+        # Instructions
+        sc_instructions = QLabel(
+            "Specify the location of your Star Citizen control profiles.\n"
+            "This allows the app to easily import profiles from your SC installation."
+        )
+        sc_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
+        sc_instructions.setWordWrap(True)
+        sc_dir_layout.addWidget(sc_instructions)
+        sc_dir_layout.addSpacing(10)
+
+        # Directory path input
+        path_input_layout = QHBoxLayout()
+        path_input_layout.addWidget(QLabel("Directory:"))
+        self.sc_profiles_path_input = QLineEdit()
+        self.sc_profiles_path_input.setPlaceholderText("C:\\Program Files\\Roberts Space Industries\\StarCitizen\\LIVE\\USER\\Client\\0\\Controls\\Mappings")
+        self.sc_profiles_path_input.setText(self.settings.get_sc_profiles_directory())
+        path_input_layout.addWidget(self.sc_profiles_path_input)
+
+        # Browse button
+        browse_btn = QPushButton("Browse...")
+        browse_btn.setMaximumWidth(100)
+        browse_btn.clicked.connect(self.on_browse_sc_directory)
+        path_input_layout.addWidget(browse_btn)
+
+        sc_dir_layout.addLayout(path_input_layout)
+        sc_dir_layout.addSpacing(10)
+
+        # Save button
+        sc_save_btn = QPushButton("Save SC Directory")
+        sc_save_btn.clicked.connect(self.on_save_sc_directory_clicked)
+        sc_save_layout = QHBoxLayout()
+        sc_save_layout.addStretch()
+        sc_save_layout.addWidget(sc_save_btn)
+        sc_dir_layout.addLayout(sc_save_layout)
+
+        layout.addWidget(sc_dir_group)
         layout.addStretch()
 
     def refresh_devices(self):
@@ -205,3 +247,52 @@ class ConfigTab(QWidget):
     def on_save_config_clicked(self):
         """Handle Save Configuration button click"""
         self.save_device_config()
+
+    def on_browse_sc_directory(self):
+        """Handle Browse button click for Star Citizen directory"""
+        try:
+            current_path = self.sc_profiles_path_input.text()
+            if not current_path or not os.path.exists(current_path):
+                current_path = os.path.expandvars(r"C:\Program Files\Roberts Space Industries")
+
+            selected_dir = QFileDialog.getExistingDirectory(
+                self,
+                "Select Star Citizen Profiles Directory",
+                current_path,
+                QFileDialog.Option.ShowDirsOnly
+            )
+
+            if selected_dir:
+                self.sc_profiles_path_input.setText(selected_dir)
+                logger.info(f"Selected SC directory: {selected_dir}")
+
+        except Exception as e:
+            logger.error(f"Error browsing directory: {e}", exc_info=True)
+            QMessageBox.warning(self, "Browse Error", f"Failed to open directory browser:\n{e}")
+
+    def on_save_sc_directory_clicked(self):
+        """Handle Save SC Directory button click"""
+        try:
+            directory = self.sc_profiles_path_input.text().strip()
+
+            if not directory:
+                QMessageBox.warning(self, "Invalid Path", "Please enter a valid directory path.")
+                return
+
+            if not os.path.exists(directory):
+                reply = QMessageBox.question(
+                    self,
+                    "Directory Not Found",
+                    f"The directory does not exist:\n{directory}\n\nDo you want to save it anyway?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                )
+                if reply != QMessageBox.StandardButton.Yes:
+                    return
+
+            self.settings.set_sc_profiles_directory(directory)
+            logger.info(f"SC profiles directory saved: {directory}")
+            QMessageBox.information(self, "Success", "Star Citizen profiles directory saved successfully!")
+
+        except Exception as e:
+            logger.error(f"Error saving SC directory: {e}", exc_info=True)
+            QMessageBox.warning(self, "Save Error", f"Failed to save Star Citizen directory:\n{e}")

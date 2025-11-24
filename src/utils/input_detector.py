@@ -28,6 +28,14 @@ class InputDetectorThread(QThread):
         self.timeout_ms = timeout_ms
         self.running = False
         self.joystick_state: Dict[int, Dict] = {}  # Track joystick axis state for threshold detection
+        self.active_modifiers: Dict[str, bool] = {  # Track which modifier keys are pressed
+            "lctrl": False,
+            "rctrl": False,
+            "lalt": False,
+            "ralt": False,
+            "lshift": False,
+            "rshift": False,
+        }
 
     def run(self):
         """Run the input detection loop"""
@@ -57,7 +65,8 @@ class InputDetectorThread(QThread):
             try:
                 from pynput import keyboard
                 keyboard_listener = keyboard.Listener(
-                    on_press=lambda key: self._on_keyboard_press(key, keyboard_detected, keyboard_result)
+                    on_press=lambda key: self._on_keyboard_press(key, keyboard_detected, keyboard_result),
+                    on_release=lambda key: self._on_keyboard_release(key)
                 )
                 keyboard_listener.start()
             except Exception as e:
@@ -277,27 +286,150 @@ class InputDetectorThread(QThread):
             if not self.running:
                 return False  # Stop listener
 
+            # Track modifier keys
+            modifier_key_map = {
+                Key.ctrl_l: "lctrl",
+                Key.ctrl_r: "rctrl",
+                Key.alt_l: "lalt",
+                Key.alt_r: "ralt",
+                Key.shift_l: "lshift",
+                Key.shift_r: "rshift",
+            }
+
+            # If this is a modifier key being pressed, track it and continue listening
+            if key in modifier_key_map:
+                self.active_modifiers[modifier_key_map[key]] = True
+                return True  # Continue listening
+
+            # Get the currently active modifier (if any)
+            modifier = self._get_active_modifier_from_state()
+
             # Get key name
-            try:
-                if isinstance(key, Key):
-                    # Special keys
-                    key_name = key.name
-                else:
-                    # Regular character keys
-                    key_name = key.char if hasattr(key, 'char') else str(key)
-            except AttributeError:
-                key_name = str(key)
+            key_name = self._get_key_name_from_pynput_key(key, modifier)
+
+            # Skip if we couldn't determine a key name
+            if not key_name:
+                return True  # Continue listening
 
             # Map to Star Citizen format
-            input_code = f"kb1_{key_name}"
-            result_dict["code"] = input_code
-            result_dict["description"] = f"Keyboard {key_name.upper()}"
+            if modifier:
+                input_code = f"kb1_{modifier}+{key_name}"
+                result_dict["code"] = input_code
+                result_dict["description"] = f"Keyboard {self._format_modifier_description(modifier)}+{key_name.upper()}"
+            else:
+                input_code = f"kb1_{key_name}"
+                result_dict["code"] = input_code
+                result_dict["description"] = f"Keyboard {key_name.upper()}"
+
             detected_event.set()
             return False  # Stop listener
 
         except Exception as e:
             logger.debug(f"Error handling keyboard press: {e}")
             return True  # Continue listening
+
+    def _get_key_name_from_pynput_key(self, key, active_modifier: Optional[str] = None) -> Optional[str]:
+        """
+        Extract key name from pynput key object.
+        Handles special cases like Ctrl+letter combinations which pynput reports as control characters.
+
+        Args:
+            key: pynput key object
+            active_modifier: The active modifier (if any), used to map control characters back to letters
+
+        Returns:
+            Key name string or None if unable to determine
+        """
+        try:
+            from pynput.keyboard import Key
+
+            # Handle special Key enums
+            if isinstance(key, Key):
+                key_name = key.name
+                # Skip pure modifier-like keys
+                if key_name in ("ctrl", "alt", "shift", "cmd"):
+                    return None
+                return key_name
+
+            # Handle regular character keys
+            if hasattr(key, 'char'):
+                char = key.char
+
+                # When Ctrl is pressed, pynput reports control characters (ASCII 0x00-0x1F)
+                # We need to map them back to the original letters
+                if active_modifier and active_modifier in ("lctrl", "rctrl"):
+                    # Map control characters back to letters
+                    # Ctrl+A = 0x01, Ctrl+B = 0x02, ..., Ctrl+Z = 0x1A
+                    ctrl_char_map = {
+                        '\x01': 'a', '\x02': 'b', '\x03': 'c', '\x04': 'd', '\x05': 'e',
+                        '\x06': 'f', '\x07': 'g', '\x08': 'h', '\x09': 'i', '\x0a': 'j',
+                        '\x0b': 'k', '\x0c': 'l', '\x0d': 'm', '\x0e': 'n', '\x0f': 'o',
+                        '\x10': 'p', '\x11': 'q', '\x12': 'r', '\x13': 's', '\x14': 't',
+                        '\x15': 'u', '\x16': 'v', '\x17': 'w', '\x18': 'x', '\x19': 'y',
+                        '\x1a': 'z',
+                    }
+
+                    if char in ctrl_char_map:
+                        return ctrl_char_map[char]
+
+                return char
+
+            return str(key) if key else None
+
+        except Exception as e:
+            logger.debug(f"Error getting key name from pynput key: {e}")
+            return None
+
+    def _on_keyboard_release(self, key):
+        """Handle keyboard key release (callback from pynput)"""
+        try:
+            from pynput.keyboard import Key
+
+            if not self.running:
+                return False  # Stop listener
+
+            # Track modifier keys being released
+            modifier_key_map = {
+                Key.ctrl_l: "lctrl",
+                Key.ctrl_r: "rctrl",
+                Key.alt_l: "lalt",
+                Key.alt_r: "ralt",
+                Key.shift_l: "lshift",
+                Key.shift_r: "rshift",
+            }
+
+            if key in modifier_key_map:
+                self.active_modifiers[modifier_key_map[key]] = False
+
+            return True  # Continue listening
+
+        except Exception as e:
+            logger.debug(f"Error handling keyboard release: {e}")
+            return True  # Continue listening
+
+    def _get_active_modifier_from_state(self) -> Optional[str]:
+        """
+        Get the first active modifier from the tracked state.
+        Returns the modifier code (lctrl, rctrl, lalt, ralt, lshift, rshift) or None.
+        Only one modifier is returned (the first active one found).
+        """
+        # Check modifiers in order: ctrl, alt, shift (with left preference)
+        for modifier in ["lctrl", "rctrl", "lalt", "ralt", "lshift", "rshift"]:
+            if self.active_modifiers.get(modifier, False):
+                return modifier
+        return None
+
+    def _format_modifier_description(self, modifier: str) -> str:
+        """Format modifier code to human-readable description"""
+        modifier_map = {
+            "lctrl": "Left Ctrl",
+            "rctrl": "Right Ctrl",
+            "lalt": "Left Alt",
+            "ralt": "Right Alt",
+            "lshift": "Left Shift",
+            "rshift": "Right Shift",
+        }
+        return modifier_map.get(modifier, modifier)
 
     def _on_mouse_click(self, button, pressed, detected_event, result_dict):
         """Handle mouse button click (callback from pynput)"""
@@ -308,10 +440,13 @@ class InputDetectorThread(QThread):
                 return True  # Continue listening
 
             # Get button name
+            # Standard mouse button mapping: left=1, right=2, middle=3, x1=4, x2=5
             button_names = {
                 Button.left: ("mouse1", "Mouse Left"),
-                Button.middle: ("mouse2", "Mouse Middle"),
-                Button.right: ("mouse3", "Mouse Right"),
+                Button.right: ("mouse2", "Mouse Right"),
+                Button.middle: ("mouse3", "Mouse Middle"),
+                Button.x1: ("mouse4", "Mouse Button 4 (Side)"),
+                Button.x2: ("mouse5", "Mouse Button 5 (Side)"),
             }
 
             if button in button_names:

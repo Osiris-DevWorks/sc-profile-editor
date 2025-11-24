@@ -127,15 +127,22 @@ class MainWindow(QMainWindow):
 
         # Import button (leftmost)
         import_btn = QPushButton("Import Profile XML")
-        import_btn.setStyleSheet("padding: 10px 20px; font-size: 14px; background-color: #4CAF50; color: white;")
+        import_btn.setStyleSheet("QPushButton { padding: 10px 20px; font-size: 14px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; } QPushButton:hover { background-color: #45a049; }")
         import_btn.clicked.connect(self.import_profile)
         header_layout.addWidget(import_btn)
 
         # New Profile button
         new_profile_btn = QPushButton("New Profile")
-        new_profile_btn.setStyleSheet("padding: 10px 20px; font-size: 14px; background-color: #2196F3; color: white;")
+        new_profile_btn.setStyleSheet("QPushButton { padding: 10px 20px; font-size: 14px; background-color: #2196F3; color: white; border: none; border-radius: 4px; } QPushButton:hover { background-color: #0b7dda; }")
         new_profile_btn.clicked.connect(self.create_new_profile)
         header_layout.addWidget(new_profile_btn)
+
+        # Save Profile button (for remapped controls)
+        self.save_profile_btn = QPushButton("💾 Save Profile")
+        self.save_profile_btn.setStyleSheet("QPushButton { padding: 10px 20px; font-size: 14px; background-color: #2196F3; color: white; border: none; border-radius: 4px; } QPushButton:hover { background-color: #0b7dda; }")
+        self.save_profile_btn.clicked.connect(self.save_profile)
+        self.save_profile_btn.setEnabled(False)  # Disabled until profile is modified
+        header_layout.addWidget(self.save_profile_btn)
 
         # Export buttons
         self.export_csv_btn = QPushButton("Export CSV")
@@ -161,13 +168,6 @@ class MainWindow(QMainWindow):
         self.export_graphic_btn.clicked.connect(self.export_graphic)
         self.export_graphic_btn.setEnabled(False)
         header_layout.addWidget(self.export_graphic_btn)
-
-        # Save Profile button (for remapped controls)
-        self.save_profile_btn = QPushButton("💾 Save Profile")
-        self.save_profile_btn.setStyleSheet("padding: 10px 20px; font-size: 14px; background-color: #2196F3; color: white;")
-        self.save_profile_btn.clicked.connect(self.save_profile)
-        self.save_profile_btn.setEnabled(False)  # Disabled until profile is modified
-        header_layout.addWidget(self.save_profile_btn)
 
         # Help button (rightmost)
         help_btn = QPushButton("Help")
@@ -201,10 +201,10 @@ class MainWindow(QMainWindow):
         self.device_filter.currentTextChanged.connect(self.apply_filters)
         filter_layout.addWidget(self.device_filter, 1)
 
-        # Action Map filter
-        filter_layout.addWidget(QLabel("Action Map:"))
+        # Action Category filter
+        filter_layout.addWidget(QLabel("Action Category:"))
         self.actionmap_filter = QComboBox()
-        self.actionmap_filter.addItem("All Action Maps")
+        self.actionmap_filter.addItem("All Action Categories")
         self.actionmap_filter.currentTextChanged.connect(self.apply_filters)
         filter_layout.addWidget(self.actionmap_filter, 1)
 
@@ -638,7 +638,7 @@ class MainWindow(QMainWindow):
             device_name = device.product_name if device.product_name else device.device_type.capitalize()
             summary_parts.append(f"  - {device.device_type.capitalize()} {device.instance}: {device_name}")
 
-        summary_parts.append(f"\nAction Maps: {len(profile.action_maps)}")
+        summary_parts.append(f"\nAction Categories: {len(profile.action_maps)}")
         summary_parts.append(f"Total Bindings: {len(profile.get_all_bindings())}")
 
         if profile.categories:
@@ -828,10 +828,10 @@ class MainWindow(QMainWindow):
 
         self.device_filter.blockSignals(False)
 
-        # Update action map filter
+        # Update action category filter
         self.actionmap_filter.blockSignals(True)
         self.actionmap_filter.clear()
-        self.actionmap_filter.addItem("All Action Maps")
+        self.actionmap_filter.addItem("All Action Categories")
         for action_map in sorted(action_maps):
             self.actionmap_filter.addItem(action_map)
 
@@ -874,8 +874,8 @@ class MainWindow(QMainWindow):
                 if device_item and device_item.text() != device_filter:
                     show_row = False
 
-            # Action map filter
-            if show_row and actionmap_filter != "All Action Maps":
+            # Action category filter
+            if show_row and actionmap_filter != "All Action Categories":
                 actionmap_item = self.controls_table.item(row, 0)
                 if actionmap_item and actionmap_item.text() != actionmap_filter:
                     show_row = False
@@ -1047,7 +1047,8 @@ class MainWindow(QMainWindow):
         from gui.remap_dialog import RemapDialog
 
         # Open in single action mode (hides "Add New Action" section)
-        dialog = RemapDialog(binding.input_code, self.current_profile, self, single_action_mode=True)
+        # Pass the binding object directly to handle unmapped actions correctly
+        dialog = RemapDialog(binding.input_code, self.current_profile, self, single_action_mode=True, binding=binding)
         dialog.bindings_changed.connect(self.on_bindings_changed_from_table)
         dialog.exec()
 
@@ -1272,12 +1273,12 @@ class MainWindow(QMainWindow):
 
                 if is_detailed:
                     # Write header for detailed view (all columns)
-                    writer.writerow(["Action Map", "Action (Original)", "Action (Override)", "Input Code", "Input Label", "Device"])
+                    writer.writerow(["Action Category", "Action (Original)", "Action (Override)", "Input Code", "Input Label", "Device"])
                     visible_cols = [0, 1, 2, 3, 4, 5]
                 else:
                     # Write header for default view (4 columns)
-                    writer.writerow(["Action Map", "Action", "Input Label", "Device"])
-                    visible_cols = [0, 2, 4, 5]  # Action Map, Action (Override), Input Label, Device
+                    writer.writerow(["Action Category", "Action", "Input Label", "Device"])
+                    visible_cols = [0, 2, 4, 5]  # Action Category, Action (Override), Input Label, Device
 
                 # Write visible rows only
                 for row in range(self.controls_table.rowCount()):
@@ -1338,12 +1339,12 @@ class MainWindow(QMainWindow):
 
             if is_detailed:
                 # Detailed view header and columns
-                table_data = [["Action Map", "Action (Original)", "Action (Override)", "Input Code", "Input Label", "Device"]]
+                table_data = [["Action Category", "Action (Original)", "Action (Override)", "Input Code", "Input Label", "Device"]]
                 visible_cols = [0, 1, 2, 3, 4, 5]
                 col_widths = [1.3*inch, 1.5*inch, 1.5*inch, 1*inch, 1.5*inch, 1.2*inch]
             else:
                 # Default view header and columns
-                table_data = [["Action Map", "Action", "Input Label", "Device"]]
+                table_data = [["Action Category", "Action", "Input Label", "Device"]]
                 visible_cols = [0, 2, 4, 5]
                 col_widths = [2*inch, 3*inch, 2.5*inch, 1.5*inch]
 
@@ -1434,10 +1435,10 @@ class MainWindow(QMainWindow):
             is_detailed = self.show_detailed_checkbox.isChecked()
 
             if is_detailed:
-                headers = ["Action Map", "Action (Original)", "Action (Override)", "Input Code", "Input Label", "Device"]
+                headers = ["Action Category", "Action (Original)", "Action (Override)", "Input Code", "Input Label", "Device"]
                 visible_cols = [0, 1, 2, 3, 4, 5]
             else:
-                headers = ["Action Map", "Action", "Input Label", "Device"]
+                headers = ["Action Category", "Action", "Input Label", "Device"]
                 visible_cols = [0, 2, 4, 5]
 
             # Create table

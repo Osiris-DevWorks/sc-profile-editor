@@ -13,10 +13,14 @@ class InputValidator:
     BUTTON_PATTERN = re.compile(r'^js(\d+)_button(\d+)$')
     AXIS_PATTERN = re.compile(r'^js(\d+)_(x|y|z|rotx|roty|rotz|slider\d+)$')
     HAT_PATTERN = re.compile(r'^js(\d+)_hat(\d+)_(up|down|left|right)$')
-    KEYBOARD_PATTERN = re.compile(r'^kb(\d+)_(.+)$')
+    # Keyboard pattern with optional modifier: kb1_lctrl+a or kb1_a
+    KEYBOARD_PATTERN = re.compile(r'^kb(\d+)_(?:(lctrl|rctrl|lalt|ralt|lshift|rshift)\+)?(.+)$')
     MOUSE_PATTERN = re.compile(r'^mouse(\d+)$')
     MOUSEWHEEL_PATTERN = re.compile(r'^mwheel_(up|down)$')
     UNBOUND_PATTERN = re.compile(r'^(js|kb|mouse)(\d+)_ $')
+
+    # Valid modifier keys
+    VALID_MODIFIERS = {"lctrl", "rctrl", "lalt", "ralt", "lshift", "rshift"}
 
     # Valid activation modes
     ACTIVATION_MODES = [
@@ -112,8 +116,8 @@ class InputValidator:
                 "device_type": "keyboard",
                 "device_instance": int(match.group(1)),
                 "input_type": "key",
-                "input_value": match.group(2),
-                "input_detail": None
+                "input_value": match.group(3),  # Key is now in group 3 (after optional modifier)
+                "input_detail": match.group(2) if match.group(2) else None  # Modifier in group 2
             }
 
         # Try mouse pattern
@@ -180,7 +184,10 @@ class InputValidator:
 
         elif device_type == "keyboard":
             if input_type == "key":
-                return f"kb{device_instance}_{input_value}"
+                if input_detail and input_detail in cls.VALID_MODIFIERS:
+                    return f"kb{device_instance}_{input_detail}+{input_value}"
+                else:
+                    return f"kb{device_instance}_{input_value}"
             elif input_type == "unbound":
                 return f"kb{device_instance}_ "
 
@@ -216,13 +223,37 @@ class InputValidator:
         detail = parsed["input_detail"]
 
         if input_type == "button":
-            return f"{device} {instance} Button {value}"
+            # Special handling for mouse buttons with friendly names
+            if device == "Mouse":
+                mouse_button_names = {
+                    1: "Left Click",
+                    2: "Right Click",
+                    3: "Middle Click",
+                    4: "Button 4 (Side)",
+                    5: "Button 5 (Side)",
+                }
+                friendly_name = mouse_button_names.get(value, f"Button {value}")
+                return f"Mouse {friendly_name}"
+            else:
+                return f"{device} {instance} Button {value}"
         elif input_type == "axis":
             return f"{device} {instance} {value.upper()} Axis"
         elif input_type == "hat":
             return f"{device} {instance} Hat {value} {detail.upper()}"
         elif input_type == "key":
-            return f"Keyboard {value.upper()}"
+            # Format modifier key names for display
+            modifier_map = {
+                "lctrl": "Left Ctrl",
+                "rctrl": "Right Ctrl",
+                "lalt": "Left Alt",
+                "ralt": "Right Alt",
+                "lshift": "Left Shift",
+                "rshift": "Right Shift",
+            }
+            if detail and detail in modifier_map:
+                return f"Keyboard {modifier_map[detail]}+{value.upper()}"
+            else:
+                return f"Keyboard {value.upper()}"
         elif input_type == "wheel":
             return f"Mouse Wheel {value.upper()}"
         elif input_type == "unbound":

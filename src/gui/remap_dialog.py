@@ -188,15 +188,22 @@ class RemapDialog(QDialog):
     # Signal emitted when bindings are changed
     bindings_changed = pyqtSignal(list)  # List of modified bindings
 
-    def __init__(self, input_code: str, profile: ControlProfile, parent=None, single_action_mode: bool = False):
-        logger.info(f"RemapDialog.__init__ called with input_code={input_code}, single_action_mode={single_action_mode}")
+    def __init__(self, input_code: str, profile: ControlProfile, parent=None, single_action_mode: bool = False, binding: 'ActionBinding' = None):
+        logger.info(f"RemapDialog.__init__ called with input_code={input_code}, single_action_mode={single_action_mode}, binding={binding is not None}")
         try:
             super().__init__(parent)
             self.input_code = input_code
             self.profile = profile
             self.single_action_mode = single_action_mode  # Hide "Add New Action" section when editing from table
-            logger.debug(f"Finding bindings for input_code: {input_code}")
-            self.bindings_for_input = self.find_bindings_by_input_code(input_code)
+
+            # If a specific binding is provided (e.g., from table edit), use it directly
+            # Otherwise, search for bindings by input code
+            if binding is not None:
+                logger.debug(f"Using provided binding for action: {binding.action_name}")
+                self.bindings_for_input = [binding]
+            else:
+                logger.debug(f"Finding bindings for input_code: {input_code}")
+                self.bindings_for_input = self.find_bindings_by_input_code(input_code)
             self.deleted_bindings = []  # Track bindings to be deleted
 
             # Store all actions grouped by action map
@@ -293,7 +300,8 @@ class RemapDialog(QDialog):
         # Show current input
         current_input_text = self._get_current_input_display()
         desc_label = QLabel(f"<b>Current:</b> {current_input_text}")
-        desc_label.setStyleSheet("color: #333; font-size: 10px;")
+        # Use a stylesheet that respects the system theme - works in both light and dark mode
+        desc_label.setStyleSheet("QLabel { color: palette(text); font-size: 10px; }")
         self.desc_label = desc_label
         change_input_layout.addWidget(desc_label)
 
@@ -342,7 +350,8 @@ class RemapDialog(QDialog):
 
         # "No actions" placeholder
         self.no_actions_label = QLabel("No actions assigned to this button yet.")
-        self.no_actions_label.setStyleSheet("color: #999; font-style: italic; padding: 10px;")
+        # Use a stylesheet that respects the system theme - works in both light and dark mode
+        self.no_actions_label.setStyleSheet("QLabel { color: palette(text); font-style: italic; padding: 10px; opacity: 0.6; }")
         self.actions_container_layout.addWidget(self.no_actions_label)
 
         layout.addWidget(current_group, 1)  # Stretch this section
@@ -376,7 +385,8 @@ class RemapDialog(QDialog):
 
         # Show action description when selected
         self.action_desc_label = QLabel("")
-        self.action_desc_label.setStyleSheet("color: #666; font-size: 10px; font-style: italic;")
+        # Use a stylesheet that respects the system theme - works in both light and dark mode
+        self.action_desc_label.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
         self.action_desc_label.setWordWrap(True)
         add_layout.addWidget(self.action_desc_label)
         self.action_combo.currentIndexChanged.connect(self.on_action_selected)
@@ -556,10 +566,10 @@ class RemapDialog(QDialog):
 
     def accept_changes(self):
         """Accept and apply all changes"""
-        # Collect all modified bindings (with custom labels)
+        # Collect all modified bindings (with custom labels and updated input code)
         modified_bindings = []
 
-        # Update custom labels for all current bindings
+        # Update custom labels and input code for all current bindings
         for i, widget in enumerate(self.action_widgets):
             custom_label = widget.get_custom_label()
             binding = widget.binding
@@ -570,6 +580,11 @@ class RemapDialog(QDialog):
                 binding.custom_label = custom_label
             else:
                 binding.custom_label = None
+
+            # Update input code if it has changed
+            # For single_action_mode (editing from table), apply the current input code to the binding
+            if self.single_action_mode and binding in self.bindings_for_input:
+                binding.input_code = self.input_code
 
             modified_bindings.append(binding)
 

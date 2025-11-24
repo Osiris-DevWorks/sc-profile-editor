@@ -35,6 +35,12 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
+[CustomMessages]
+SCDirectoryPrompt=Star Citizen Profiles Directory
+SCDirectoryPromptDesc=Please specify your Star Citizen profiles directory for quick access to your control profiles.
+SCDirectoryDefaultDesc=This is typically located at:
+SCDirectoryDefaultPath=C:\Program Files\Roberts Space Industries\StarCitizen\LIVE\USER\Client\0\Controls\Mappings
+
 [Files]
 Source: "dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "assets\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
@@ -106,6 +112,10 @@ begin
   end;
 end;
 
+var
+  SCDirectoryPage: TInputDirWizardPage;
+  SCDirectoryPath: String;
+
 function InitializeSetup(): Boolean;
 var
   ResultCode: Integer;
@@ -141,6 +151,61 @@ begin
         // Cancel installation
         Result := False;
       end;
+    end;
+  end;
+end;
+
+procedure InitializeWizard();
+var
+  DefaultPath: String;
+begin
+  // Create custom page for Star Citizen directory selection
+  DefaultPath := ExpandConstant('{#MyAppVersion}');
+
+  // Check if default SC directory exists
+  if DirExists('C:\Program Files\Roberts Space Industries\StarCitizen\LIVE\USER\Client\0\Controls\Mappings') then
+    DefaultPath := 'C:\Program Files\Roberts Space Industries\StarCitizen\LIVE\USER\Client\0\Controls\Mappings'
+  else
+    DefaultPath := 'C:\Program Files\Roberts Space Industries';
+
+  SCDirectoryPage := CreateInputDirPage(
+    wpSelectTasks,
+    ExpandConstant('{cm:SCDirectoryPrompt}'),
+    ExpandConstant('{cm:SCDirectoryPromptDesc}'),
+    ExpandConstant('{cm:SCDirectoryDefaultDesc}' + #13#10 + '{cm:SCDirectoryDefaultPath}'),
+    False,
+    'Star Citizen Profiles'
+  );
+
+  SCDirectoryPage.Add('');
+  SCDirectoryPage.Values[0] := DefaultPath;
+end;
+
+procedure CurPageChanged(CurPageID: Integer);
+begin
+  // Store the selected directory path
+  if CurPageID = SCDirectoryPage.ID then
+  begin
+    SCDirectoryPath := SCDirectoryPage.Values[0];
+  end;
+end;
+
+procedure CurInstallProgressChanged(CurProgress, MaxProgress: Integer);
+begin
+  // Empty - just to satisfy the syntax
+end;
+
+procedure CurFinished(LastStep: TSetupStep);
+var
+  RegPath: String;
+begin
+  if LastStep = ssPostInstall then
+  begin
+    // Save the SC directory to registry
+    if SCDirectoryPath <> '' then
+    begin
+      RegPath := 'Software\SC Tools\Star Citizen Profile Viewer';
+      RegWriteStringValue(HKCU, RegPath, 'sc_profiles_directory', SCDirectoryPath);
     end;
   end;
 end;

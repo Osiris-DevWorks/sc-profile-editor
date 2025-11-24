@@ -99,3 +99,32 @@ class AppSettings:
         self.settings.remove("device_config")
         self.settings.sync()
         logger.info("Cleared device configuration")
+
+    def get_sc_profiles_directory(self) -> str:
+        """
+        Get the Star Citizen profiles directory path
+
+        Returns:
+            Path to Star Citizen profiles directory, or default path if not set
+        """
+        default_path = r"C:\Program Files\Roberts Space Industries\StarCitizen\LIVE\USER\Client\0\Controls\Mappings"
+        path = self.settings.value("sc_profiles_directory", default_path, type=str)
+        logger.debug(f"Retrieved SC profiles directory: {path}")
+        return path
+
+    def set_sc_profiles_directory(self, path: str):
+        """
+        Save the Star Citizen profiles directory path
+
+        Args:
+            path: Full path to the Star Citizen Mappings directory
+        """
+        self.settings.setValue("sc_profiles_directory", path)
+        self.settings.sync()
+        logger.info(f"Saved SC profiles directory: {path}")
+
+    def clear_sc_profiles_directory(self):
+        """Clear the Star Citizen profiles directory setting"""
+        self.settings.remove("sc_profiles_directory")
+        self.settings.sync()
+        logger.info("Cleared SC profiles directory")
