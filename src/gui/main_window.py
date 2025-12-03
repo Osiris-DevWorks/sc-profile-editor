@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                               QPushButton, QLabel, QFileDialog, QMessageBox,
                               QTextEdit, QTableWidget, QTableWidgetItem, QSplitter,
                               QLineEdit, QComboBox, QGroupBox, QCheckBox, QTabWidget,
-                              QStyledItemDelegate, QDialog, QTextBrowser)
+                              QStyledItemDelegate, QDialog, QTextBrowser, QInputDialog)
 from PyQt6.QtCore import Qt, QSortFilterProxyModel, QTimer, QUrl, QEvent
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QDesktopServices, QPixmap, QCursor
 import sys
@@ -177,7 +177,24 @@ class MainWindow(QMainWindow):
 
         main_layout.addLayout(header_layout)
 
-        # Profile info label
+        # Profile name section with editable field
+        profile_name_layout = QHBoxLayout()
+        profile_name_layout.setContentsMargins(5, 5, 5, 5)
+
+        profile_name_layout.addWidget(QLabel("Profile Name:"))
+        self.profile_name_input = QLineEdit()
+        self.profile_name_input.setPlaceholderText("Enter profile name...")
+        self.profile_name_input.setEnabled(False)
+        profile_name_layout.addWidget(self.profile_name_input, 1)
+
+        self.update_profile_name_btn = QPushButton("Update Name")
+        self.update_profile_name_btn.setEnabled(False)
+        self.update_profile_name_btn.clicked.connect(self.on_update_profile_name)
+        profile_name_layout.addWidget(self.update_profile_name_btn)
+
+        main_layout.addLayout(profile_name_layout)
+
+        # Profile info label (for other info)
         self.profile_info_label = QLabel("No profile loaded")
         self.profile_info_label.setStyleSheet("font-size: 12px; margin: 5px; color: #666;")
         main_layout.addWidget(self.profile_info_label)
@@ -624,6 +641,11 @@ class MainWindow(QMainWindow):
             return
 
         profile = self.current_profile
+
+        # Update profile name input field and enable editing
+        self.profile_name_input.setText(profile.profile_name)
+        self.profile_name_input.setEnabled(True)
+        self.update_profile_name_btn.setEnabled(True)
 
         # Update profile info label
         self.profile_info_label.setText(f"Profile: {profile.profile_name}")
@@ -1507,32 +1529,69 @@ class MainWindow(QMainWindow):
         if self.pdf_device_widget and self.pdf_device_widget.current_device:
             self.pdf_device_widget.load_device_pdf()
 
+    def on_update_profile_name(self):
+        """Handle profile name change from input field"""
+        if not self.current_profile:
+            return
+
+        new_name = self.profile_name_input.text().strip()
+
+        # Validate name is not empty
+        if not new_name:
+            QMessageBox.warning(self, "Invalid Name", "Profile name cannot be empty.")
+            self.profile_name_input.setText(self.current_profile.profile_name)
+            return
+
+        # Check if name actually changed
+        if new_name == self.current_profile.profile_name:
+            return
+
+        # Update profile name
+        self.current_profile.profile_name = new_name
+
+        # Mark as modified
+        self.current_profile.mark_modified()
+
+        # Update UI
+        self.profile_info_label.setText(f"Profile: {new_name}")
+        self.on_profile_modified()
+
+        logger.info(f"Profile name updated to: {new_name}")
+
     def save_profile(self):
         """Save the modified profile to XML"""
         if not self.current_profile or not self.current_profile.is_modified:
             return
 
-        # Get output path - use default naming with _scpe suffix
-        output_path = None
+        # Prompt user for profile name
+        profile_name, ok = QInputDialog.getText(
+            self,
+            "Profile Name",
+            "Enter a name for your profile:",
+            QLineEdit.EchoMode.Normal,
+            self.current_profile.profile_name  # Default to current name
+        )
 
+        if not ok or not profile_name.strip():
+            # User cancelled or entered empty name
+            return
+
+        # Update the profile name
+        profile_name = profile_name.strip()
+        self.current_profile.profile_name = profile_name
+
+        # Generate filename using layout_<name>.xml pattern
+        suggested_name = f"layout_{profile_name}.xml"
+
+        # Determine default directory
         if self.current_profile.source_xml_path:
-            # Generate default filename with _scpe suffix
-            source_path = self.current_profile.source_xml_path
-            base_name = os.path.splitext(os.path.basename(source_path))[0]
-
-            # Remove _exported suffix if present
-            if base_name.endswith('_exported'):
-                base_name = base_name[:-9]
-
-            suggested_name = f"{base_name}_scpe.xml"
-            suggested_dir = os.path.dirname(source_path)
+            suggested_dir = os.path.dirname(self.current_profile.source_xml_path)
             default_path = os.path.join(suggested_dir, suggested_name)
         else:
-            # No source path, use profile name
-            suggested_name = f"{self.current_profile.profile_name}_scpe.xml"
+            # No source path, use current directory
             default_path = suggested_name
 
-        # Show save dialog with default name
+        # Show save dialog with generated filename
         output_path, _ = QFileDialog.getSaveFileName(
             self,
             "Export Profile",
