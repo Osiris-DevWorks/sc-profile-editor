@@ -6,7 +6,8 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                               QPushButton, QLabel, QFileDialog, QMessageBox,
                               QTextEdit, QTableWidget, QTableWidgetItem, QSplitter,
                               QLineEdit, QComboBox, QGroupBox, QCheckBox, QTabWidget,
-                              QStyledItemDelegate, QDialog, QTextBrowser, QInputDialog)
+                              QStyledItemDelegate, QDialog, QTextBrowser, QInputDialog,
+                              QListWidget, QListWidgetItem)
 from PyQt6.QtCore import Qt, QSortFilterProxyModel, QTimer, QUrl, QEvent
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QDesktopServices, QPixmap, QCursor
 import sys
