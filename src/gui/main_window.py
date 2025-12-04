@@ -1818,6 +1818,7 @@ class MainWindow(QMainWindow):
         lines = markdown_text.split('\n')
         in_code_block = False
         in_list = False
+        in_blockquote = False
 
         for line in lines:
             # Code blocks
@@ -1834,33 +1835,79 @@ class MainWindow(QMainWindow):
                 html += line + "\n"
                 continue
 
+            # Skip image badges (![...])
+            if line.strip().startswith('!['):
+                continue
+
             # Headers (with anchor IDs for links)
             if line.startswith('# '):
+                if in_list:
+                    html += f"</{in_list}>"
+                    in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 header_text = line[2:].strip()
                 anchor_id = self.create_anchor_id(header_text)
                 html += f"<h1 id='{anchor_id}'>{header_text}</h1>"
             elif line.startswith('## '):
+                if in_list:
+                    html += f"</{in_list}>"
+                    in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 header_text = line[3:].strip()
                 anchor_id = self.create_anchor_id(header_text)
                 html += f"<h2 id='{anchor_id}'>{header_text}</h2>"
             elif line.startswith('### '):
+                if in_list:
+                    html += f"</{in_list}>"
+                    in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 header_text = line[4:].strip()
                 anchor_id = self.create_anchor_id(header_text)
                 html += f"<h3 id='{anchor_id}'>{header_text}</h3>"
             elif line.startswith('#### '):
+                if in_list:
+                    html += f"</{in_list}>"
+                    in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 header_text = line[5:].strip()
                 anchor_id = self.create_anchor_id(header_text)
                 html += f"<h4 id='{anchor_id}'>{header_text}</h4>"
+            # Blockquotes
+            elif line.strip().startswith('> '):
+                if in_list:
+                    html += f"</{in_list}>"
+                    in_list = False
+                if not in_blockquote:
+                    html += "<blockquote>"
+                    in_blockquote = True
+                blockquote_text = line.strip()[2:].strip()
+                html += f"{self.format_inline_markdown(blockquote_text)}<br/>"
             # Ordered lists
-            elif line.strip().startswith(tuple(f"{i}. " for i in range(1, 100))):
-                if not in_list:
+            elif line.strip() and line.strip()[0].isdigit() and '. ' in line.strip()[:4]:
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
+                if in_list != 'ol':
+                    if in_list:
+                        html += f"</{in_list}>"
                     html += "<ol>"
                     in_list = 'ol'
                 # Extract the list item text (after the number and period)
-                item_text = line.strip().split('. ', 1)[1] if '. ' in line else line.strip()
+                item_text = line.strip().split('. ', 1)[1] if '. ' in line.strip() else line.strip()
                 html += f"<li>{self.format_inline_markdown(item_text)}</li>"
             # Unordered lists
             elif line.strip().startswith('- ') or line.strip().startswith('* '):
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 if in_list != 'ul':
                     if in_list:
                         html += f"</{in_list}>"
@@ -1872,22 +1919,33 @@ class MainWindow(QMainWindow):
                 if in_list:
                     html += f"</{in_list}>"
                     in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 html += "<hr/>"
             # Empty line
             elif not line.strip():
                 if in_list:
                     html += f"</{in_list}>"
                     in_list = False
-                html += "<br/>"
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
+                # Don't add extra breaks, just skip empty lines
             # Regular paragraph
             else:
                 if in_list:
                     html += f"</{in_list}>"
                     in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 html += f"<p>{self.format_inline_markdown(line)}</p>"
 
         if in_list:
             html += f"</{in_list}>"
+        if in_blockquote:
+            html += "</blockquote>"
 
         html += "</body></html>"
         return html
