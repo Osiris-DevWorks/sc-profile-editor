@@ -1755,15 +1755,15 @@ class MainWindow(QMainWindow):
         # Content area layout (horizontal: sidebar + browser)
         content_layout = QHBoxLayout()
 
+        # Text browser for displaying markdown as HTML
+        browser = QTextBrowser()
+        browser.setOpenExternalLinks(True)
+
         # Create sidebar for table of contents
         toc_widget = QListWidget()
         toc_widget.setMaximumWidth(250)
         toc_widget.itemClicked.connect(lambda item: self.navigate_to_section(browser, item.data(Qt.UserRole)))
         content_layout.addWidget(toc_widget)
-
-        # Text browser for displaying markdown as HTML
-        browser = QTextBrowser()
-        browser.setOpenExternalLinks(True)
         content_layout.addWidget(browser)
 
         main_layout.addLayout(content_layout)
