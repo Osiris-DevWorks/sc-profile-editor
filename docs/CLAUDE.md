@@ -8,9 +8,9 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 
 ## Current Status
 
-**Version:** 0.6.0 (in development)
-**Current Branch:** v0.6.0-profile-editing (active development)
-**Status:** Table-based input editing, keyboard modifiers, device view improvements, and action management enhancements
+**Version:** 0.6.1 (in development)
+**Current Branch:** v0.6.1-development (active development)
+**Status:** Device configuration and hot-swap detection, keyboard modifiers, device view improvements, and action management enhancements
 **Platform:** Windows (PyInstaller executable)
 
 ## Implemented Features
@@ -280,7 +280,16 @@ cmd //c scripts\build\build_all.bat
 
 ### Recent Important Changes
 
-#### v0.6.0 (In Development)
+#### v0.6.1 (In Development)
+- **Device Configuration Tab**: New Config tab for managing connected devices and device-to-joystick mappings
+- **Device hot-swap detection**: Pygame reinitialization enables detection of newly connected devices without restart
+- **Device cleanup**: Disconnected devices completely removed from mapping list (no "unavailable" placeholders)
+- **Auto-populate mappings**: Automatically map connected joysticks to js1, js2, js3 with one click
+- **Device View warnings**: Warning popup when loading profile with disconnected devices
+- **Input detection fixes**: Replaced python-dinput with pygame, fixed modal dialog suppression of keyboard listener
+- **Device mapping application**: Input detection now applies Config tab device mappings automatically
+
+#### v0.6.0
 - **Keyboard modifier support**: Full support for Ctrl, Alt, Shift modifiers with left/right distinction
 - **Table-based input editing**: Edit inputs directly from Controls Table with Edit button
 - **Device view improvements**: Hide "Change Input Binding" section when editing from Device View
