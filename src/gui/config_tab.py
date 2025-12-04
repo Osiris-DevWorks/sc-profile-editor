@@ -95,13 +95,21 @@ class ConfigTab(QWidget):
 
         mapping_layout.addSpacing(10)
 
-        # Save button
+        # Auto-populate and Save buttons
+        button_layout = QHBoxLayout()
+
+        auto_populate_btn = QPushButton("Auto-Populate from Connected Devices")
+        auto_populate_btn.setToolTip("Automatically map connected joysticks to js1, js2, js3 based on detection order")
+        auto_populate_btn.clicked.connect(self.on_auto_populate_clicked)
+        button_layout.addWidget(auto_populate_btn)
+
+        button_layout.addStretch()
+
         save_btn = QPushButton("Save Configuration")
         save_btn.clicked.connect(self.on_save_config_clicked)
-        save_layout = QHBoxLayout()
-        save_layout.addStretch()
-        save_layout.addWidget(save_btn)
-        mapping_layout.addLayout(save_layout)
+        button_layout.addWidget(save_btn)
+
+        mapping_layout.addLayout(button_layout)
 
         layout.addWidget(mapping_group)
 
@@ -249,6 +257,51 @@ class ConfigTab(QWidget):
         """Handle Refresh Devices button click"""
         self.refresh_devices()
         QMessageBox.information(self, "Devices Refreshed", f"Found {len(self.current_devices)} device(s)")
+
+    def on_auto_populate_clicked(self):
+        """Auto-populate device mappings from connected joysticks"""
+        try:
+            # Get list of connected joystick devices
+            joysticks = [d for d in self.current_devices if d.get('type') == 'joystick']
+
+            if not joysticks:
+                QMessageBox.warning(self, "No Joysticks", "No joystick devices are currently connected.")
+                return
+
+            # Sort by instance to ensure consistent ordering
+            joysticks.sort(key=lambda d: d.get('instance', 0))
+
+            logger.info(f"Auto-populating device mappings for {len(joysticks)} joystick(s)")
+
+            # Map first N joysticks to js1, js2, js3, etc.
+            for idx, device in enumerate(joysticks, 1):
+                if idx > 3:
+                    # Only map up to js3 for now
+                    break
+
+                js_label = f"js{idx}"
+                device_name = device.get('name', f"Joystick {idx}")
+
+                # Find and select this device in the corresponding combo
+                if js_label in self.mapping_combos:
+                    combo = self.mapping_combos[js_label]
+                    for i in range(combo.count()):
+                        if combo.itemData(i) == device_name:
+                            combo.setCurrentIndex(i)
+                            logger.info(f"Mapped {js_label} to {device_name}")
+                            break
+
+            # Show summary message
+            summary = f"Auto-populated {len(joysticks)} joystick device mapping(s):\n\n"
+            for idx, device in enumerate(joysticks[:3], 1):
+                summary += f"js{idx}: {device.get('name', f'Joystick {idx}')}\n"
+
+            QMessageBox.information(self, "Auto-Population Complete", summary)
+            logger.info(f"Auto-populated device mappings: {summary}")
+
+        except Exception as e:
+            logger.error(f"Error auto-populating device mappings: {e}", exc_info=True)
+            QMessageBox.warning(self, "Auto-Population Error", f"Failed to auto-populate device mappings:\n{e}")
 
     def on_save_config_clicked(self):
         """Handle Save Configuration button click"""
