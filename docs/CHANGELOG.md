@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - In Development
+
+### Added
+- **10 Complete Device Templates** - Completing support for remaining Thrustmaster, VKB, and Virpil devices:
+  - Thrustmaster T.16000M FCS Joystick
+  - Thrustmaster TWCS Throttle Unit
+  - VKB STECS Throttle with variants (ATEM, Space Throttle Grip Left/Right, STEM)
+  - VKB Throttle Quadrant V (standard and WW2 module)
+  - Virpil MongoosT-50CM3 (Left and Right variants)
+- **Documentation Enhancements**:
+  - Comprehensive field_mapping.json documentation for complex button layouts
+  - .build-ignore file usage guide for managing incomplete templates
+  - v0.7.0 Development Plan with completion workflow for all devices
+  - Consistent Version/Date/For headers across all documentation
+
 ## [0.6.1] - 2025-12-03
 
 ### Added

@@ -12,9 +12,10 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 
 ## Current Status
 
-**Version:** 0.6.1 (in development)
-**Current Branch:** v0.6.1-development (active development)
-**Status:** Device configuration and hot-swap detection, keyboard modifiers, device view improvements, and action management enhancements
+**Version:** 0.7.0 (in development)
+**Current Branch:** v0.7.0-development (active development)
+**Status:** Completing device template support for Thrustmaster, VKB, and Virpil devices
+**Previous Release:** 0.6.1 (completed 2025-12-03)
 **Platform:** Windows (PyInstaller executable)
 
 ## Implemented Features
@@ -284,7 +285,14 @@ cmd //c scripts\build\build_all.bat
 
 ### Recent Important Changes
 
-#### v0.6.1 (In Development)
+#### v0.7.0 (In Development)
+- **Device template completion**: Focus on completing 10 incomplete device templates (Thrustmaster, VKB, Virpil)
+- **Documentation enhancements**: Added field_mapping.json documentation for complex button layouts
+- **Build-ignore system**: Documented .build-ignore file usage for managing incomplete templates
+- **Development planning**: Created comprehensive v0.7.0 development plan with completion workflow
+- **Header standardization**: Added consistent Version/Date/For headers to all documentation files
+
+#### v0.6.1 (Released 2025-12-03)
 - **Device Configuration Tab**: New Config tab for managing connected devices and device-to-joystick mappings
 - **Device hot-swap detection**: Pygame reinitialization enables detection of newly connected devices without restart
 - **Device cleanup**: Disconnected devices completely removed from mapping list (no "unavailable" placeholders)
