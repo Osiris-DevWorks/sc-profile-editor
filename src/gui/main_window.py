@@ -1743,72 +1743,110 @@ class MainWindow(QMainWindow):
 
     def show_help(self):
         """Show the user guide in a dialog with TOC sidebar"""
-        # Create help dialog
-        help_dialog = QDialog(self)
-        help_dialog.setWindowTitle(f"User Guide - Star Citizen Profile Editor v{self.version}")
-        help_dialog.setGeometry(100, 100, 1200, 800)
-
-        # Main layout
-        main_layout = QVBoxLayout()
-        help_dialog.setLayout(main_layout)
-
-        # Content area layout (horizontal: sidebar + browser)
-        content_layout = QHBoxLayout()
-
-        # Text browser for displaying markdown as HTML
-        browser = QTextBrowser()
-        browser.setOpenExternalLinks(True)
-
-        # Create sidebar for table of contents
-        toc_widget = QListWidget()
-        toc_widget.setMaximumWidth(250)
-        toc_widget.itemClicked.connect(lambda item: self.navigate_to_section(browser, item.data(Qt.UserRole)))
-        content_layout.addWidget(toc_widget)
-        content_layout.addWidget(browser)
-
-        main_layout.addLayout(content_layout)
-
-        # Load the README.md file
-        user_guide_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            "README.md"
-        )
-
+        logger.info("=== show_help() called ===")
         try:
-            with open(user_guide_path, 'r', encoding='utf-8') as f:
-                markdown_content = f.read()
+            # Create help dialog
+            logger.info("Creating help dialog...")
+            help_dialog = QDialog(self)
+            help_dialog.setWindowTitle(f"User Guide - Star Citizen Profile Editor v{self.version}")
+            help_dialog.setGeometry(100, 100, 1200, 800)
+            logger.info("Help dialog created successfully")
 
-            # Extract headings for TOC and convert markdown to HTML
-            headings = self.extract_headings(markdown_content)
+            # Main layout
+            logger.info("Creating main layout...")
+            main_layout = QVBoxLayout()
+            help_dialog.setLayout(main_layout)
+            logger.info("Main layout set")
 
-            # Populate TOC
-            for heading_level, heading_text in headings:
-                item = QListWidgetItem(heading_text)
-                anchor_id = self.create_anchor_id(heading_text)
-                item.setData(Qt.UserRole, anchor_id)
-                # Indent sub-headings
-                if heading_level > 2:
-                    item.setText("  " * (heading_level - 2) + heading_text)
-                toc_widget.addItem(item)
+            # Content area layout (horizontal: sidebar + browser)
+            logger.info("Creating content layout...")
+            content_layout = QHBoxLayout()
 
-            # Convert markdown to HTML
-            html_content = self.markdown_to_html(markdown_content)
-            browser.setHtml(html_content)
+            # Text browser for displaying markdown as HTML
+            logger.info("Creating text browser...")
+            browser = QTextBrowser()
+            browser.setOpenExternalLinks(True)
+            logger.info("Text browser created")
 
-        except FileNotFoundError:
-            browser.setHtml("<h1>User Guide Not Found</h1><p>The README.md file could not be found.</p>")
+            # Create sidebar for table of contents
+            logger.info("Creating TOC widget...")
+            toc_widget = QListWidget()
+            toc_widget.setMaximumWidth(250)
+            logger.info("Connecting TOC signal...")
+            toc_widget.itemClicked.connect(lambda item: self.navigate_to_section(browser, item.data(Qt.UserRole)))
+            logger.info("TOC signal connected")
+            content_layout.addWidget(toc_widget)
+            content_layout.addWidget(browser)
+            logger.info("Widgets added to content layout")
+
+            main_layout.addLayout(content_layout)
+            logger.info("Content layout added to main layout")
+
+            # Load the README.md file
+            logger.info("Finding README.md file...")
+            user_guide_path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                "README.md"
+            )
+            logger.info(f"README.md path: {user_guide_path}")
+
+            try:
+                logger.info("Opening README.md...")
+                with open(user_guide_path, 'r', encoding='utf-8') as f:
+                    markdown_content = f.read()
+                logger.info(f"README.md loaded: {len(markdown_content)} characters")
+
+                # Extract headings for TOC and convert markdown to HTML
+                logger.info("Extracting headings...")
+                headings = self.extract_headings(markdown_content)
+                logger.info(f"Found {len(headings)} headings")
+
+                # Populate TOC
+                logger.info("Populating TOC...")
+                for heading_level, heading_text in headings:
+                    logger.debug(f"Adding TOC item: level={heading_level}, text='{heading_text}'")
+                    item = QListWidgetItem(heading_text)
+                    anchor_id = self.create_anchor_id(heading_text)
+                    logger.debug(f"Anchor ID: {anchor_id}")
+                    item.setData(Qt.UserRole, anchor_id)
+                    # Indent sub-headings
+                    if heading_level > 2:
+                        item.setText("  " * (heading_level - 2) + heading_text)
+                    toc_widget.addItem(item)
+                logger.info(f"TOC populated with {toc_widget.count()} items")
+
+                # Convert markdown to HTML
+                logger.info("Converting markdown to HTML...")
+                html_content = self.markdown_to_html(markdown_content)
+                logger.info(f"HTML generated: {len(html_content)} characters")
+                logger.info("Setting HTML content in browser...")
+                browser.setHtml(html_content)
+                logger.info("HTML content set successfully")
+
+            except FileNotFoundError as e:
+                logger.error(f"README.md not found: {e}")
+                browser.setHtml("<h1>User Guide Not Found</h1><p>The README.md file could not be found.</p>")
+            except Exception as e:
+                logger.error(f"Error loading guide: {e}", exc_info=True)
+                browser.setHtml(f"<h1>Error Loading Guide</h1><p>{str(e)}</p>")
+
+            # Close button
+            logger.info("Creating close button...")
+            button_layout = QHBoxLayout()
+            close_btn = QPushButton("Close")
+            close_btn.clicked.connect(help_dialog.close)
+            button_layout.addStretch()
+            button_layout.addWidget(close_btn)
+            main_layout.addLayout(button_layout)
+            logger.info("Close button added")
+
+            logger.info("Showing help dialog...")
+            help_dialog.exec()
+            logger.info("Help dialog closed")
+
         except Exception as e:
-            browser.setHtml(f"<h1>Error Loading Guide</h1><p>{str(e)}</p>")
-
-        # Close button
-        button_layout = QHBoxLayout()
-        close_btn = QPushButton("Close")
-        close_btn.clicked.connect(help_dialog.close)
-        button_layout.addStretch()
-        button_layout.addWidget(close_btn)
-        main_layout.addLayout(button_layout)
-
-        help_dialog.exec()
+            logger.error(f"Fatal error in show_help(): {e}", exc_info=True)
+            QMessageBox.critical(self, "Help Dialog Error", f"Failed to show help dialog:\n{str(e)}")
 
     def markdown_to_html(self, markdown_text):
         """Convert markdown to HTML (basic implementation)"""
