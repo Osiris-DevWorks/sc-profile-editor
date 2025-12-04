@@ -79,7 +79,7 @@ After importing a profile, you'll see:
 The application is organized into three main tabs:
 
 1. **Controls Table** - View and edit all your control bindings in a searchable, filterable table
-2. **Device View** - See visual representations of your controllers with labeled buttons
+2. **Device View** - See visual representations of your controllers with labeled buttons; click buttons to edit their bindings
 3. **Config** - Manage connected devices and configure device-to-joystick mappings
 4. **About** - Project information and acknowledgements
 
