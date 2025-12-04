@@ -527,23 +527,21 @@ class InputDetector:
                 pygame.joystick.init()
 
                 joystick_count = pygame.joystick.get_count()
+                instance_counter = 0
 
                 for i in range(joystick_count):
                     try:
                         joy = pygame.joystick.Joystick(i)
                         joy.init()
+                        instance_counter += 1
                         devices.append({
                             "type": "joystick",
-                            "instance": i + 1,
-                            "name": f"Joystick {i + 1}: {joy.get_name()}"
+                            "instance": instance_counter,
+                            "name": joy.get_name()
                         })
                     except Exception as e:
                         logger.debug(f"Could not initialize joystick {i}: {e}")
-                        devices.append({
-                            "type": "joystick",
-                            "instance": i + 1,
-                            "name": f"Joystick {i + 1} (unavailable)"
-                        })
+                        # Skip unavailable joysticks instead of adding them to the list
 
             except ImportError:
                 logger.warning("pygame not available, joystick detection skipped")
