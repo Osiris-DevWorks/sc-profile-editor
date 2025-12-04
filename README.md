@@ -50,20 +50,6 @@ You can download SC Profile Editor from the [GitHub Releases page](https://githu
 
 ---
 
-## Table of Contents
-- [Getting Started](#getting-started)
-- [Main Features](#main-features)
-- [Device Configuration](#device-configuration)
-- [Control Table Views](#control-table-views)
-- [Input Detection & Remapping](#input-detection--remapping)
-- [Customizing Labels](#customizing-labels)
-- [Device View](#device-view)
-- [Exporting Your Profile](#exporting-your-profile)
-- [Filters and Search](#filters-and-search)
-- [Tips and Tricks](#tips-and-tricks)
-
----
-
 ## Getting Started
 
 ### Importing a Profile
