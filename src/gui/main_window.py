@@ -1786,26 +1786,33 @@ class MainWindow(QMainWindow):
 
     def markdown_to_html(self, markdown_text):
         """Convert markdown to HTML (basic implementation)"""
+        # Get theme-aware colors from the application palette
+        palette = self.palette()
+        text_color = palette.color(palette.ColorRole.Text).name()
+        base_color = palette.color(palette.ColorRole.Base).name()
+        link_color = palette.color(palette.ColorRole.Link).name()
+
+        # Increase font sizes for better readability
         html = "<html><head><style>"
-        html += "body { font-family: Arial, sans-serif; line-height: 1.8; padding: 20px; font-size: 14px; }"
-        html += "h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; font-size: 32px; font-weight: bold; margin-top: 20px; }"
-        html += "h2 { color: #34495e; border-bottom: 2px solid #95a5a6; padding-bottom: 5px; margin-top: 30px; font-size: 26px; font-weight: bold; }"
-        html += "h3 { color: #555; margin-top: 20px; font-size: 20px; font-weight: bold; }"
-        html += "h4 { color: #666; margin-top: 15px; font-size: 16px; font-weight: bold; }"
-        html += "p { font-size: 14px; margin: 10px 0; }"
-        html += "li { font-size: 14px; margin: 5px 0; }"
-        html += "a { color: #3498db; text-decoration: none; }"
-        html += "a:hover { text-decoration: underline; }"
-        html += "code { background-color: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 13px; }"
-        html += "pre { background-color: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; font-size: 13px; }"
-        html += "ul { margin-left: 20px; font-size: 14px; }"
-        html += "ol { margin-left: 20px; font-size: 14px; }"
-        html += "strong { color: #2c3e50; font-weight: bold; }"
-        html += "blockquote { border-left: 4px solid #3498db; padding-left: 15px; color: #555; font-style: italic; font-size: 14px; }"
-        html += "table { border-collapse: collapse; width: 100%; margin: 20px 0; }"
-        html += "th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }"
-        html += "th { background-color: #3498db; color: white; font-weight: bold; }"
-        html += "tr:nth-child(even) { background-color: #f2f2f2; }"
+        html += f"body {{ font-family: Segoe UI, Arial, sans-serif; line-height: 1.8; padding: 20px; font-size: 16px; color: {text_color}; background-color: {base_color}; }}"
+        html += f"h1 {{ color: {link_color}; border-bottom: 3px solid {link_color}; padding-bottom: 10px; font-size: 36px; font-weight: bold; margin-top: 20px; }}"
+        html += f"h2 {{ color: {link_color}; border-bottom: 2px solid {link_color}; padding-bottom: 5px; margin-top: 30px; font-size: 28px; font-weight: bold; }}"
+        html += f"h3 {{ color: {link_color}; margin-top: 20px; font-size: 22px; font-weight: bold; }}"
+        html += f"h4 {{ color: {link_color}; margin-top: 15px; font-size: 18px; font-weight: bold; }}"
+        html += f"p {{ font-size: 16px; margin: 10px 0; color: {text_color}; }}"
+        html += f"li {{ font-size: 16px; margin: 5px 0; color: {text_color}; }}"
+        html += f"a {{ color: {link_color}; text-decoration: none; }}"
+        html += f"a:hover {{ text-decoration: underline; }}"
+        html += f"code {{ background-color: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 15px; color: {text_color}; }}"
+        html += f"pre {{ background-color: rgba(0,0,0,0.05); padding: 10px; border-radius: 5px; overflow-x: auto; font-size: 15px; color: {text_color}; }}"
+        html += f"ul {{ margin-left: 20px; font-size: 16px; }}"
+        html += f"ol {{ margin-left: 20px; font-size: 16px; }}"
+        html += f"strong {{ color: {text_color}; font-weight: bold; }}"
+        html += f"blockquote {{ border-left: 4px solid {link_color}; padding-left: 15px; color: {text_color}; font-style: italic; font-size: 16px; }}"
+        html += f"table {{ border-collapse: collapse; width: 100%; margin: 20px 0; }}"
+        html += f"th, td {{ border: 1px solid {link_color}; padding: 10px; text-align: left; font-size: 16px; color: {text_color}; }}"
+        html += f"th {{ background-color: {link_color}; color: white; font-weight: bold; }}"
+        html += f"tr:nth-child(even) {{ background-color: rgba(0,0,0,0.03); }}"
         html += "</style></head><body>"
 
         lines = markdown_text.split('\n')
