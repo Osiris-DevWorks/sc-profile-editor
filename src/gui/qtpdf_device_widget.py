@@ -792,9 +792,12 @@ class QtPdfDeviceWidget(QWidget):
         try:
             from gui.remap_dialog import RemapDialog
 
+            # Use non-modal dialog to avoid Windows keyboard listener suppression
             dialog = RemapDialog(input_code, self.current_profile, self, show_input_binding=False)
             dialog.bindings_changed.connect(self.on_bindings_changed)
-            dialog.exec()
+            dialog.setWindowModality(Qt.WindowModality.NonModal)
+            dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+            dialog.show()
         except Exception as e:
             logger.error(f"Error showing remap dialog: {e}", exc_info=True)
             QMessageBox.critical(

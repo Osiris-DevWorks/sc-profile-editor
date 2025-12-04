@@ -1013,9 +1013,12 @@ class MainWindow(QMainWindow):
 
         from gui.remap_dialog import RemapDialog
 
+        # Use non-modal dialog to avoid Windows keyboard listener suppression
         dialog = RemapDialog(binding.input_code, self.current_profile, self)
         dialog.bindings_changed.connect(self.on_bindings_changed_from_table)
-        dialog.exec()
+        dialog.setWindowModality(Qt.WindowModality.NonModal)
+        dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        dialog.show()
 
     def on_binding_remapped(self, binding, new_input_code: str, new_label: str, new_activation_mode: str):
         """Handle binding changes from the remapping dialog"""
@@ -1070,9 +1073,12 @@ class MainWindow(QMainWindow):
 
         # Open in single action mode (hides "Add New Action" section)
         # Pass the binding object directly to handle unmapped actions correctly
+        # Use non-modal dialog to avoid Windows keyboard listener suppression
         dialog = RemapDialog(binding.input_code, self.current_profile, self, single_action_mode=True, binding=binding)
         dialog.bindings_changed.connect(self.on_bindings_changed_from_table)
-        dialog.exec()
+        dialog.setWindowModality(Qt.WindowModality.NonModal)
+        dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        dialog.show()
 
     def on_bindings_changed_from_table(self, bindings: list):
         """Handle binding changes from RemapDialog opened via table Edit button"""
