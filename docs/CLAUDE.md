@@ -1,5 +1,9 @@
 # SC Profile Editor - Project Context
 
+**Version:** 0.6.1
+**Date:** 2025-12-04
+**For:** AI assistants - Comprehensive project overview and development guidelines
+
 This document provides context for AI assistants working on this project.
 
 ## Project Overview

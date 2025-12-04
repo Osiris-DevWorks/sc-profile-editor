@@ -1,5 +1,9 @@
 # Changelog
 
+**Version:** 0.6.1
+**Date:** 2025-12-04
+**For:** Users and developers - Version history and release notes
+
 All notable changes to SC Profile Editor will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

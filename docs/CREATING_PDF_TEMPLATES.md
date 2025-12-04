@@ -1,12 +1,12 @@
 # Creating PDF Device Templates
 
-**Version:** v0.4.0
-**Date:** 2025-01-08
-**For:** SC Profile Viewer PDF-based templates
+**Version:** v0.6.1
+**Date:** 2025-12-04
+**For:** SC Profile Editor PDF-based templates
 
 ## Overview
 
-This guide provides step-by-step instructions for creating PDF device templates in Adobe InDesign. These templates are used by SC Profile Viewer to display visual representations of HOTAS devices with button labels.
+This guide provides step-by-step instructions for creating PDF device templates in Adobe InDesign. These templates are used by SC Profile Editor to display visual representations of HOTAS devices with button labels.
 
 **Prerequisites:**
 - Adobe InDesign CC 2020 or later
@@ -25,7 +25,9 @@ This guide provides step-by-step instructions for creating PDF device templates 
 5. **Name fields** using SC convention (`js1_button1`, etc.)
 6. **Export as Interactive PDF**
 7. **Validate** using validation script
-8. **Test** in SC Profile Viewer
+8. **Create field_mapping.json** (optional, documents button layout)
+9. **Add .build-ignore** (if incomplete) or **update template_registry.json** (if complete)
+10. **Test** in SC Profile Viewer
 
 ---
 
@@ -495,7 +497,102 @@ Status: [OK] All field names are valid!
 
 ---
 
-### Step 11: Update Template Registry
+### Step 11: Create Field Mapping File (Optional but Recommended)
+
+#### When to Create field_mapping.json
+
+Field mapping files are **optional** but highly recommended for templates where:
+- PDF field names don't directly match the device's button numbering (e.g., complex devices with named buttons)
+- You need to document the mapping between PDF field names and button numbers
+- The device has multiple instances or columns (e.g., dual-setup joysticks, MFD panels)
+- Button numbering is non-sequential or uses custom names
+
+#### Field Mapping Structure
+
+```json
+{
+  "comment": "Brief description of the mapping",
+  "device_columns": {
+    "_1": "Description of first device/column",
+    "_2": "Description of second device/column (optional)"
+  },
+  "button_mapping": {
+    "PDF_FIELD_NAME_1": "[BUTTON_NUMBER]",
+    "PDF_FIELD_NAME_2": "BUTTON_NUMBER or custom label",
+    "PDF_FIELD_NAME_3": ""
+  },
+  "axis_mapping": {
+    "AXIS_FIELD_NAME": "x|y|z|rotx|roty|rotz"
+  },
+  "hat_mapping": {
+    "HAT_FIELD_NAME_UP": "hat1_up|hat2_up|etc",
+    "HAT_FIELD_NAME_DOWN": "hat1_down"
+  }
+}
+```
+
+#### Mapping Format Details
+
+**Button Mapping:**
+- PDF field name as key (must match exactly)
+- Value can be:
+  - `"[N]"` (in brackets): Button number for column _1
+  - `N` (number only): Button number for column _2 (dual-setup) or primary value
+  - `""` (empty string): Field is not mapped to a button (e.g., mode switch indicator)
+  - Custom text: Any descriptive label (e.g., `"[ANALOG MODE SWITCH]"`)
+
+**Axis Mapping:**
+- Maps axis field names to joystick axis names
+- Valid values: `x`, `y`, `z`, `rotx`, `roty`, `rotz`
+
+**Hat Mapping:**
+- Maps hat switch field names to hat directions
+- Format: `hat[N]_[direction]` where direction is `up`, `down`, `left`, `right`
+
+#### Example: VKB Gladiator SCG Right
+
+```json
+{
+  "comment": "Button and axis mapping for vkb_gladiator_scg_rh",
+  "device_columns": {
+    "_1": "First device (left column or single device)",
+    "_2": "Second device (right column or dual setup)"
+  },
+  "button_mapping": {
+    "MT_A_1": "[1]",
+    "MT_A_2": 1,
+    "MT_B_1": "[2]",
+    "MT_B_2": 2,
+    "A2_A_1": "[3]",
+    "A2_A_2": 3
+  },
+  "axis_mapping": {
+    "A1_X": "x",
+    "A1_Y": "y",
+    "AX_THROTTLE": "z"
+  },
+  "hat_mapping": {
+    "A1_B_2": "hat1_up",
+    "A1_C_2": "hat1_down",
+    "A1_D_2": "hat1_left",
+    "A1_E_2": "hat1_right"
+  }
+}
+```
+
+#### File Location
+
+Save the field mapping file in the same directory as the PDF:
+
+```
+visual-templates/{device_id}/
+├── {device_id}.pdf
+└── field_mapping.json
+```
+
+---
+
+### Step 12: Update Template Registry
 
 #### Add Entry to template_registry.json
 
@@ -520,6 +617,86 @@ Status: [OK] All field names are valid!
 - `joystick_index`: Default JS index (optional, for single-device profiles)
 - `device_match_patterns`: List of strings to match device names
 - `type`: Device type (joystick, throttle, mfd, pedals)
+
+---
+
+### Step 13: Mark Incomplete Templates with .build-ignore (If Needed)
+
+#### When to Use .build-ignore
+
+If your template is **incomplete** or **not ready for production**, you should mark it with a `.build-ignore` file to prevent it from being included in builds and installers. This is useful for:
+- Templates with incomplete PDF fields
+- Templates that haven't been validated yet
+- Templates still being tested or refined
+- Templates with known issues
+- Experimental device support
+
+#### How to Use .build-ignore
+
+1. **Create empty file in template directory:**
+   ```
+   visual-templates/{device_id}/.build-ignore
+   ```
+
+2. **File contents:** Leave the file empty (it's just a marker)
+
+3. **Example structure:**
+   ```
+   visual-templates/vkb_thq/
+   ├── vkb_thq.pdf
+   ├── field_mapping.json
+   └── .build-ignore    ← Prevents this template from building
+   ```
+
+#### Build Process with .build-ignore
+
+**During Development (before marking complete):**
+1. Create template directory and files
+2. Add `.build-ignore` file
+3. Test locally: Application still loads and displays templates from `visual-templates/`
+4. Validate and refine the template
+
+**When Ready for Release:**
+1. **Remove** the `.build-ignore` file
+2. Run build: `python scripts/build/build_exe.py --increment patch`
+   - Build script scans for `.build-ignore` files
+   - Excludes marked templates from the build output
+   - Creates `dist/visual-templates/` with only complete templates
+   - Packages executable with complete templates only
+3. Build installer: `cmd //c scripts\build\build_installer.bat`
+   - Installer copies from `dist/` (not `visual-templates/`)
+   - Only complete templates are included
+
+**User Distribution:**
+- Users receive executable and installer with only complete, validated templates
+- Incomplete templates never reach end users
+- Development templates remain in your git repository for future completion
+
+#### Example: Marking a Template Complete
+
+```bash
+# When template is ready
+rm visual-templates/vkb_thq/.build-ignore
+
+# Build for distribution
+python scripts/build/build_exe.py --increment patch
+```
+
+#### Current Incomplete Templates
+
+The following templates currently have `.build-ignore` files:
+
+- `vkb_stecs` - STECS throttle (incomplete)
+- `vkb_stecs_atem` - STECS with ATEM module (incomplete)
+- `vkb_stecs_spacethrottlegrip_lh` - STECS with Space Throttle Grip left (incomplete)
+- `vkb_stecs_spacethrottlegrip_rh` - STECS with Space Throttle Grip right (incomplete)
+- `vkb_stecs_stem` - STECS with STEM module (incomplete)
+- `vkb_thq_v` - VKB Throttle Quadrant V (incomplete)
+- `vkb_thq_v_ww2` - VKB Throttle Quadrant V WW2 (incomplete)
+- `vpc_mt50cm3_left` - VPC MongoosT-50CM3 left (incomplete)
+- `vpc_mt50cm3_right` - VPC MongoosT-50CM3 right (incomplete)
+- `thrustmaster_t16000` - Thrustmaster T16000 (incomplete)
+- `thrustmaster_twcs_throttle` - Thrustmaster TWCS Throttle (incomplete)
 
 ---
 
@@ -679,11 +856,31 @@ Status: [OK] All field names are valid!
 
 ### Template File Structure
 
+**Minimal (Complete Template):**
 ```
 visual-templates/vkb_gladiator_evo_right/
-├── vkb_gladiator_evo_right.png          # Device image
-├── vkb_gladiator_evo_right.pdf          # Exported PDF template
-└── vkb_gladiator_evo_right.indd         # InDesign source file
+├── vkb_gladiator_evo_right.pdf          # Exported PDF template (REQUIRED)
+├── vkb_gladiator_evo_right.png          # Device image (optional, for reference)
+└── vkb_gladiator_evo_right.indd         # InDesign source file (optional, for future edits)
+```
+
+**With Field Mapping (Recommended for complex devices):**
+```
+visual-templates/vkb_gladiator_evo_right/
+├── vkb_gladiator_evo_right.pdf          # Exported PDF template (REQUIRED)
+├── field_mapping.json                   # Button to field name mapping (RECOMMENDED)
+├── vkb_gladiator_evo_right.png          # Device image (optional)
+└── vkb_gladiator_evo_right.indd         # InDesign source file (optional)
+```
+
+**Incomplete Template (During Development):**
+```
+visual-templates/vkb_thq/
+├── vkb_thq.pdf                          # Exported PDF template
+├── field_mapping.json                   # Button to field name mapping
+├── .build-ignore                        # Marker: excludes from build
+├── vkb_thq.png                          # Device image
+└── vkb_thq.indd                         # InDesign source file
 ```
 
 ---
@@ -736,6 +933,15 @@ visual-templates/vkb_gladiator_evo_right/
 ---
 
 ## Version History
+
+- **v0.6.1 (2025-12-04):** Enhanced guide with field mapping and build configuration
+  - Added Step 11: Field mapping file documentation (field_mapping.json)
+  - Added Step 12: Updated template registry instructions
+  - Added Step 13: Build-ignore file usage for incomplete templates
+  - Updated Quick Start with new steps
+  - Expanded template file structure examples
+  - Added current incomplete templates list
+  - Updated version and application name references
 
 - **v0.4.0 (2025-01-08):** Initial guide for PDF template creation
   - Complete InDesign workflow

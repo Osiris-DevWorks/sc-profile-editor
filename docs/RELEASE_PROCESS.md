@@ -1,6 +1,10 @@
 # Release Process
 
-This document outlines the standard process for creating a new release of SC Profile Viewer.
+**Version:** 0.6.1
+**Date:** 2025-12-04
+**For:** Release managers - Creating and publishing new versions
+
+This document outlines the standard process for creating a new release of SC Profile Editor.
 
 ## Pre-Release Checklist
 

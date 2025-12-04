@@ -1,5 +1,9 @@
 # Star Citizen Profile Editor - Development Guide
 
+**Version:** 0.6.1
+**Date:** 2025-12-04
+**For:** Developers - Setup, architecture, and development workflow
+
 A desktop application for editing and converting Star Citizen control profile XML files into human-readable formats (PDF, Word, CSV) with annotated device graphics.
 
 > **Note:** This guide is for developers. For end-user documentation, see [README.md](../README.md).
