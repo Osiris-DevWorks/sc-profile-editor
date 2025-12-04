@@ -2,12 +2,16 @@
 
 A desktop application for editing and exporting Star Citizen control profiles in human-readable formats. Create visual diagrams of your controller layouts and export your bindings to PDF, Word, CSV, and annotated device graphics.
 
-![Version](https://img.shields.io/badge/version-0.4.0-blue)
+![Version](https://img.shields.io/badge/version-0.6.1-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 
 ## Features
 
 - Import and customize Star Citizen control profiles
+- **Table-based input editing** - Edit inputs directly from Controls Table
+- **Device Configuration** - Map physical devices to joystick slots with hot-swap detection
+- **Automatic input detection** - Detect joystick buttons, axes, keyboard keys, and mouse clicks
+- **Keyboard modifier support** - Full Ctrl, Alt, Shift support with left/right distinction
 - Generate visual controller diagrams with labeled buttons
 - Export to multiple formats: PDF, Word, CSV, PNG
 - 20+ device templates (VKB, VPC, Thrustmaster)
@@ -31,7 +35,9 @@ For now, download `SCProfileViewer.exe` from the releases page and run it direct
 ## Table of Contents
 - [Getting Started](#getting-started)
 - [Main Features](#main-features)
+- [Device Configuration](#device-configuration)
 - [Control Table Views](#control-table-views)
+- [Input Detection & Remapping](#input-detection--remapping)
 - [Customizing Labels](#customizing-labels)
 - [Device View](#device-view)
 - [Exporting Your Profile](#exporting-your-profile)
@@ -64,9 +70,18 @@ After importing a profile, you'll see:
 
 ## Main Features
 
+### Three Application Tabs
+
+The application is organized into three main tabs:
+
+1. **Controls Table** - View and edit all your control bindings in a searchable, filterable table
+2. **Device View** - See visual representations of your controllers with labeled buttons
+3. **Config** - Manage connected devices and configure device-to-joystick mappings
+4. **About** - Project information and acknowledgements
+
 ### Two Viewing Modes
 
-The application offers two ways to view your control bindings:
+The Controls Table offers two ways to view your control bindings:
 
 #### Default View (Simplified)
 - Shows only essential information: **Action Map**, **Action**, and **Device**
@@ -86,6 +101,100 @@ The application offers two ways to view your control bindings:
 
 ---
 
+## Device Configuration
+
+The **Config** tab helps you manage your connected devices and ensure consistent control mappings across sessions.
+
+### What's the Config Tab?
+
+The Config tab displays:
+- **Connected Devices** - All currently connected devices (keyboard, mouse, joysticks)
+- **Device-to-Joystick Mapping** - Configuration for which physical device maps to which joystick slot
+- **Star Citizen Profiles Directory** - Path to your SC control profiles folder
+
+### Connected Devices
+
+The connected devices section shows:
+- **Device Type** - Keyboard, Mouse, or Joystick
+- **Product Name** - The actual device name (e.g., "T.16000M", "Keyboard")
+- **Instance** - The device instance number
+
+**Refresh Devices button** - Click to detect any newly connected devices (devices plugged in after app startup)
+
+### Device-to-Joystick Mapping
+
+When you have multiple joysticks connected, Star Citizen assigns them joystick slots (js1, js2, js3, etc.) based on connection order. If you unplug and replug devices in different order, the mappings change - breaking your profile bindings.
+
+**Solution: Configure persistent device mappings**
+
+1. Select which physical device maps to which slot (js1, js2, js3)
+2. Click **"Save Configuration"** to persist the mapping
+3. The app will remember this configuration and apply it to input detection
+
+**Auto-Populate button** - Automatically map all connected joysticks to js1, js2, js3 based on detection order. Perfect for quick setup!
+
+### Star Citizen Profiles Directory
+
+Specify where your Star Citizen control profiles are stored. This helps the app quickly load profiles without browsing.
+
+**Default location:** `C:\Program Files\Roberts Space Industries\StarCitizen\LIVE\USER\Client\0\Controls\Mappings`
+
+---
+
+## Input Detection & Remapping
+
+### Detecting Inputs
+
+When editing a control binding, you can use the **"Detect Input"** button to automatically detect what button/key you press:
+
+1. Click the **Edit** button in the Controls Table for any action
+2. In the RemapDialog, click **"Detect Input"** (or in the "Change Input Binding" section)
+3. Press the button/key you want to bind
+4. The input will be detected automatically (joystick buttons, axes, keyboard keys, mouse clicks)
+5. Optionally adjust which device this input maps to using the dropdown
+6. Click **"Save Binding"** to apply
+
+### Supported Input Types
+
+**Joystick:**
+- Buttons (up to 32 per joystick)
+- Analog axes (X, Y, Z, throttle, etc.)
+- POV hats (8-direction switches)
+
+**Keyboard:**
+- All letter keys, numbers, symbols
+- Function keys (F1-F12)
+- Modifier combinations (Ctrl+A, Alt+P, Shift+Down, etc.)
+- Arrow keys, Enter, Space, Tab, etc.
+
+**Mouse:**
+- Left, Right, Middle buttons
+- Forward, Back buttons (5-button mice)
+
+### Keyboard Modifiers
+
+Full support for modifier key combinations:
+- **Ctrl** (Left and Right)
+- **Alt** (Left and Right, including AltGr for non-US keyboards)
+- **Shift** (Left and Right)
+
+Just hold the modifier key while pressing another key - the app will detect the combination automatically!
+
+**Examples:**
+- Ctrl+A, Alt+P, Shift+Down
+- Right Ctrl+Right Shift (both modifier keys together)
+
+### Manual Input Selection
+
+Can't detect your input? Use the searchable dropdown in the "Change Input Binding" section:
+
+1. Click in the input dropdown
+2. Type to search (e.g., "button", "ctrl", "axis")
+3. Select your input from the list
+4. The full list shows all available inputs organized by device type
+
+---
+
 ## Control Table Views
 
 ### Understanding the Table
@@ -93,16 +202,28 @@ The application offers two ways to view your control bindings:
 The control table displays all your keybindings organized by action map. Each row represents one binding.
 
 **Default Columns:**
-- **Action Map**: Category like "Spaceship Movement", "Spaceship Weapons", etc.
-- **Action**: What the button does (e.g., "Fire", "Afterburner")
+- **Action Category**: Category like "Spaceship Movement", "Spaceship Weapons", etc.
+- **Label**: Custom or auto-generated short name for the action
+- **Input**: Human-readable input description (e.g., "Joystick 1: Button 5") with tooltip showing raw code
 - **Device**: Which controller (e.g., "Keyboard", "Joystick 1")
+- **Edit**: Pencil icon button to open RemapDialog for editing that specific binding
 
 **Detailed Columns (when "Show Detailed" is checked):**
 - All default columns plus:
-- **Action (Original)**: The auto-generated name from the game
-- **Action (Override)**: Your custom short name
-- **Input Code**: Technical identifier (e.g., "js1_button1")
-- **Input Label**: Formatted input name (e.g., "Joystick 1: Button 1")
+- **Action**: The original auto-generated action name from Star Citizen
+
+### Editing Inputs
+
+Click the **Edit** button (pencil icon) in any row to open the RemapDialog:
+- Change the input binding (use Detect Input or manual dropdown selection)
+- Change which device the input maps to
+- See whether the binding is applied to a single action or multiple actions
+- Confirm changes with Save Binding
+
+This is especially useful when you want to:
+- Remap a button to a different input
+- Move a binding from one device to another
+- Apply device mapping configuration to detected inputs
 
 ### Sorting
 
@@ -437,19 +558,23 @@ For development setup, building from source, and contributing:
 
 ## Version Information
 
-This guide is for Star Citizen Profile Editor v0.4.0
+This guide is for Star Citizen Profile Editor v0.6.1
 
-**Features in v0.4.0:**
-- Interactive PDF-based device templates (20+ devices supported)
-- Expanded VKB device support (Gladiator, Gunfighter, STECS, THQ variants)
-- Browser-like PDF viewer with QtWebEngine
-- Three-tab interface: Controls Table, Device View, About
-- Custom label override system with three-tier priority
-- Show Detailed view toggle (3 or 6 columns)
-- Export to CSV, PDF, Word, and device graphics (PNG/PDF)
-- Filter by device, action map, search text
-- Automatic label mapping to device buttons
-- Version display in window title and exports
+**Major Features in v0.6.1:**
+- **Device Configuration Tab** - Manage connected devices and device-to-joystick mappings
+- **Device hot-swap detection** - Automatically detect newly connected devices
+- **Automatic input detection** - Detect joystick, keyboard, and mouse inputs with one click
+- **Keyboard modifier support** - Full Ctrl, Alt, Shift support with left/right distinction
+- **Table-based input editing** - Edit inputs directly from Controls Table with Edit button
+- **Interactive PDF-based device templates** (20+ devices supported)
+- **Expanded VKB device support** (Gladiator, Gunfighter, STECS, THQ variants)
+- **Four-tab interface:** Controls Table, Device View, Config, About
+- **Custom label override system** with three-tier priority
+- **Show Detailed view toggle** (3 or 6 columns)
+- **Export to CSV, PDF, Word, and device graphics** (PNG/PDF)
+- **Filter by device, action map, search text**
+- **Automatic label mapping** to device buttons
+- **Version display** in window title and exports
 
 ---
 
