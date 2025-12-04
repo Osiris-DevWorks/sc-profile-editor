@@ -1742,19 +1742,31 @@ class MainWindow(QMainWindow):
             )
 
     def show_help(self):
-        """Show the user guide in a dialog"""
+        """Show the user guide in a dialog with TOC sidebar"""
         # Create help dialog
         help_dialog = QDialog(self)
         help_dialog.setWindowTitle(f"User Guide - Star Citizen Profile Editor v{self.version}")
-        help_dialog.setGeometry(100, 100, 900, 700)
+        help_dialog.setGeometry(100, 100, 1200, 800)
 
-        # Layout
-        layout = QVBoxLayout()
-        help_dialog.setLayout(layout)
+        # Main layout
+        main_layout = QVBoxLayout()
+        help_dialog.setLayout(main_layout)
+
+        # Content area layout (horizontal: sidebar + browser)
+        content_layout = QHBoxLayout()
+
+        # Create sidebar for table of contents
+        toc_widget = QListWidget()
+        toc_widget.setMaximumWidth(250)
+        toc_widget.itemClicked.connect(lambda item: self.navigate_to_section(browser, item.data(Qt.UserRole)))
+        content_layout.addWidget(toc_widget)
 
         # Text browser for displaying markdown as HTML
         browser = QTextBrowser()
         browser.setOpenExternalLinks(True)
+        content_layout.addWidget(browser)
+
+        main_layout.addLayout(content_layout)
 
         # Load the README.md file
         user_guide_path = os.path.join(
@@ -1766,7 +1778,20 @@ class MainWindow(QMainWindow):
             with open(user_guide_path, 'r', encoding='utf-8') as f:
                 markdown_content = f.read()
 
-            # Convert markdown to HTML (basic conversion)
+            # Extract headings for TOC and convert markdown to HTML
+            headings = self.extract_headings(markdown_content)
+
+            # Populate TOC
+            for heading_level, heading_text in headings:
+                item = QListWidgetItem(heading_text)
+                anchor_id = self.create_anchor_id(heading_text)
+                item.setData(Qt.UserRole, anchor_id)
+                # Indent sub-headings
+                if heading_level > 2:
+                    item.setText("  " * (heading_level - 2) + heading_text)
+                toc_widget.addItem(item)
+
+            # Convert markdown to HTML
             html_content = self.markdown_to_html(markdown_content)
             browser.setHtml(html_content)
 
@@ -1775,12 +1800,13 @@ class MainWindow(QMainWindow):
         except Exception as e:
             browser.setHtml(f"<h1>Error Loading Guide</h1><p>{str(e)}</p>")
 
-        layout.addWidget(browser)
-
         # Close button
+        button_layout = QHBoxLayout()
         close_btn = QPushButton("Close")
         close_btn.clicked.connect(help_dialog.close)
-        layout.addWidget(close_btn)
+        button_layout.addStretch()
+        button_layout.addWidget(close_btn)
+        main_layout.addLayout(button_layout)
 
         help_dialog.exec()
 
@@ -1975,6 +2001,28 @@ class MainWindow(QMainWindow):
         text = re.sub(r'\[(.+?)\]\((.+?)\)', r'<a href="\2">\1</a>', text)
 
         return text
+
+    def extract_headings(self, markdown_text):
+        """Extract all headings from markdown text with their levels"""
+        headings = []
+        lines = markdown_text.split('\n')
+
+        for line in lines:
+            if line.startswith('# '):
+                headings.append((1, line[2:].strip()))
+            elif line.startswith('## '):
+                headings.append((2, line[3:].strip()))
+            elif line.startswith('### '):
+                headings.append((3, line[4:].strip()))
+            elif line.startswith('#### '):
+                headings.append((4, line[5:].strip()))
+
+        return headings
+
+    def navigate_to_section(self, browser, anchor_id):
+        """Navigate to a section in the browser by anchor ID"""
+        if anchor_id:
+            browser.scrollToAnchor(anchor_id)
 
     def open_discord_link(self, event):
         """Open Discord invite link in browser"""
