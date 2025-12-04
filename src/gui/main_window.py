@@ -848,6 +848,11 @@ class MainWindow(QMainWindow):
             action_map_label = LabelGenerator.generate_actionmap_label(action_map_name)
             action_maps.add(action_map_label)
 
+        # Always include keyboard, mouse, and joystick options
+        devices.add("Keyboard")
+        devices.add("Mouse")
+        # Joysticks will be added dynamically if present in bindings
+
         # Save current selections before clearing
         current_device = self.device_filter.currentText()
         current_actionmap = self.actionmap_filter.currentText()
