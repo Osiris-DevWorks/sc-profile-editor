@@ -656,6 +656,9 @@ class MainWindow(QMainWindow):
         # Update profile info label
         self.profile_info_label.setText(f"Profile: {profile.profile_name}")
 
+        # Check if any joystick devices in profile are disconnected
+        self._check_and_warn_disconnected_devices(profile)
+
         # Build summary text
         summary_parts = []
         summary_parts.append(f"Profile Name: {profile.profile_name}")
@@ -1556,6 +1559,67 @@ class MainWindow(QMainWindow):
         # Refresh device view if active
         if self.pdf_device_widget and self.pdf_device_widget.current_device:
             self.pdf_device_widget.load_device_pdf()
+
+    def _check_and_warn_disconnected_devices(self, profile):
+        """Check if profile has disconnected devices and show warning if needed"""
+        try:
+            # Get connected devices from config tab
+            if not hasattr(self, 'config_tab') or not self.config_tab:
+                return
+
+            connected_devices = self.config_tab.current_devices
+            if not connected_devices:
+                return
+
+            # Find joystick devices in profile
+            profile_joysticks = [d for d in profile.devices if d.device_type == 'joystick']
+            if not profile_joysticks:
+                return
+
+            # Check which profile devices are disconnected
+            disconnected = []
+            for profile_device in profile_joysticks:
+                is_connected = False
+                device_name = profile_device.product_name if profile_device.product_name else f"Joystick {profile_device.instance}"
+
+                for connected in connected_devices:
+                    if connected.get('type') == 'joystick':
+                        if connected.get('instance') == profile_device.instance:
+                            # Check product name match
+                            if profile_device.product_name:
+                                connected_name = connected.get('name', '').lower()
+                                device_product = profile_device.product_name.lower()
+                                if device_product in connected_name or any(
+                                    word in connected_name for word in device_product.split()
+                                ):
+                                    is_connected = True
+                                    break
+                            else:
+                                is_connected = True
+                                break
+
+                if not is_connected:
+                    disconnected.append(device_name)
+
+            # Show warning if any devices are disconnected
+            if disconnected:
+                warning_text = "⚠️ Profile Devices Not Connected\n\n"
+                warning_text += "The following devices in this profile are not currently connected:\n\n"
+                for device_name in disconnected:
+                    warning_text += f"  • {device_name}\n"
+                warning_text += "\n"
+                warning_text += "Impact:\n"
+                warning_text += "  • Input detection will NOT work for disconnected devices\n"
+                warning_text += "  • You can still manually select inputs from these devices\n"
+                warning_text += "  • Use the manual input selection dropdown in the editing interface\n"
+                warning_text += "\n"
+                warning_text += "You can still view and edit templates for these devices in the Device View tab."
+
+                QMessageBox.information(self, "Disconnected Devices", warning_text)
+                logger.info(f"Profile loaded with {len(disconnected)} disconnected device(s): {', '.join(disconnected)}")
+
+        except Exception as e:
+            logger.error(f"Error checking disconnected devices: {e}", exc_info=True)
 
     def on_update_profile_name(self):
         """Handle profile name change from input field"""
