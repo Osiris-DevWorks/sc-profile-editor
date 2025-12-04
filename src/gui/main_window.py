@@ -1774,7 +1774,7 @@ class MainWindow(QMainWindow):
             toc_widget = QListWidget()
             toc_widget.setMaximumWidth(250)
             logger.info("Connecting TOC signal...")
-            toc_widget.itemClicked.connect(lambda item: self.navigate_to_section(browser, item.data(Qt.UserRole)))
+            toc_widget.itemClicked.connect(lambda item: self.navigate_to_section(browser, item.data(Qt.ItemDataRole.UserRole)))
             logger.info("TOC signal connected")
             content_layout.addWidget(toc_widget)
             content_layout.addWidget(browser)
@@ -1809,7 +1809,7 @@ class MainWindow(QMainWindow):
                     item = QListWidgetItem(heading_text)
                     anchor_id = self.create_anchor_id(heading_text)
                     logger.debug(f"Anchor ID: {anchor_id}")
-                    item.setData(Qt.UserRole, anchor_id)
+                    item.setData(Qt.ItemDataRole.UserRole, anchor_id)
                     # Indent sub-headings
                     if heading_level > 2:
                         item.setText("  " * (heading_level - 2) + heading_text)
