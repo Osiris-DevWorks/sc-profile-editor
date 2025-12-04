@@ -62,16 +62,6 @@ You can download SC Profile Editor from the [GitHub Releases page](https://githu
 
 The application will automatically load the last profile you opened when you start it again.
 
-### First Look
-
-After importing a profile, you'll see:
-- **Profile Summary**: Basic information about your profile in the top section
-- **Control Table**: A detailed table of all your keybindings
-- **Device View Tab**: Visual representations of your controllers with labeled buttons
-- **About Tab**: Project information, credits, and acknowledgements
-
----
-
 ## Main Features
 
 ### Three Application Tabs
@@ -79,7 +69,7 @@ After importing a profile, you'll see:
 The application is organized into three main tabs:
 
 1. **Controls Table** - View and edit all your control bindings in a searchable, filterable table
-2. **Device View** - See visual representations of your controllers with labeled buttons; click buttons to edit their bindings
+2. **Device View** - See & edit buttons in a visual representations of your controllers with labeled buttons
 3. **Config** - Manage connected devices and configure device-to-joystick mappings
 4. **About** - Project information and acknowledgements
 
@@ -113,7 +103,7 @@ The **Config** tab helps you manage your connected devices and ensure consistent
 
 The Config tab displays:
 - **Connected Devices** - All currently connected devices (keyboard, mouse, joysticks)
-- **Device-to-Joystick Mapping** - Configuration for which physical device maps to which joystick slot
+- **Device-to-Joystick Mapping** - Configuration for which physical device maps to which SC profile joystick identifier
 - **Star Citizen Profiles Directory** - Path to your SC control profiles folder
 
 ### Connected Devices
@@ -123,7 +113,7 @@ The connected devices section shows:
 - **Product Name** - The actual device name (e.g., "T.16000M", "Keyboard")
 - **Instance** - The device instance number
 
-**Refresh Devices button** - Click to detect any newly connected devices (devices plugged in after app startup)
+**Refresh Devices button** - Click to detect any newly connected or disconnected devices 
 
 ### Device-to-Joystick Mapping
 
@@ -135,7 +125,7 @@ When you have multiple joysticks connected, Star Citizen assigns them joystick s
 2. Click **"Save Configuration"** to persist the mapping
 3. The app will remember this configuration and apply it to input detection
 
-**Auto-Populate button** - Automatically map all connected joysticks to js1, js2, js3 based on detection order. Perfect for quick setup!
+**Auto-Populate button** - Automatically map all connected joysticks to js1, js2, js3 based on detection order. 
 
 ### Star Citizen Profiles Directory
 
