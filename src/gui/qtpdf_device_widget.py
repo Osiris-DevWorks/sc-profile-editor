@@ -347,9 +347,9 @@ class QtPdfDeviceWidget(QWidget):
             self.load_profile(self.current_profile)
 
     def _is_device_connected(self, device: Device) -> bool:
-        """Check if a device is in the connected devices list"""
-        if not self.connected_devices or self.show_all_templates:
-            return True  # Show all if no connected devices tracked or toggle is on
+        """Check if a device is actually connected (for visual indicator purposes)"""
+        if not self.connected_devices:
+            return False  # No devices connected if list is empty
 
         # For joystick devices, check both instance and product name match
         if device.device_type == 'joystick':
@@ -393,10 +393,9 @@ class QtPdfDeviceWidget(QWidget):
 
         for device in profile.devices:
             if device.device_type == 'joystick':
-                # Filter: only show connected devices unless "Show all" is checked
-                if not self._is_device_connected(device):
-                    logger.debug(f"Skipping disconnected device: {device.product_name}")
-                    continue
+                # Always show devices from profile, but check if connected for visual feedback
+                is_connected = self._is_device_connected(device)
+                connection_status = "" if is_connected else " [DISCONNECTED]"
 
                 raw_device_name = device.product_name if device.product_name else f"Joystick {device.instance}"
 
@@ -412,19 +411,23 @@ class QtPdfDeviceWidget(QWidget):
                         for template in matching_templates:
                             # Store tuple: (device, template.name) for searching
                             # Use template name as search key since it's unique
-                            self.device_combo.addItem(template.name, (device, template.name))
+                            display_text = template.name + connection_status
+                            self.device_combo.addItem(display_text, (device, template.name))
                     else:
                         friendly_base_name = get_friendly_device_name(base_stick_name)
-                        self.device_combo.addItem(f"{friendly_base_name} (No template)", (device, base_stick_name))
+                        display_text = f"{friendly_base_name} (No template){connection_status}"
+                        self.device_combo.addItem(display_text, (device, base_stick_name))
 
                     # 2. Add SEM module entry
                     sem_template = self.pdf_manager.find_template("VKB SEM")
 
                     if sem_template:
                         # Store tuple: (device, "VKB SEM")
-                        self.device_combo.addItem("VKB SEM", (device, "VKB SEM"))
+                        display_text = "VKB SEM" + connection_status
+                        self.device_combo.addItem(display_text, (device, "VKB SEM"))
                     else:
-                        self.device_combo.addItem("VKB SEM (No template)", (device, "VKB SEM"))
+                        display_text = f"VKB SEM (No template){connection_status}"
+                        self.device_combo.addItem(display_text, (device, "VKB SEM"))
                 else:
                     # Regular device (no SEM) - show ALL matching templates
                     matching_templates = self.find_all_matching_templates(raw_device_name)
@@ -432,16 +435,22 @@ class QtPdfDeviceWidget(QWidget):
                     if matching_templates:
                         for template in matching_templates:
                             # Store tuple: (device, template.name)
-                            self.device_combo.addItem(template.name, (device, template.name))
+                            display_text = template.name + connection_status
+                            self.device_combo.addItem(display_text, (device, template.name))
                     else:
                         device_name = get_friendly_device_name(raw_device_name)
-                        self.device_combo.addItem(f"{device_name} (No template)", device)
+                        display_text = f"{device_name} (No template){connection_status}"
+                        self.device_combo.addItem(display_text, device)
 
         if self.device_combo.count() == 0:
-            self.status_label.setText("No devices found")
+            self.status_label.setText("No devices found in profile")
             self.device_combo.addItem("No devices available", None)
         else:
-            self.status_label.setText(f"Found {self.device_combo.count()} device(s)")
+            # Count connected vs total
+            connected_count = sum(1 for d in profile.devices
+                                if d.device_type == 'joystick' and self._is_device_connected(d))
+            total_count = sum(1 for d in profile.devices if d.device_type == 'joystick')
+            self.status_label.setText(f"Found {self.device_combo.count()} device option(s) ({connected_count}/{total_count} connected)")
 
     def find_all_matching_templates(self, device_name: str) -> list:
         """
