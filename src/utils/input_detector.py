@@ -524,6 +524,9 @@ class InputDetector:
             try:
                 import pygame
                 pygame.init()
+
+                # Quit and reinitialize joystick module to detect hot-swapped devices
+                pygame.joystick.quit()
                 pygame.joystick.init()
 
                 joystick_count = pygame.joystick.get_count()
