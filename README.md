@@ -21,9 +21,27 @@ A desktop application for editing and exporting Star Citizen control profiles in
 
 ## Download & Installation
 
-> **Note:** Installation instructions will be added when releases are published on GitHub.
+You can download SC Profile Editor from the [GitHub Releases page](https://github.com/Osiris-RK/sc-profile-editor/releases). Two options are available:
 
-For now, download `SCProfileViewer.exe` from the releases page and run it directly (no installation required).
+### Option 1: Installer (Recommended)
+
+**`SCProfileEditor-vX.X.X-Setup.exe`** - Full installer with automatic updates
+
+- Double-click to run the installer
+- Choose your installation location
+- Creates Start Menu shortcuts
+- Easy uninstall via Programs & Features
+- Recommended for most users
+
+### Option 2: Standalone Executable
+
+**`SCProfileEditor.exe`** - Portable version (no installation required)
+
+- Download and run directly
+- No installation or Admin rights needed
+- Perfect for portable storage or USB drives
+- All settings stored locally in the executable folder
+- Choose this if you prefer minimal system changes
 
 ## System Requirements
 
