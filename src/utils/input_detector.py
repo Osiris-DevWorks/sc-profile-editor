@@ -143,90 +143,92 @@ class InputDetectorThread(QThread):
             self.running = False
 
     def _detect_joystick(self, detected_event, result_dict):
-        """Detect joystick input in a separate thread"""
+        """Detect joystick input in a separate thread using pygame"""
         try:
-            import dinput
+            import pygame
 
-            # Get list of devices
-            devices = dinput.get_joysticks()
+            # Initialize pygame and joystick module
+            pygame.init()
+            pygame.joystick.init()
 
-            if not devices:
+            # Get list of joysticks
+            joystick_count = pygame.joystick.get_count()
+
+            if joystick_count == 0:
                 logger.warning("No joysticks detected")
                 return
 
-            logger.info(f"Found {len(devices)} joystick(s)")
+            logger.info(f"Found {joystick_count} joystick(s)")
 
-            # Create joystick objects
+            # Initialize all joysticks
             joysticks = []
-            for i, device_guid in enumerate(devices):
+            for i in range(joystick_count):
                 try:
-                    joystick = dinput.Joystick(device_guid)
-                    joystick.open()
-                    joysticks.append((i + 1, joystick))  # 1-indexed for SC
-                    logger.info(f"Initialized joystick {i + 1}")
+                    joy = pygame.joystick.Joystick(i)
+                    joy.init()
+                    joysticks.append((i + 1, joy))  # 1-indexed for SC
+                    logger.info(f"Initialized joystick {i + 1}: {joy.get_name()}")
                 except Exception as e:
                     logger.warning(f"Could not initialize joystick {i}: {e}")
 
             if not joysticks:
+                logger.warning("No joysticks could be initialized")
                 return
+
+            # Track previous axis values to avoid duplicates
+            previous_axis_state = {}
 
             # Joystick detection loop
             start_time = time.time()
-            axis_state = {}  # Track previous axis values to detect significant changes
 
             while self.running and (time.time() - start_time) * 1000 < self.timeout_ms:
                 try:
-                    for js_num, joystick in joysticks:
-                        try:
-                            # Update state
-                            joystick.update()
-                            state = joystick.state
+                    # Process pygame events for button presses
+                    for event in pygame.event.get():
+                        if event.type == pygame.JOYBUTTONDOWN:
+                            js_num = event.joy + 1  # Convert to 1-indexed
+                            button_num = event.button + 1  # pygame uses 0-indexed buttons
+                            input_code = f"js{js_num}_button{button_num}"
+                            result_dict["code"] = input_code
+                            result_dict["description"] = f"Joystick {js_num} Button {button_num}"
+                            detected_event.set()
+                            return
 
-                            # Check buttons
-                            if hasattr(state, 'buttons') and state.buttons:
-                                for button_idx, button_pressed in enumerate(state.buttons):
-                                    if button_pressed:
-                                        input_code = f"js{js_num}_button{button_idx + 1}"
-                                        result_dict["code"] = input_code
-                                        result_dict["description"] = f"Joystick {js_num} Button {button_idx + 1}"
-                                        detected_event.set()
-                                        return
+                        elif event.type == pygame.JOYHATMOTION:
+                            # Hat/POV switch
+                            js_num = event.joy + 1  # Convert to 1-indexed
+                            hat_num = event.hat + 1
+                            x, y = event.value
 
-                            # Check POV/hat switches
-                            if hasattr(state, 'pov') and state.pov is not None and state.pov >= 0:
-                                # POV is in degrees: 0=up, 9000=right, 18000=down, 27000=left
-                                # -1 or 65535 means not pressed
-                                if state.pov < 36000:  # Valid POV value
-                                    if state.pov == 0:
-                                        direction = "up"
-                                    elif state.pov == 9000:
-                                        direction = "right"
-                                    elif state.pov == 18000:
-                                        direction = "down"
-                                    elif state.pov == 27000:
-                                        direction = "left"
-                                    else:
-                                        # Diagonal - use closest direction
-                                        if state.pov < 4500:
-                                            direction = "up"
-                                        elif state.pov < 13500:
-                                            direction = "right"
-                                        elif state.pov < 22500:
-                                            direction = "down"
-                                        else:
-                                            direction = "left"
+                            # Map hat motion to directions
+                            if y == 1:
+                                direction = "up"
+                            elif y == -1:
+                                direction = "down"
+                            elif x == 1:
+                                direction = "right"
+                            elif x == -1:
+                                direction = "left"
+                            else:
+                                continue  # No motion
 
-                                    input_code = f"js{js_num}_hat1_{direction}"
-                                    result_dict["code"] = input_code
-                                    result_dict["description"] = f"Joystick {js_num} Hat 1 {direction.upper()}"
-                                    detected_event.set()
-                                    return
+                            input_code = f"js{js_num}_hat{hat_num}_{direction}"
+                            result_dict["code"] = input_code
+                            result_dict["description"] = f"Joystick {js_num} Hat {hat_num} {direction.upper()}"
+                            detected_event.set()
+                            return
 
-                            # Check axes (with threshold for analog sticks)
+                        elif event.type == pygame.JOYAXISMOTION:
+                            # Analog axis/stick movement
+                            js_num = event.joy + 1  # Convert to 1-indexed
+                            axis_num = event.axis
+                            value = event.value
+
+                            # Map axis number to name
                             axis_names = {
                                 0: "x",       # X axis (left stick horizontal)
                                 1: "y",       # Y axis (left stick vertical)
-                                2: "z",       # Z axis (right stick horizontal, or throttle)
+                                2: "z",       # Z axis (right stick horizontal or throttle)
                                 3: "rotz",    # Rotation Z (right stick vertical)
                                 4: "rotx",    # Rotation X (twist)
                                 5: "roty",    # Rotation Y
@@ -234,47 +236,35 @@ class InputDetectorThread(QThread):
                                 7: "slider2", # Slider 2
                             }
 
-                            if hasattr(state, 'lX'):
-                                axes = [
-                                    state.lX if hasattr(state, 'lX') else 0,
-                                    state.lY if hasattr(state, 'lY') else 0,
-                                    state.lZ if hasattr(state, 'lZ') else 0,
-                                    state.lRz if hasattr(state, 'lRz') else 0,
-                                    state.lRx if hasattr(state, 'lRx') else 0,
-                                    state.lRy if hasattr(state, 'lRy') else 0,
-                                ]
+                            axis_name = axis_names.get(axis_num, f"axis{axis_num}")
 
-                                # Normalize axes from -32768 to 32767 to -1.0 to 1.0
-                                threshold = 0.5
-                                for axis_idx, raw_value in enumerate(axes):
-                                    # Normalize
-                                    if raw_value > 0:
-                                        normalized_value = raw_value / 32767.0
-                                    else:
-                                        normalized_value = raw_value / 32768.0
+                            # Only detect significant movements (threshold: 0.5)
+                            threshold = 0.5
+                            if abs(value) > threshold:
+                                # Track state to avoid duplicates
+                                state_key = (js_num, axis_name)
+                                if state_key not in previous_axis_state or abs(previous_axis_state[state_key]) <= threshold:
+                                    previous_axis_state[state_key] = value
+                                    direction = "+" if value > 0 else "-"
+                                    input_code = f"js{js_num}_{axis_name}"
+                                    result_dict["code"] = input_code
+                                    result_dict["description"] = f"Joystick {js_num} {axis_name.upper()} ({direction})"
+                                    detected_event.set()
+                                    return
+                            else:
+                                # Reset state when axis returns below threshold
+                                state_key = (js_num, axis_name)
+                                if state_key in previous_axis_state:
+                                    previous_axis_state[state_key] = value
 
-                                    # Check if significant movement
-                                    if abs(normalized_value) > threshold:
-                                        axis_name = axis_names.get(axis_idx, f"axis{axis_idx}")
-                                        direction = "+" if normalized_value > 0 else "-"
-                                        input_code = f"js{js_num}_{axis_name}"
-                                        result_dict["code"] = input_code
-                                        result_dict["description"] = f"Joystick {js_num} {axis_name.upper()} ({direction})"
-                                        detected_event.set()
-                                        return
-
-                        except Exception as e:
-                            logger.debug(f"Error checking joystick {js_num}: {e}")
-                            continue
-
-                    time.sleep(0.05)  # 50ms polling interval
+                    time.sleep(0.01)  # 10ms polling for pygame events
 
                 except Exception as e:
                     logger.debug(f"Error in joystick detection loop: {e}")
-                    time.sleep(0.05)
+                    time.sleep(0.01)
 
         except ImportError:
-            logger.error("python-dinput not installed. Joystick detection unavailable.")
+            logger.error("pygame not installed. Joystick detection unavailable. Install with: pip install pygame")
         except Exception as e:
             logger.error(f"Error in joystick detection: {e}", exc_info=True)
 
@@ -530,23 +520,25 @@ class InputDetector:
             devices.append({"type": "keyboard", "instance": 1, "name": "Keyboard"})
             devices.append({"type": "mouse", "instance": 1, "name": "Mouse"})
 
-            # Add joysticks
+            # Add joysticks using pygame
             try:
-                import dinput
-                joystick_guids = dinput.get_joysticks()
+                import pygame
+                pygame.init()
+                pygame.joystick.init()
 
-                for i, guid in enumerate(joystick_guids):
+                joystick_count = pygame.joystick.get_count()
+
+                for i in range(joystick_count):
                     try:
-                        joystick = dinput.Joystick(guid)
-                        joystick.open()
+                        joy = pygame.joystick.Joystick(i)
+                        joy.init()
                         devices.append({
                             "type": "joystick",
                             "instance": i + 1,
-                            "name": f"Joystick {i + 1}"
+                            "name": f"Joystick {i + 1}: {joy.get_name()}"
                         })
-                        joystick.close()
                     except Exception as e:
-                        logger.debug(f"Could not open joystick {i}: {e}")
+                        logger.debug(f"Could not initialize joystick {i}: {e}")
                         devices.append({
                             "type": "joystick",
                             "instance": i + 1,
@@ -554,7 +546,7 @@ class InputDetector:
                         })
 
             except ImportError:
-                logger.warning("python-dinput not available, joystick detection skipped")
+                logger.warning("pygame not available, joystick detection skipped")
             except Exception as e:
                 logger.error(f"Error detecting joysticks: {e}", exc_info=True)
 

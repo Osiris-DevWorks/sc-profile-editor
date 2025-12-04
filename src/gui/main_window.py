@@ -312,6 +312,12 @@ class MainWindow(QMainWindow):
         self.config_tab = ConfigTab()
         self.tab_widget.addTab(self.config_tab, "Config")
 
+        # Connect config tab device updates to Device View
+        if self.pdf_device_widget:
+            self.config_tab.devices_changed.connect(self.pdf_device_widget.set_connected_devices)
+            # Pass initial devices to Device View
+            self.pdf_device_widget.set_connected_devices(self.config_tab.current_devices)
+
         # Tab 4: About
         about_tab = QWidget()
         about_layout = QVBoxLayout()
@@ -799,7 +805,7 @@ class MainWindow(QMainWindow):
             self.controls_table.setColumnWidth(5, 50)   # Edit button
 
     def parse_device_from_input(self, input_code: str) -> str:
-        """Parse device type from input code"""
+        """Parse device type from input code using actual connected device info"""
         if input_code.startswith('kb'):
             return "Keyboard"
         elif input_code.startswith('js'):
@@ -807,13 +813,24 @@ class MainWindow(QMainWindow):
             import re
             match = re.match(r'js(\d+)_', input_code)
             if match:
-                instance = match.group(1)
-                # Try to find device name
+                instance = int(match.group(1))
+
+                # First, try to find the actual connected device with this instance number
+                if hasattr(self, 'config_tab') and self.config_tab and hasattr(self.config_tab, 'current_devices'):
+                    for connected_device in self.config_tab.current_devices:
+                        if (connected_device.get('type') == 'joystick' and
+                            connected_device.get('instance') == instance):
+                            device_name = connected_device.get('name', f"Joystick {instance}")
+                            # Split composite devices (e.g., VKB Gladiator + SEM)
+                            return get_device_for_input(device_name, input_code)
+
+                # Fallback: try to find device in profile (for backwards compatibility)
                 for device in self.current_profile.devices:
-                    if device.device_type == 'joystick' and device.instance == int(instance):
+                    if device.device_type == 'joystick' and device.instance == instance:
                         device_name = device.product_name if device.product_name else f"Joystick {instance}"
                         # Split composite devices (e.g., VKB Gladiator + SEM)
                         return get_device_for_input(device_name, input_code)
+
                 return f"Joystick {instance}"
         elif 'mouse' in input_code.lower():
             return "Mouse"

@@ -7,7 +7,7 @@ import os
 import logging
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLabel, QPushButton,
                               QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLineEdit, QFileDialog)
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -20,6 +20,9 @@ logger = logging.getLogger(__name__)
 
 class ConfigTab(QWidget):
     """Tab for managing device configuration and device-to-js mappings"""
+
+    # Signal emitted when connected devices change
+    devices_changed = pyqtSignal(list)  # Emits list of connected devices
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -150,6 +153,9 @@ class ConfigTab(QWidget):
         try:
             self.current_devices = InputDetector.get_available_devices()
             logger.debug(f"Found {len(self.current_devices)} devices")
+
+            # Emit signal so other widgets (like Device View) can update
+            self.devices_changed.emit(self.current_devices)
 
             # Update devices table
             self.devices_table.setRowCount(len(self.current_devices))
