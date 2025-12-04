@@ -10,7 +10,7 @@ import os
 import logging
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                               QComboBox, QMessageBox, QGraphicsView, QGraphicsScene,
-                              QGraphicsPixmapItem, QInputDialog, QPushButton, QSizePolicy, QToolTip)
+                              QGraphicsPixmapItem, QInputDialog, QPushButton, QSizePolicy, QToolTip, QCheckBox)
 from PyQt6.QtGui import QPainter, QFont
 from PyQt6.QtCore import Qt, pyqtSignal, QRectF, QTimer
 
@@ -260,6 +260,10 @@ class QtPdfDeviceWidget(QWidget):
         self.current_field_values: dict = {}  # Store current field values
         self.field_to_input_code: dict = {}  # Map PDF field names to input codes
 
+        # Track connected devices for filtering
+        self.connected_devices = []  # List of connected device dicts from InputDetector
+        self.show_all_templates = False  # Toggle to show all templates or just connected
+
         self.setup_ui()
 
     def setup_ui(self):
@@ -267,13 +271,19 @@ class QtPdfDeviceWidget(QWidget):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        # Device selection
+        # Device selection with toggle for all templates
         selection_layout = QHBoxLayout()
         selection_layout.addWidget(QLabel("Select Device:"))
 
         self.device_combo = QComboBox()
         self.device_combo.currentIndexChanged.connect(self.on_device_changed)
         selection_layout.addWidget(self.device_combo, 1)
+
+        # Toggle to show all templates (not just connected devices)
+        self.show_all_checkbox = QCheckBox("Show all templates")
+        self.show_all_checkbox.setToolTip("When unchecked, only shows templates for connected devices")
+        self.show_all_checkbox.stateChanged.connect(self.on_show_all_toggled)
+        selection_layout.addWidget(self.show_all_checkbox)
 
         layout.addLayout(selection_layout)
 
@@ -312,6 +322,56 @@ class QtPdfDeviceWidget(QWidget):
         self.status_label.setStyleSheet("color: #666; font-size: 11px;")
         layout.addWidget(self.status_label)
 
+    def set_connected_devices(self, devices: list):
+        """
+        Set the list of currently connected devices
+
+        Args:
+            devices: List of device dicts from InputDetector.get_available_devices()
+                     Each dict has: {'type': 'joystick'|'keyboard'|'mouse', 'instance': N, 'name': 'Device Name'}
+        """
+        self.connected_devices = devices
+        logger.debug(f"Connected devices updated: {len(devices)} devices")
+
+        # Reload profile if one is loaded to update device list
+        if self.current_profile:
+            self.load_profile(self.current_profile)
+
+    def on_show_all_toggled(self, state):
+        """Handle toggle for showing all templates vs only connected devices"""
+        self.show_all_templates = (state != 0)
+        logger.debug(f"Show all templates toggled: {self.show_all_templates}")
+
+        # Reload device list with new filter
+        if self.current_profile:
+            self.load_profile(self.current_profile)
+
+    def _is_device_connected(self, device: Device) -> bool:
+        """Check if a device is actually connected (for visual indicator purposes)"""
+        if not self.connected_devices:
+            return False  # No devices connected if list is empty
+
+        # For joystick devices, check both instance and product name match
+        if device.device_type == 'joystick':
+            for connected in self.connected_devices:
+                if connected.get('type') == 'joystick':
+                    # Match by instance number first
+                    if connected.get('instance') == device.instance:
+                        # Also check if product name matches (if device has product name)
+                        if device.product_name:
+                            connected_name = connected.get('name', '').lower()
+                            device_product = device.product_name.lower()
+                            # Check if the product name appears in the connected device name
+                            if device_product in connected_name or any(
+                                word in connected_name for word in device_product.split()
+                            ):
+                                return True
+                        else:
+                            # No product name in profile, just match by instance
+                            return True
+
+        return False
+
     def load_profile(self, profile: ControlProfile):
         """Load a profile and populate device list"""
         self.current_profile = profile
@@ -333,6 +393,10 @@ class QtPdfDeviceWidget(QWidget):
 
         for device in profile.devices:
             if device.device_type == 'joystick':
+                # Always show devices from profile, but check if connected for visual feedback
+                is_connected = self._is_device_connected(device)
+                connection_status = "" if is_connected else " [DISCONNECTED]"
+
                 raw_device_name = device.product_name if device.product_name else f"Joystick {device.instance}"
 
                 # Check if this is a VKB device with SEM module
@@ -347,19 +411,23 @@ class QtPdfDeviceWidget(QWidget):
                         for template in matching_templates:
                             # Store tuple: (device, template.name) for searching
                             # Use template name as search key since it's unique
-                            self.device_combo.addItem(template.name, (device, template.name))
+                            display_text = template.name + connection_status
+                            self.device_combo.addItem(display_text, (device, template.name))
                     else:
                         friendly_base_name = get_friendly_device_name(base_stick_name)
-                        self.device_combo.addItem(f"{friendly_base_name} (No template)", (device, base_stick_name))
+                        display_text = f"{friendly_base_name} (No template){connection_status}"
+                        self.device_combo.addItem(display_text, (device, base_stick_name))
 
                     # 2. Add SEM module entry
                     sem_template = self.pdf_manager.find_template("VKB SEM")
 
                     if sem_template:
                         # Store tuple: (device, "VKB SEM")
-                        self.device_combo.addItem("VKB SEM", (device, "VKB SEM"))
+                        display_text = "VKB SEM" + connection_status
+                        self.device_combo.addItem(display_text, (device, "VKB SEM"))
                     else:
-                        self.device_combo.addItem("VKB SEM (No template)", (device, "VKB SEM"))
+                        display_text = f"VKB SEM (No template){connection_status}"
+                        self.device_combo.addItem(display_text, (device, "VKB SEM"))
                 else:
                     # Regular device (no SEM) - show ALL matching templates
                     matching_templates = self.find_all_matching_templates(raw_device_name)
@@ -367,16 +435,22 @@ class QtPdfDeviceWidget(QWidget):
                     if matching_templates:
                         for template in matching_templates:
                             # Store tuple: (device, template.name)
-                            self.device_combo.addItem(template.name, (device, template.name))
+                            display_text = template.name + connection_status
+                            self.device_combo.addItem(display_text, (device, template.name))
                     else:
                         device_name = get_friendly_device_name(raw_device_name)
-                        self.device_combo.addItem(f"{device_name} (No template)", device)
+                        display_text = f"{device_name} (No template){connection_status}"
+                        self.device_combo.addItem(display_text, device)
 
         if self.device_combo.count() == 0:
-            self.status_label.setText("No devices found")
+            self.status_label.setText("No devices found in profile")
             self.device_combo.addItem("No devices available", None)
         else:
-            self.status_label.setText(f"Found {self.device_combo.count()} device(s)")
+            # Count connected vs total
+            connected_count = sum(1 for d in profile.devices
+                                if d.device_type == 'joystick' and self._is_device_connected(d))
+            total_count = sum(1 for d in profile.devices if d.device_type == 'joystick')
+            self.status_label.setText(f"Found {self.device_combo.count()} device option(s) ({connected_count}/{total_count} connected)")
 
     def find_all_matching_templates(self, device_name: str) -> list:
         """
@@ -792,9 +866,12 @@ class QtPdfDeviceWidget(QWidget):
         try:
             from gui.remap_dialog import RemapDialog
 
+            # Use non-modal dialog to avoid Windows keyboard listener suppression
             dialog = RemapDialog(input_code, self.current_profile, self, show_input_binding=False)
             dialog.bindings_changed.connect(self.on_bindings_changed)
-            dialog.exec()
+            dialog.setWindowModality(Qt.WindowModality.NonModal)
+            dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+            dialog.show()
         except Exception as e:
             logger.error(f"Error showing remap dialog: {e}", exc_info=True)
             QMessageBox.critical(

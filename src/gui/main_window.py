@@ -6,7 +6,8 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                               QPushButton, QLabel, QFileDialog, QMessageBox,
                               QTextEdit, QTableWidget, QTableWidgetItem, QSplitter,
                               QLineEdit, QComboBox, QGroupBox, QCheckBox, QTabWidget,
-                              QStyledItemDelegate, QDialog, QTextBrowser)
+                              QStyledItemDelegate, QDialog, QTextBrowser, QInputDialog,
+                              QListWidget, QListWidgetItem)
 from PyQt6.QtCore import Qt, QSortFilterProxyModel, QTimer, QUrl, QEvent
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QDesktopServices, QPixmap, QCursor
 import sys
@@ -177,7 +178,24 @@ class MainWindow(QMainWindow):
 
         main_layout.addLayout(header_layout)
 
-        # Profile info label
+        # Profile name section with editable field
+        profile_name_layout = QHBoxLayout()
+        profile_name_layout.setContentsMargins(5, 5, 5, 5)
+
+        profile_name_layout.addWidget(QLabel("Profile Name:"))
+        self.profile_name_input = QLineEdit()
+        self.profile_name_input.setPlaceholderText("Enter profile name...")
+        self.profile_name_input.setEnabled(False)
+        profile_name_layout.addWidget(self.profile_name_input, 1)
+
+        self.update_profile_name_btn = QPushButton("Update Name")
+        self.update_profile_name_btn.setEnabled(False)
+        self.update_profile_name_btn.clicked.connect(self.on_update_profile_name)
+        profile_name_layout.addWidget(self.update_profile_name_btn)
+
+        main_layout.addLayout(profile_name_layout)
+
+        # Profile info label (for other info)
         self.profile_info_label = QLabel("No profile loaded")
         self.profile_info_label.setStyleSheet("font-size: 12px; margin: 5px; color: #666;")
         main_layout.addWidget(self.profile_info_label)
@@ -294,6 +312,12 @@ class MainWindow(QMainWindow):
         from gui.config_tab import ConfigTab
         self.config_tab = ConfigTab()
         self.tab_widget.addTab(self.config_tab, "Config")
+
+        # Connect config tab device updates to Device View
+        if self.pdf_device_widget:
+            self.config_tab.devices_changed.connect(self.pdf_device_widget.set_connected_devices)
+            # Pass initial devices to Device View
+            self.pdf_device_widget.set_connected_devices(self.config_tab.current_devices)
 
         # Tab 4: About
         about_tab = QWidget()
@@ -625,8 +649,16 @@ class MainWindow(QMainWindow):
 
         profile = self.current_profile
 
+        # Update profile name input field and enable editing
+        self.profile_name_input.setText(profile.profile_name)
+        self.profile_name_input.setEnabled(True)
+        self.update_profile_name_btn.setEnabled(True)
+
         # Update profile info label
         self.profile_info_label.setText(f"Profile: {profile.profile_name}")
+
+        # Check if any joystick devices in profile are disconnected
+        self._check_and_warn_disconnected_devices(profile)
 
         # Build summary text
         summary_parts = []
@@ -777,7 +809,7 @@ class MainWindow(QMainWindow):
             self.controls_table.setColumnWidth(5, 50)   # Edit button
 
     def parse_device_from_input(self, input_code: str) -> str:
-        """Parse device type from input code"""
+        """Parse device type from input code using actual connected device info"""
         if input_code.startswith('kb'):
             return "Keyboard"
         elif input_code.startswith('js'):
@@ -785,13 +817,24 @@ class MainWindow(QMainWindow):
             import re
             match = re.match(r'js(\d+)_', input_code)
             if match:
-                instance = match.group(1)
-                # Try to find device name
+                instance = int(match.group(1))
+
+                # First, try to find the actual connected device with this instance number
+                if hasattr(self, 'config_tab') and self.config_tab and hasattr(self.config_tab, 'current_devices'):
+                    for connected_device in self.config_tab.current_devices:
+                        if (connected_device.get('type') == 'joystick' and
+                            connected_device.get('instance') == instance):
+                            device_name = connected_device.get('name', f"Joystick {instance}")
+                            # Split composite devices (e.g., VKB Gladiator + SEM)
+                            return get_device_for_input(device_name, input_code)
+
+                # Fallback: try to find device in profile (for backwards compatibility)
                 for device in self.current_profile.devices:
-                    if device.device_type == 'joystick' and device.instance == int(instance):
+                    if device.device_type == 'joystick' and device.instance == instance:
                         device_name = device.product_name if device.product_name else f"Joystick {instance}"
                         # Split composite devices (e.g., VKB Gladiator + SEM)
                         return get_device_for_input(device_name, input_code)
+
                 return f"Joystick {instance}"
         elif 'mouse' in input_code.lower():
             return "Mouse"
@@ -808,6 +851,11 @@ class MainWindow(QMainWindow):
             devices.add(device)
             action_map_label = LabelGenerator.generate_actionmap_label(action_map_name)
             action_maps.add(action_map_label)
+
+        # Always include keyboard, mouse, and joystick options
+        devices.add("Keyboard")
+        devices.add("Mouse")
+        # Joysticks will be added dynamically if present in bindings
 
         # Save current selections before clearing
         current_device = self.device_filter.currentText()
@@ -991,9 +1039,12 @@ class MainWindow(QMainWindow):
 
         from gui.remap_dialog import RemapDialog
 
+        # Use non-modal dialog to avoid Windows keyboard listener suppression
         dialog = RemapDialog(binding.input_code, self.current_profile, self)
         dialog.bindings_changed.connect(self.on_bindings_changed_from_table)
-        dialog.exec()
+        dialog.setWindowModality(Qt.WindowModality.NonModal)
+        dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        dialog.show()
 
     def on_binding_remapped(self, binding, new_input_code: str, new_label: str, new_activation_mode: str):
         """Handle binding changes from the remapping dialog"""
@@ -1048,9 +1099,12 @@ class MainWindow(QMainWindow):
 
         # Open in single action mode (hides "Add New Action" section)
         # Pass the binding object directly to handle unmapped actions correctly
+        # Use non-modal dialog to avoid Windows keyboard listener suppression
         dialog = RemapDialog(binding.input_code, self.current_profile, self, single_action_mode=True, binding=binding)
         dialog.bindings_changed.connect(self.on_bindings_changed_from_table)
-        dialog.exec()
+        dialog.setWindowModality(Qt.WindowModality.NonModal)
+        dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        dialog.show()
 
     def on_bindings_changed_from_table(self, bindings: list):
         """Handle binding changes from RemapDialog opened via table Edit button"""
@@ -1507,32 +1561,130 @@ class MainWindow(QMainWindow):
         if self.pdf_device_widget and self.pdf_device_widget.current_device:
             self.pdf_device_widget.load_device_pdf()
 
+    def _check_and_warn_disconnected_devices(self, profile):
+        """Check if profile has disconnected devices and show warning if needed"""
+        try:
+            # Get connected devices from config tab
+            if not hasattr(self, 'config_tab') or not self.config_tab:
+                return
+
+            connected_devices = self.config_tab.current_devices
+            if not connected_devices:
+                return
+
+            # Find joystick devices in profile
+            profile_joysticks = [d for d in profile.devices if d.device_type == 'joystick']
+            if not profile_joysticks:
+                return
+
+            # Check which profile devices are disconnected
+            disconnected = []
+            for profile_device in profile_joysticks:
+                is_connected = False
+                device_name = profile_device.product_name if profile_device.product_name else f"Joystick {profile_device.instance}"
+
+                for connected in connected_devices:
+                    if connected.get('type') == 'joystick':
+                        if connected.get('instance') == profile_device.instance:
+                            # Check product name match
+                            if profile_device.product_name:
+                                connected_name = connected.get('name', '').lower()
+                                device_product = profile_device.product_name.lower()
+                                if device_product in connected_name or any(
+                                    word in connected_name for word in device_product.split()
+                                ):
+                                    is_connected = True
+                                    break
+                            else:
+                                is_connected = True
+                                break
+
+                if not is_connected:
+                    disconnected.append(device_name)
+
+            # Show warning if any devices are disconnected
+            if disconnected:
+                warning_text = "⚠️ Profile Devices Not Connected\n\n"
+                warning_text += "The following devices in this profile are not currently connected:\n\n"
+                for device_name in disconnected:
+                    warning_text += f"  • {device_name}\n"
+                warning_text += "\n"
+                warning_text += "Impact:\n"
+                warning_text += "  • Input detection will NOT work for disconnected devices\n"
+                warning_text += "  • You can still manually select inputs from these devices\n"
+                warning_text += "  • Use the manual input selection dropdown in the editing interface\n"
+                warning_text += "\n"
+                warning_text += "You can still view and edit templates for these devices in the Device View tab."
+
+                QMessageBox.information(self, "Disconnected Devices", warning_text)
+                logger.info(f"Profile loaded with {len(disconnected)} disconnected device(s): {', '.join(disconnected)}")
+
+        except Exception as e:
+            logger.error(f"Error checking disconnected devices: {e}", exc_info=True)
+
+    def on_update_profile_name(self):
+        """Handle profile name change from input field"""
+        if not self.current_profile:
+            return
+
+        new_name = self.profile_name_input.text().strip()
+
+        # Validate name is not empty
+        if not new_name:
+            QMessageBox.warning(self, "Invalid Name", "Profile name cannot be empty.")
+            self.profile_name_input.setText(self.current_profile.profile_name)
+            return
+
+        # Check if name actually changed
+        if new_name == self.current_profile.profile_name:
+            return
+
+        # Update profile name
+        self.current_profile.profile_name = new_name
+
+        # Mark as modified
+        self.current_profile.mark_modified()
+
+        # Update UI
+        self.profile_info_label.setText(f"Profile: {new_name}")
+        self.on_profile_modified()
+
+        logger.info(f"Profile name updated to: {new_name}")
+
     def save_profile(self):
         """Save the modified profile to XML"""
         if not self.current_profile or not self.current_profile.is_modified:
             return
 
-        # Get output path - use default naming with _scpe suffix
-        output_path = None
+        # Prompt user for profile name
+        profile_name, ok = QInputDialog.getText(
+            self,
+            "Profile Name",
+            "Enter a name for your profile:",
+            QLineEdit.EchoMode.Normal,
+            self.current_profile.profile_name  # Default to current name
+        )
 
+        if not ok or not profile_name.strip():
+            # User cancelled or entered empty name
+            return
+
+        # Update the profile name
+        profile_name = profile_name.strip()
+        self.current_profile.profile_name = profile_name
+
+        # Generate filename using layout_<name>.xml pattern
+        suggested_name = f"layout_{profile_name}.xml"
+
+        # Determine default directory
         if self.current_profile.source_xml_path:
-            # Generate default filename with _scpe suffix
-            source_path = self.current_profile.source_xml_path
-            base_name = os.path.splitext(os.path.basename(source_path))[0]
-
-            # Remove _exported suffix if present
-            if base_name.endswith('_exported'):
-                base_name = base_name[:-9]
-
-            suggested_name = f"{base_name}_scpe.xml"
-            suggested_dir = os.path.dirname(source_path)
+            suggested_dir = os.path.dirname(self.current_profile.source_xml_path)
             default_path = os.path.join(suggested_dir, suggested_name)
         else:
-            # No source path, use profile name
-            suggested_name = f"{self.current_profile.profile_name}_scpe.xml"
+            # No source path, use current directory
             default_path = suggested_name
 
-        # Show save dialog with default name
+        # Show save dialog with generated filename
         output_path, _ = QFileDialog.getSaveFileName(
             self,
             "Export Profile",
@@ -1591,75 +1743,147 @@ class MainWindow(QMainWindow):
             )
 
     def show_help(self):
-        """Show the user guide in a dialog"""
-        # Create help dialog
-        help_dialog = QDialog(self)
-        help_dialog.setWindowTitle(f"User Guide - Star Citizen Profile Editor v{self.version}")
-        help_dialog.setGeometry(100, 100, 900, 700)
-
-        # Layout
-        layout = QVBoxLayout()
-        help_dialog.setLayout(layout)
-
-        # Text browser for displaying markdown as HTML
-        browser = QTextBrowser()
-        browser.setOpenExternalLinks(True)
-
-        # Load the README.md file
-        user_guide_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            "README.md"
-        )
-
+        """Show the user guide in a dialog with TOC sidebar"""
+        logger.info("=== show_help() called ===")
         try:
-            with open(user_guide_path, 'r', encoding='utf-8') as f:
-                markdown_content = f.read()
+            # Create help dialog
+            logger.info("Creating help dialog...")
+            help_dialog = QDialog(self)
+            help_dialog.setWindowTitle(f"User Guide - Star Citizen Profile Editor v{self.version}")
+            help_dialog.setGeometry(100, 100, 1200, 800)
+            logger.info("Help dialog created successfully")
 
-            # Convert markdown to HTML (basic conversion)
-            html_content = self.markdown_to_html(markdown_content)
-            browser.setHtml(html_content)
+            # Main layout
+            logger.info("Creating main layout...")
+            main_layout = QVBoxLayout()
+            help_dialog.setLayout(main_layout)
+            logger.info("Main layout set")
 
-        except FileNotFoundError:
-            browser.setHtml("<h1>User Guide Not Found</h1><p>The README.md file could not be found.</p>")
+            # Content area layout (horizontal: sidebar + browser)
+            logger.info("Creating content layout...")
+            content_layout = QHBoxLayout()
+
+            # Text browser for displaying markdown as HTML
+            logger.info("Creating text browser...")
+            browser = QTextBrowser()
+            browser.setOpenExternalLinks(True)
+            logger.info("Text browser created")
+
+            # Create sidebar for table of contents
+            logger.info("Creating TOC widget...")
+            toc_widget = QListWidget()
+            toc_widget.setMaximumWidth(250)
+            logger.info("Connecting TOC signal...")
+            toc_widget.itemClicked.connect(lambda item: self.navigate_to_section(browser, item.data(Qt.ItemDataRole.UserRole)))
+            logger.info("TOC signal connected")
+            content_layout.addWidget(toc_widget)
+            content_layout.addWidget(browser)
+            logger.info("Widgets added to content layout")
+
+            main_layout.addLayout(content_layout)
+            logger.info("Content layout added to main layout")
+
+            # Load the README.md file
+            logger.info("Finding README.md file...")
+            user_guide_path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                "README.md"
+            )
+            logger.info(f"README.md path: {user_guide_path}")
+
+            try:
+                logger.info("Opening README.md...")
+                with open(user_guide_path, 'r', encoding='utf-8') as f:
+                    markdown_content = f.read()
+                logger.info(f"README.md loaded: {len(markdown_content)} characters")
+
+                # Extract headings for TOC and convert markdown to HTML
+                logger.info("Extracting headings...")
+                headings = self.extract_headings(markdown_content)
+                logger.info(f"Found {len(headings)} headings")
+
+                # Populate TOC
+                logger.info("Populating TOC...")
+                for heading_level, heading_text in headings:
+                    logger.debug(f"Adding TOC item: level={heading_level}, text='{heading_text}'")
+                    item = QListWidgetItem(heading_text)
+                    anchor_id = self.create_anchor_id(heading_text)
+                    logger.debug(f"Anchor ID: {anchor_id}")
+                    item.setData(Qt.ItemDataRole.UserRole, anchor_id)
+                    # Indent sub-headings
+                    if heading_level > 2:
+                        item.setText("  " * (heading_level - 2) + heading_text)
+                    toc_widget.addItem(item)
+                logger.info(f"TOC populated with {toc_widget.count()} items")
+
+                # Convert markdown to HTML
+                logger.info("Converting markdown to HTML...")
+                html_content = self.markdown_to_html(markdown_content)
+                logger.info(f"HTML generated: {len(html_content)} characters")
+                logger.info("Setting HTML content in browser...")
+                browser.setHtml(html_content)
+                logger.info("HTML content set successfully")
+
+            except FileNotFoundError as e:
+                logger.error(f"README.md not found: {e}")
+                browser.setHtml("<h1>User Guide Not Found</h1><p>The README.md file could not be found.</p>")
+            except Exception as e:
+                logger.error(f"Error loading guide: {e}", exc_info=True)
+                browser.setHtml(f"<h1>Error Loading Guide</h1><p>{str(e)}</p>")
+
+            # Close button
+            logger.info("Creating close button...")
+            button_layout = QHBoxLayout()
+            close_btn = QPushButton("Close")
+            close_btn.clicked.connect(help_dialog.close)
+            button_layout.addStretch()
+            button_layout.addWidget(close_btn)
+            main_layout.addLayout(button_layout)
+            logger.info("Close button added")
+
+            logger.info("Showing help dialog...")
+            help_dialog.exec()
+            logger.info("Help dialog closed")
+
         except Exception as e:
-            browser.setHtml(f"<h1>Error Loading Guide</h1><p>{str(e)}</p>")
-
-        layout.addWidget(browser)
-
-        # Close button
-        close_btn = QPushButton("Close")
-        close_btn.clicked.connect(help_dialog.close)
-        layout.addWidget(close_btn)
-
-        help_dialog.exec()
+            logger.error(f"Fatal error in show_help(): {e}", exc_info=True)
+            QMessageBox.critical(self, "Help Dialog Error", f"Failed to show help dialog:\n{str(e)}")
 
     def markdown_to_html(self, markdown_text):
         """Convert markdown to HTML (basic implementation)"""
+        # Get theme-aware colors from the application palette
+        palette = self.palette()
+        text_color = palette.color(palette.ColorRole.Text).name()
+        base_color = palette.color(palette.ColorRole.Base).name()
+        link_color = palette.color(palette.ColorRole.Link).name()
+
+        # Increase font sizes for better readability
         html = "<html><head><style>"
-        html += "body { font-family: Arial, sans-serif; line-height: 1.8; padding: 20px; font-size: 14px; }"
-        html += "h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; font-size: 32px; font-weight: bold; margin-top: 20px; }"
-        html += "h2 { color: #34495e; border-bottom: 2px solid #95a5a6; padding-bottom: 5px; margin-top: 30px; font-size: 26px; font-weight: bold; }"
-        html += "h3 { color: #555; margin-top: 20px; font-size: 20px; font-weight: bold; }"
-        html += "h4 { color: #666; margin-top: 15px; font-size: 16px; font-weight: bold; }"
-        html += "p { font-size: 14px; margin: 10px 0; }"
-        html += "li { font-size: 14px; margin: 5px 0; }"
-        html += "a { color: #3498db; text-decoration: none; }"
-        html += "a:hover { text-decoration: underline; }"
-        html += "code { background-color: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 13px; }"
-        html += "pre { background-color: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; font-size: 13px; }"
-        html += "ul { margin-left: 20px; font-size: 14px; }"
-        html += "ol { margin-left: 20px; font-size: 14px; }"
-        html += "strong { color: #2c3e50; font-weight: bold; }"
-        html += "blockquote { border-left: 4px solid #3498db; padding-left: 15px; color: #555; font-style: italic; font-size: 14px; }"
-        html += "table { border-collapse: collapse; width: 100%; margin: 20px 0; }"
-        html += "th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }"
-        html += "th { background-color: #3498db; color: white; font-weight: bold; }"
-        html += "tr:nth-child(even) { background-color: #f2f2f2; }"
+        html += f"body {{ font-family: Segoe UI, Arial, sans-serif; line-height: 1.8; padding: 20px; font-size: 16px; color: {text_color}; background-color: {base_color}; }}"
+        html += f"h1 {{ color: {link_color}; border-bottom: 3px solid {link_color}; padding-bottom: 10px; font-size: 36px; font-weight: bold; margin-top: 20px; }}"
+        html += f"h2 {{ color: {link_color}; border-bottom: 2px solid {link_color}; padding-bottom: 5px; margin-top: 30px; font-size: 28px; font-weight: bold; }}"
+        html += f"h3 {{ color: {link_color}; margin-top: 20px; font-size: 22px; font-weight: bold; }}"
+        html += f"h4 {{ color: {link_color}; margin-top: 15px; font-size: 18px; font-weight: bold; }}"
+        html += f"p {{ font-size: 16px; margin: 10px 0; color: {text_color}; }}"
+        html += f"li {{ font-size: 16px; margin: 5px 0; color: {text_color}; }}"
+        html += f"a {{ color: {link_color}; text-decoration: none; }}"
+        html += f"a:hover {{ text-decoration: underline; }}"
+        html += f"code {{ background-color: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 15px; color: {text_color}; }}"
+        html += f"pre {{ background-color: rgba(0,0,0,0.05); padding: 10px; border-radius: 5px; overflow-x: auto; font-size: 15px; color: {text_color}; }}"
+        html += f"ul {{ margin-left: 20px; font-size: 16px; }}"
+        html += f"ol {{ margin-left: 20px; font-size: 16px; }}"
+        html += f"strong {{ color: {text_color}; font-weight: bold; }}"
+        html += f"blockquote {{ border-left: 4px solid {link_color}; padding-left: 15px; color: {text_color}; font-style: italic; font-size: 16px; }}"
+        html += f"table {{ border-collapse: collapse; width: 100%; margin: 20px 0; }}"
+        html += f"th, td {{ border: 1px solid {link_color}; padding: 10px; text-align: left; font-size: 16px; color: {text_color}; }}"
+        html += f"th {{ background-color: {link_color}; color: white; font-weight: bold; }}"
+        html += f"tr:nth-child(even) {{ background-color: rgba(0,0,0,0.03); }}"
         html += "</style></head><body>"
 
         lines = markdown_text.split('\n')
         in_code_block = False
         in_list = False
+        in_blockquote = False
 
         for line in lines:
             # Code blocks
@@ -1676,33 +1900,79 @@ class MainWindow(QMainWindow):
                 html += line + "\n"
                 continue
 
+            # Skip image badges (![...])
+            if line.strip().startswith('!['):
+                continue
+
             # Headers (with anchor IDs for links)
             if line.startswith('# '):
+                if in_list:
+                    html += f"</{in_list}>"
+                    in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 header_text = line[2:].strip()
                 anchor_id = self.create_anchor_id(header_text)
                 html += f"<h1 id='{anchor_id}'>{header_text}</h1>"
             elif line.startswith('## '):
+                if in_list:
+                    html += f"</{in_list}>"
+                    in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 header_text = line[3:].strip()
                 anchor_id = self.create_anchor_id(header_text)
                 html += f"<h2 id='{anchor_id}'>{header_text}</h2>"
             elif line.startswith('### '):
+                if in_list:
+                    html += f"</{in_list}>"
+                    in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 header_text = line[4:].strip()
                 anchor_id = self.create_anchor_id(header_text)
                 html += f"<h3 id='{anchor_id}'>{header_text}</h3>"
             elif line.startswith('#### '):
+                if in_list:
+                    html += f"</{in_list}>"
+                    in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 header_text = line[5:].strip()
                 anchor_id = self.create_anchor_id(header_text)
                 html += f"<h4 id='{anchor_id}'>{header_text}</h4>"
+            # Blockquotes
+            elif line.strip().startswith('> '):
+                if in_list:
+                    html += f"</{in_list}>"
+                    in_list = False
+                if not in_blockquote:
+                    html += "<blockquote>"
+                    in_blockquote = True
+                blockquote_text = line.strip()[2:].strip()
+                html += f"{self.format_inline_markdown(blockquote_text)}<br/>"
             # Ordered lists
-            elif line.strip().startswith(tuple(f"{i}. " for i in range(1, 100))):
-                if not in_list:
+            elif line.strip() and line.strip()[0].isdigit() and '. ' in line.strip()[:4]:
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
+                if in_list != 'ol':
+                    if in_list:
+                        html += f"</{in_list}>"
                     html += "<ol>"
                     in_list = 'ol'
                 # Extract the list item text (after the number and period)
-                item_text = line.strip().split('. ', 1)[1] if '. ' in line else line.strip()
+                item_text = line.strip().split('. ', 1)[1] if '. ' in line.strip() else line.strip()
                 html += f"<li>{self.format_inline_markdown(item_text)}</li>"
             # Unordered lists
             elif line.strip().startswith('- ') or line.strip().startswith('* '):
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 if in_list != 'ul':
                     if in_list:
                         html += f"</{in_list}>"
@@ -1714,22 +1984,33 @@ class MainWindow(QMainWindow):
                 if in_list:
                     html += f"</{in_list}>"
                     in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 html += "<hr/>"
             # Empty line
             elif not line.strip():
                 if in_list:
                     html += f"</{in_list}>"
                     in_list = False
-                html += "<br/>"
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
+                # Don't add extra breaks, just skip empty lines
             # Regular paragraph
             else:
                 if in_list:
                     html += f"</{in_list}>"
                     in_list = False
+                if in_blockquote:
+                    html += "</blockquote>"
+                    in_blockquote = False
                 html += f"<p>{self.format_inline_markdown(line)}</p>"
 
         if in_list:
             html += f"</{in_list}>"
+        if in_blockquote:
+            html += "</blockquote>"
 
         html += "</body></html>"
         return html
@@ -1759,6 +2040,28 @@ class MainWindow(QMainWindow):
         text = re.sub(r'\[(.+?)\]\((.+?)\)', r'<a href="\2">\1</a>', text)
 
         return text
+
+    def extract_headings(self, markdown_text):
+        """Extract all headings from markdown text with their levels"""
+        headings = []
+        lines = markdown_text.split('\n')
+
+        for line in lines:
+            if line.startswith('# '):
+                headings.append((1, line[2:].strip()))
+            elif line.startswith('## '):
+                headings.append((2, line[3:].strip()))
+            elif line.startswith('### '):
+                headings.append((3, line[4:].strip()))
+            elif line.startswith('#### '):
+                headings.append((4, line[5:].strip()))
+
+        return headings
+
+    def navigate_to_section(self, browser, anchor_id):
+        """Navigate to a section in the browser by anchor ID"""
+        if anchor_id:
+            browser.scrollToAnchor(anchor_id)
 
     def open_discord_link(self, event):
         """Open Discord invite link in browser"""

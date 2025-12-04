@@ -2,7 +2,7 @@
 ; Created with Inno Setup
 
 #define MyAppName "Star Citizen Profile Editor"
-#define MyAppVersion "0.6.0"
+#define MyAppVersion "0.6.1"
 #define MyAppPublisher "SC Profile Tools"
 #define MyAppURL "https://github.com/yourusername/scpe-releases"
 #define MyAppExeName "SCProfileEditor.exe"
@@ -46,7 +46,8 @@ Source: "dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "assets\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "label_overrides.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "visual-templates\*"; DestDir: "{app}\visual-templates"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Visual templates are embedded in the .onefile executable
+; Source: "dist\visual-templates\*"; DestDir: "{app}\visual-templates"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "example-profiles\*"; DestDir: "{app}\example-profiles"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2025-12-03
+
 ### Added
 - **Keyboard modifier support** - Full support for Ctrl, Alt, and Shift key modifiers:
   - Detect and generate modifier key combinations (Ctrl+A, Alt+P, Shift+Down, etc.)
@@ -16,6 +18,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Support for AltGr (Right Alt) on non-US keyboards
   - Input codes format: `kb1_{modifier}+{key}` (e.g., `kb1_lctrl+a`)
   - Human-readable display: "Keyboard Left Ctrl+A", "Keyboard Right Alt+P", etc.
+- **Device Configuration Tab** (new "Config" tab):
+  - View all connected devices with type, product name, and instance number
+  - "Refresh Devices" button to re-detect connected devices
+  - Configure device-to-joystick mappings (js1, js2, js3, etc.)
+  - "Auto-Populate from Connected Devices" button to automatically map connected joysticks
+  - "Save Configuration" button to persist device mappings to settings
+  - Star Citizen profiles directory configuration with browse button
+  - Helps maintain consistent bindings when devices connect in different order
+- **Device hot-swap detection** - Devices plugged in after app startup are now detected:
+  - Pygame joystick module reinitialized on each device refresh
+  - Disconnected devices completely removed from connected list (no "(unavailable)" placeholders)
+  - Device mapping automatically cleaned when devices disconnect
+- **Device View enhancements**:
+  - Always show profile devices with [DISCONNECTED] suffix when not connected
+  - Warning popup when loading profile with disconnected devices
+  - Status bar shows connection count (e.g., "3/5 connected")
+  - "Show all templates" toggle to view unsupported devices (for manual selection)
 - **Device View UX improvements**:
   - Hide "Change Input Binding" section when editing from Device View (input already determined by button clicked)
   - Cleaner, more focused dialog for managing actions on a specific button
@@ -31,9 +50,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cleaner action selection experience with 585 unique actions instead of 621
 
 ### Fixed
+- Fixed keyboard input detection that stopped working when editing mappings from control table (modal dialogs suppressed pynput listeners)
+- Fixed joystick input detection to use pygame instead of unavailable python-dinput
+- Fixed control table showing wrong device (now uses actual connected hardware instead of profile device)
+- Fixed device filter missing keyboard and mouse options (now always shown)
+- Fixed input detection not applying device mapping from Config tab (detected input now remapped based on configuration)
 - Fixed Ctrl+letter modifier detection that was mapping to control characters (showing as squares/rectangles)
 - Fixed AltGr (Right Alt on non-US keyboards) blocking regular key input detection
 - Fixed duplicate actions appearing in "ALL" and category action dropdowns
+- Fixed disconnected devices not being removed from mapping list (now completely removed when device disconnect detected)
+- Fixed device not appearing in list after hot-plugging (now redetects on each refresh)
 
 ## [0.6.0] - 2025-11-19
 
