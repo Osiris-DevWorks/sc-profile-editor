@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2025-12-03
+
 ### Added
 - **Keyboard modifier support** - Full support for Ctrl, Alt, and Shift key modifiers:
   - Detect and generate modifier key combinations (Ctrl+A, Alt+P, Shift+Down, etc.)
