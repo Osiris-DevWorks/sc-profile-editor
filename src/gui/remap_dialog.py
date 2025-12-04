@@ -18,6 +18,7 @@ from models.profile_model import ActionBinding, ControlProfile
 from parser.label_generator import LabelGenerator
 from utils.input_validator import InputValidator
 from utils.input_detector import InputDetector
+from utils.settings import AppSettings
 
 logger = logging.getLogger(__name__)
 
@@ -218,6 +219,11 @@ class RemapDialog(QDialog):
             logger.debug("Setting up input detector")
             self.input_detector = InputDetector()
             self.detecting_input = False
+
+            # Load device mapping from settings (for remapping detected input)
+            settings = AppSettings()
+            self.device_mapping = settings.get_device_config()
+            logger.debug(f"Loaded device mapping: {self.device_mapping}")
 
             # Store action assignment widgets for easy access
             self.action_widgets = []
@@ -666,12 +672,63 @@ class RemapDialog(QDialog):
             detector_thread.input_detected.connect(self.on_input_detected)
             detector_thread.detection_cancelled.connect(self.on_input_detection_timeout)
 
+    def _apply_device_mapping(self, input_code: str) -> str:
+        """Apply device mapping to remap joystick indices if configured"""
+        if not self.device_mapping or not input_code.startswith('js'):
+            return input_code
+
+        # Extract joystick instance from input code (e.g., "js1_button1" -> 1)
+        import re
+        match = re.match(r'js(\d+)_', input_code)
+        if not match:
+            return input_code
+
+        detected_instance = int(match.group(1))
+        rest_of_code = input_code[len(f"js{detected_instance}_"):]  # e.g., "button1"
+
+        # Get the list of connected devices
+        connected_devices = InputDetector.get_available_devices()
+
+        # Find which physical device was detected at the detected_instance
+        detected_device_name = None
+        for device in connected_devices:
+            if device.get('type') == 'joystick' and device.get('instance') == detected_instance:
+                detected_device_name = device.get('name', '')
+                logger.debug(f"Detected device at js{detected_instance}: {detected_device_name}")
+                break
+
+        if not detected_device_name:
+            logger.debug(f"No device found at js{detected_instance}, no mapping applied")
+            return input_code
+
+        # Now find which js slot in the mapping corresponds to this physical device
+        # device_mapping format: {"js1": "Thrustmaster T.16000M", "js2": "VKB Stick", ...}
+        for js_slot, mapped_device_name in self.device_mapping.items():
+            # Check if this is the device we detected
+            if mapped_device_name and mapped_device_name.lower() in detected_device_name.lower():
+                try:
+                    target_instance = int(js_slot.replace('js', ''))
+                    if target_instance != detected_instance:
+                        # Remap: detected js1_button1 -> js2_button1 if that's where it's mapped
+                        remapped_code = f"js{target_instance}_{rest_of_code}"
+                        logger.info(f"Device mapping applied: {input_code} -> {remapped_code}")
+                        return remapped_code
+                except (ValueError, AttributeError):
+                    continue
+
+        logger.debug(f"No mapping found for device '{detected_device_name}', keeping original js{detected_instance}")
+        return input_code
+
     def on_input_detected(self, input_code: str, description: str):
         """Handle detected input"""
         logger.info(f"Input detected: {input_code} - {description}")
 
+        # Apply device mapping to remap joystick indices
+        mapped_input_code = self._apply_device_mapping(input_code)
+        logger.debug(f"After mapping: {input_code} -> {mapped_input_code}")
+
         # Update the stored input code
-        self.input_code = input_code
+        self.input_code = mapped_input_code
 
         # Update the UI with proper formatting
         current_display = self._get_current_input_display()
