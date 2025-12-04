@@ -582,4 +582,31 @@ This guide is for Star Citizen Profile Editor v0.6.1
 
 ---
 
+## Support the Project
+
+SC Profile Editor is a free, open-source project created to help Star Citizen players manage their control profiles. If you find it useful and would like to support the development, here are ways you can help:
+
+### Donate
+
+Your financial support helps fund development of new features and device templates:
+
+- **PayPal:** [https://paypal.me/RighteousKill](https://paypal.me/RighteousKill)
+- **Venmo:** [https://venmo.com/u/Amr-Abouelleil](https://venmo.com/u/Amr-Abouelleil)
+
+### Contribute
+
+- **Report bugs** with steps to reproduce
+- **Request features** you'd like to see
+- **Request device templates** for controllers you own
+- **Share configurations** and label sets with the community
+- **Submit code contributions** via GitHub
+
+### Join the Community
+
+- **Discord:** [https://discord.gg/BNzRegKZ7k](https://discord.gg/BNzRegKZ7k) - Join for support, discussions, and feature requests
+
+Even if you can't donate, your feedback and bug reports are invaluable!
+
+---
+
 **Happy Flying, Citizen!** o7
