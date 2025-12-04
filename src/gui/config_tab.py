@@ -185,6 +185,12 @@ class ConfigTab(QWidget):
                 self.devices_table.setItem(row, 2, inst_item)
 
             # Update mapping dropdowns with current devices
+            # Also clean up device_mapping to remove disconnected devices
+            connected_device_names = set()
+            for device in self.current_devices:
+                if device.get('type') == 'joystick':
+                    connected_device_names.add(device.get('name', f"Joystick {device.get('instance', 0)}"))
+
             for combo in self.mapping_combos.values():
                 combo.blockSignals(True)
                 current_selection = combo.currentData()
@@ -200,13 +206,25 @@ class ConfigTab(QWidget):
                         combo.addItem(display_text, product_name)
 
                 # Restore previous selection if still available
-                if current_selection:
+                if current_selection and current_selection in connected_device_names:
                     for i in range(combo.count()):
                         if combo.itemData(i) == current_selection:
                             combo.setCurrentIndex(i)
                             break
 
                 combo.blockSignals(False)
+
+            # Clean up device_mapping: remove devices that are no longer connected
+            updated_mapping = {}
+            for js_label, device_name in self.device_mapping.items():
+                if device_name in connected_device_names:
+                    updated_mapping[js_label] = device_name
+
+            if updated_mapping != self.device_mapping:
+                logger.info(f"Cleaned up device mapping: removed {len(self.device_mapping) - len(updated_mapping)} disconnected device(s)")
+                self.device_mapping = updated_mapping
+                # Save the cleaned up mapping
+                self.settings.set_device_config(updated_mapping)
 
             logger.info(f"Devices refreshed: {len(self.current_devices)} devices found")
 
