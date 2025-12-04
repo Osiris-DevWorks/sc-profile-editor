@@ -590,8 +590,18 @@ SC Profile Editor is a free, open-source project created to help Star Citizen pl
 
 Your financial support helps fund development of new features and device templates:
 
-- **PayPal:** [https://paypal.me/RighteousKill](https://paypal.me/RighteousKill)
-- **Venmo:** [https://venmo.com/u/Amr-Abouelleil](https://venmo.com/u/Amr-Abouelleil)
+<html>
+<div style="text-align: center; margin: 20px 0;">
+  <a href="https://paypal.me/RighteousKill" style="display: inline-block; margin: 0 15px;">
+    <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal" style="height: 40px; vertical-align: middle;">
+    <span style="margin-left: 10px; font-weight: bold;">Donate via PayPal</span>
+  </a>
+  <a href="https://venmo.com/u/Amr-Abouelleil" style="display: inline-block; margin: 0 15px;">
+    <img src="https://venmo.com/favicon.ico" alt="Venmo" style="height: 40px; vertical-align: middle;">
+    <span style="margin-left: 10px; font-weight: bold;">Donate via Venmo</span>
+  </a>
+</div>
+</html>
 
 ### Contribute
 
@@ -603,7 +613,16 @@ Your financial support helps fund development of new features and device templat
 
 ### Join the Community
 
-- **Discord:** [https://discord.gg/BNzRegKZ7k](https://discord.gg/BNzRegKZ7k) - Join for support, discussions, and feature requests
+<html>
+<div style="text-align: center; margin: 20px 0;">
+  <a href="https://discord.gg/BNzRegKZ7k" style="display: inline-block; margin: 0 15px;">
+    <img src="https://discord.com/assets/favicon.ico" alt="Discord" style="height: 40px; vertical-align: middle;">
+    <span style="margin-left: 10px; font-weight: bold;">Join Discord Community</span>
+  </a>
+</div>
+
+Join for support, discussions, and feature requests
+</html>
 
 Even if you can't donate, your feedback and bug reports are invaluable!
 
