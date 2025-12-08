@@ -26,11 +26,14 @@
         "Gladiator SCG R",
         "VKB Gladiator SCG Right",
         "VKBsim Gladiator EVO R",
-        "Gladiator EVO R"
+        "Gladiator EVO R",
+        "VKBsim Gladiator NXT R",
+        "VKB-Sim Gladiator NXT R",
+        "Gladiator NXT R"
       ],
       "type": "joystick",
       "manufacturer": "VKB",
-      "notes": "SCG grip - standard right hand configuration"
+      "notes": "SCG grip - standard right hand configuration. Matches SCG, EVO, and NXT base variants."
     },
     {
       "id": "vkb_gladiator_scg_lh",
@@ -43,11 +46,15 @@
         "VKBsim Gladiator SCG L SEM",
         "VKBsim Gladiator EVO L",
         "Gladiator EVO L",
-        "VKBsim Gladiator EVO L SEM"
+        "VKBsim Gladiator EVO L SEM",
+        "VKBsim Gladiator NXT L",
+        "VKB-Sim Gladiator NXT L",
+        "Gladiator NXT L",
+        "VKBsim Gladiator NXT L SEM"
       ],
       "type": "joystick",
       "manufacturer": "VKB",
-      "notes": "SCG grip - standard left hand configuration (no OTA). Matches with or without SEM module."
+      "notes": "SCG grip - standard left hand configuration (no OTA). Matches SCG, EVO, and NXT base variants with or without SEM module."
     },
     {
       "id": "vkb_gladiator_scg_ota_rh",
@@ -59,12 +66,13 @@
         "VKB Gladiator SCG OTA Right",
         "VKBsim Gladiator EVO OTA R",
         "Gladiator EVO OTA R",
-        "VKBsim Gladiator EVO R",
-        "Gladiator EVO R"
+        "VKBsim Gladiator NXT OTA R",
+        "VKB-Sim Gladiator NXT OTA R",
+        "Gladiator NXT OTA R"
       ],
       "type": "joystick",
       "manufacturer": "VKB",
-      "notes": "SCG with Omni Throttle Adapter - right hand. Also matches EVO bases."
+      "notes": "SCG with Omni Throttle Adapter - right hand. Matches SCG, EVO, and NXT base variants with OTA."
     },
     {
       "id": "vkb_gladiator_scg_ota_lh",
@@ -78,11 +86,15 @@
         "Gladiator EVO OTA L",
         "VKBsim Gladiator EVO L",
         "Gladiator EVO L",
-        "VKBsim Gladiator EVO L SEM"
+        "VKBsim Gladiator EVO L SEM",
+        "VKBsim Gladiator NXT OTA L",
+        "VKB-Sim Gladiator NXT OTA L",
+        "Gladiator NXT OTA L",
+        "VKBsim Gladiator NXT L SEM"
       ],
       "type": "joystick",
       "manufacturer": "VKB",
-      "notes": "SCG with Omni Throttle Adapter. EVO bases typically use OTA-capable grips. Matches with or without SEM module."
+      "notes": "SCG with Omni Throttle Adapter - left hand. Matches SCG, EVO, and NXT base variants with or without SEM module."
     },
     {
       "id": "vkb_sem",
