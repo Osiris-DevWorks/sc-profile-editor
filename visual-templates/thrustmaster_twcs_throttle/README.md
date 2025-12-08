@@ -30,7 +30,25 @@ The Thrustmaster TWCS Throttle typically includes:
 - Rudder rocker (optional)
 
 ## Status
-🚧 **In Development** - Template not yet created
+✅ **Complete** - PDF template with interactive form fields created
+
+## Form Fields
+The PDF template includes 10 interactive form fields positioned at device control callout locations:
+1. **Antenna_Paddle** - Paddle switch on back
+2. **POV_Up** - POV/HAT switch upward
+3. **POV_Right** - POV/HAT switch rightward
+4. **POV_Down** - POV/HAT switch downward
+5. **POV_Left** - POV/HAT switch leftward
+6. **Rotation_Axis** - Analog mini-stick/rocker rotation
+7. **Throttle_Axis** - Main throttle slider axis
+8. **Button_1** - Primary button
+9. **Button_2** - Secondary button
+10. **Button_3** - Tertiary button
+
+## Files
+- **thrustmaster_twcs_throttle.svg** - Original SVG file
+- **thrustmaster_twcs_throttle_labeled.png** - PNG render with labels (2651x1669px)
+- **thrustmaster_twcs_throttle.pdf** - Interactive PDF template with form fields
 
 ## Related Profiles
 Used in:
@@ -41,3 +59,4 @@ Used in:
 - Popular budget HOTAS option
 - Features S.M.A.R.T (Sliding Motion Advanced Rail Tracks) technology
 - Ambidextrous design
+- PDF template ready for use in SC Profile Editor

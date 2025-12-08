@@ -138,6 +138,7 @@
     {
       "id": "thrustmaster_twcs_throttle",
       "name": "Thrustmaster TWCS Throttle",
+      "pdf": "thrustmaster_twcs_throttle/thrustmaster_twcs_throttle.pdf",
       "device_match_patterns": [
         "Thrustmaster TWCS Throttle",
         "TWCS Throttle",
@@ -146,7 +147,19 @@
       ],
       "type": "throttle",
       "manufacturer": "Thrustmaster",
-      "buttons": {}
+      "notes": "Interactive PDF template with 10 form fields for control mapping",
+      "field_mapping": {
+        "Antenna_Paddle": "Paddle switch on back",
+        "POV_Up": "POV/HAT switch upward direction",
+        "POV_Right": "POV/HAT switch rightward direction",
+        "POV_Down": "POV/HAT switch downward direction",
+        "POV_Left": "POV/HAT switch leftward direction",
+        "Rotation_Axis": "Analog mini-stick or rocker rotation",
+        "Throttle_Axis": "Main throttle slider axis",
+        "Button_1": "Primary button on throttle body",
+        "Button_2": "Secondary button on throttle body",
+        "Button_3": "Tertiary button on throttle body"
+      }
     },
     {
       "id": "vkb_fsm_ga",
