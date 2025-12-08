@@ -266,7 +266,7 @@ class MainWindow(QMainWindow):
         self.controls_table = QTableWidget()
         self.controls_table.setColumnCount(8)  # Max columns for detailed view
         self.controls_table.setHorizontalHeaderLabels([
-            "Action Category", "Action", "Label", "Input", "Device", "Edit", "Activation", ""
+            "Action Category", "Action", "Label", "Input", "Activation", "Device", "Edit", ""
         ])
         self.controls_table.horizontalHeader().setStretchLastSection(False)
         self.controls_table.setAlternatingRowColors(True)
@@ -719,15 +719,15 @@ class MainWindow(QMainWindow):
         # Configure column visibility based on view mode
         if is_detailed:
             # Detailed view: Show columns 0, 1, 2, 3, 4, 5, 6
-            # 0: Action Category, 1: Action (original), 2: Label, 3: Input, 4: Device, 5: Edit, 6: Activation
+            # 0: Action Category, 1: Action (original), 2: Label, 3: Input, 4: Activation, 5: Device, 6: Edit
             self.controls_table.setColumnHidden(1, False)
-            self.controls_table.setColumnHidden(6, False)  # Show activation mode column
+            self.controls_table.setColumnHidden(4, False)  # Show activation mode column
             self.controls_table.setColumnHidden(7, True)   # Hide raw input code column
         else:
-            # Default view: Show columns 0, 2, 3, 4, 5
-            # 0: Action Category, 2: Label, 3: Input, 4: Device, 5: Edit
+            # Default view: Show columns 0, 2, 3, 5, 6
+            # 0: Action Category, 2: Label, 3: Input, 5: Device, 6: Edit
             self.controls_table.setColumnHidden(1, True)   # Hide original Action
-            self.controls_table.setColumnHidden(6, True)   # Hide activation mode column
+            self.controls_table.setColumnHidden(4, True)   # Hide activation mode column
             self.controls_table.setColumnHidden(7, True)   # Hide raw input code column
 
         # Populate table
@@ -765,7 +765,13 @@ class MainWindow(QMainWindow):
             input_item.setFlags(input_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             self.controls_table.setItem(row, 3, input_item)
 
-            # Column 4: Device (parsed from input code)
+            # Column 4: Activation Mode (only visible in detailed view)
+            activation_text = binding.activation_mode if binding.activation_mode else ""
+            activation_item = QTableWidgetItem(activation_text)
+            activation_item.setFlags(activation_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            self.controls_table.setItem(row, 4, activation_item)
+
+            # Column 5: Device (parsed from input code)
             if is_unmapped:
                 # For unmapped actions, show blank
                 device_item = QTableWidgetItem("")
@@ -773,19 +779,13 @@ class MainWindow(QMainWindow):
                 device = self.parse_device_from_input(binding.input_code)
                 device_item = QTableWidgetItem(device)
             device_item.setFlags(device_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            self.controls_table.setItem(row, 4, device_item)
+            self.controls_table.setItem(row, 5, device_item)
 
-            # Column 5: Edit button
+            # Column 6: Edit button
             edit_btn = QPushButton("✏️")
             edit_btn.setMaximumWidth(40)
             edit_btn.clicked.connect(lambda checked, r=row: self.on_edit_input_clicked(r))
-            self.controls_table.setCellWidget(row, 5, edit_btn)
-
-            # Column 6: Activation Mode (only visible in detailed view)
-            activation_text = binding.activation_mode if binding.activation_mode else ""
-            activation_item = QTableWidgetItem(activation_text)
-            activation_item.setFlags(activation_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            self.controls_table.setItem(row, 6, activation_item)
+            self.controls_table.setCellWidget(row, 6, edit_btn)
 
             # Column 7: Raw input code (hidden, for reference)
             input_code_item = QTableWidgetItem(binding.input_code)
@@ -807,15 +807,15 @@ class MainWindow(QMainWindow):
             self.controls_table.setColumnWidth(1, 200)  # Action (Original)
             self.controls_table.setColumnWidth(2, 200)  # Label
             self.controls_table.setColumnWidth(3, 200)  # Input
-            self.controls_table.setColumnWidth(4, 120)  # Device
-            self.controls_table.setColumnWidth(5, 50)   # Edit button
-            self.controls_table.setColumnWidth(6, 100)  # Activation Mode
+            self.controls_table.setColumnWidth(4, 100)  # Activation Mode
+            self.controls_table.setColumnWidth(5, 120)  # Device
+            self.controls_table.setColumnWidth(6, 50)   # Edit button
         else:
             self.controls_table.setColumnWidth(0, 150)  # Action Category
             self.controls_table.setColumnWidth(2, 200)  # Label
             self.controls_table.setColumnWidth(3, 200)  # Input
-            self.controls_table.setColumnWidth(4, 120)  # Device
-            self.controls_table.setColumnWidth(5, 50)   # Edit button
+            self.controls_table.setColumnWidth(5, 120)  # Device
+            self.controls_table.setColumnWidth(6, 50)   # Edit button
 
     def parse_device_from_input(self, input_code: str) -> str:
         """Parse device type from input code using actual connected device info"""
