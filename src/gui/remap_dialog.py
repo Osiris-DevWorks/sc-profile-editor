@@ -145,7 +145,7 @@ class ActionAssignmentWidget(QWidget):
 
         layout.addLayout(header_layout)
 
-        # Custom label editor
+        # Custom label editor and activation mode
         label_layout = QFormLayout()
 
         self.label_edit = QLineEdit()
@@ -153,6 +153,21 @@ class ActionAssignmentWidget(QWidget):
         self.label_edit.setText(custom_label)
         self.label_edit.setPlaceholderText(f"Default: {action_label}")
         label_layout.addRow("Custom Label:", self.label_edit)
+
+        # Activation mode dropdown
+        self.activation_mode_combo = QComboBox()
+        self.activation_mode_combo.addItem("press", "press")
+        self.activation_mode_combo.addItem("double_tap", "double_tap")
+
+        # Set current activation mode (default to "press" if not set)
+        current_activation = self.binding.activation_mode or "press"
+        index = self.activation_mode_combo.findData(current_activation)
+        if index >= 0:
+            self.activation_mode_combo.setCurrentIndex(index)
+        else:
+            self.activation_mode_combo.setCurrentIndex(0)  # Default to "press"
+
+        label_layout.addRow("Activation Mode:", self.activation_mode_combo)
 
         layout.addLayout(label_layout)
 
@@ -181,6 +196,10 @@ class ActionAssignmentWidget(QWidget):
     def get_custom_label(self) -> str:
         """Get the custom label from the text field"""
         return self.label_edit.text().strip()
+
+    def get_activation_mode(self) -> str:
+        """Get the selected activation mode (or 'press' as default)"""
+        return self.activation_mode_combo.currentData() or "press"
 
 
 class RemapDialog(QDialog):
@@ -620,9 +639,10 @@ class RemapDialog(QDialog):
         # Collect all modified bindings (with custom labels and updated input code)
         modified_bindings = []
 
-        # Update custom labels and input code for all current bindings
+        # Update custom labels, activation mode, and input code for all current bindings
         for i, widget in enumerate(self.action_widgets):
             custom_label = widget.get_custom_label()
+            activation_mode = widget.get_activation_mode()
             binding = widget.binding
 
             # Set custom label
@@ -631,6 +651,9 @@ class RemapDialog(QDialog):
                 binding.custom_label = custom_label
             else:
                 binding.custom_label = None
+
+            # Set activation mode (default to "press" if empty)
+            binding.activation_mode = activation_mode if activation_mode else "press"
 
             # Update input code if it has changed
             # For single_action_mode (editing from table), apply the current input code to the binding

@@ -766,7 +766,8 @@ class MainWindow(QMainWindow):
             self.controls_table.setItem(row, 3, input_item)
 
             # Column 4: Activation Mode (only visible in detailed view)
-            activation_text = binding.activation_mode if binding.activation_mode else ""
+            # Default to "press" if no activation mode is specified
+            activation_text = binding.activation_mode if binding.activation_mode else "press"
             activation_item = QTableWidgetItem(activation_text)
             activation_item.setFlags(activation_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             self.controls_table.setItem(row, 4, activation_item)
