@@ -30,20 +30,28 @@ The Thrustmaster TWCS Throttle typically includes:
 - Rudder rocker (optional)
 
 ## Status
-✅ **Complete** - PDF template with interactive form fields created
+✅ **Complete** - PDF template with 23 interactive form fields (corrected placement from SVG analysis)
 
 ## Form Fields
-The PDF template includes 10 interactive form fields positioned at device control callout locations:
-1. **Antenna_Paddle** - Paddle switch on back
-2. **POV_Up** - POV/HAT switch upward
-3. **POV_Right** - POV/HAT switch rightward
-4. **POV_Down** - POV/HAT switch downward
-5. **POV_Left** - POV/HAT switch leftward
-6. **Rotation_Axis** - Analog mini-stick/rocker rotation
-7. **Throttle_Axis** - Main throttle slider axis
-8. **Button_1** - Primary button
-9. **Button_2** - Secondary button
-10. **Button_3** - Tertiary button
+The PDF template includes 23 interactive form fields precisely positioned from SVG label coordinates:
+
+### Buttons (14 fields)
+- Button_1 through Button_14 - All physical buttons on the throttle
+
+### HAT Switch / POV (4 fields)
+- Hat_1_Up - POV/HAT switch upward direction
+- Hat_1_Right - POV/HAT switch rightward direction
+- Hat_1_Down - POV/HAT switch downward direction
+- Hat_1_Left - POV/HAT switch leftward direction
+
+### Axes (4 fields)
+- Axis_X - Left/Right axis (mini-stick or rocker)
+- Axis_Y - Forward/Back axis (mini-stick or rocker)
+- Axis_Z - Up/Down axis
+- Axis_ROTZ - Rotation axis
+
+### Sliders (1 field)
+- Slider_1 - Main throttle slider
 
 ## Files
 - **thrustmaster_twcs_throttle.svg** - Original SVG file
