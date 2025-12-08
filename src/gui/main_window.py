@@ -266,7 +266,7 @@ class MainWindow(QMainWindow):
         self.controls_table = QTableWidget()
         self.controls_table.setColumnCount(8)  # Max columns for detailed view
         self.controls_table.setHorizontalHeaderLabels([
-            "Action Category", "Action", "Label", "Input", "Activation", "Device", "Edit", ""
+            "Action Category", "Action", "Label", "Input", "Activation", "Device", "Edit", "Input Code"
         ])
         self.controls_table.horizontalHeader().setStretchLastSection(False)
         self.controls_table.setAlternatingRowColors(True)
@@ -718,11 +718,11 @@ class MainWindow(QMainWindow):
 
         # Configure column visibility based on view mode
         if is_detailed:
-            # Detailed view: Show columns 0, 1, 2, 3, 4, 5, 6
-            # 0: Action Category, 1: Action (original), 2: Label, 3: Input, 4: Activation, 5: Device, 6: Edit
+            # Detailed view: Show columns 0, 1, 2, 3, 4, 5, 6, 7
+            # 0: Action Category, 1: Action (original), 2: Label, 3: Input, 4: Activation, 5: Device, 6: Edit, 7: Input Code
             self.controls_table.setColumnHidden(1, False)
             self.controls_table.setColumnHidden(4, False)  # Show activation mode column
-            self.controls_table.setColumnHidden(7, True)   # Hide raw input code column
+            self.controls_table.setColumnHidden(7, False)  # Show raw input code column
         else:
             # Default view: Show columns 0, 2, 3, 5, 6
             # 0: Action Category, 2: Label, 3: Input, 5: Device, 6: Edit
@@ -810,6 +810,7 @@ class MainWindow(QMainWindow):
             self.controls_table.setColumnWidth(4, 100)  # Activation Mode
             self.controls_table.setColumnWidth(5, 120)  # Device
             self.controls_table.setColumnWidth(6, 50)   # Edit button
+            self.controls_table.setColumnWidth(7, 150)  # Input Code (raw)
         else:
             self.controls_table.setColumnWidth(0, 150)  # Action Category
             self.controls_table.setColumnWidth(2, 200)  # Label
