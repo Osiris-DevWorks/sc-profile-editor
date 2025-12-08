@@ -264,9 +264,9 @@ class MainWindow(QMainWindow):
 
         # Controls table
         self.controls_table = QTableWidget()
-        self.controls_table.setColumnCount(7)  # Max columns for detailed view
+        self.controls_table.setColumnCount(8)  # Max columns for detailed view
         self.controls_table.setHorizontalHeaderLabels([
-            "Action Category", "Action", "Label", "Input", "Device", "Edit", ""
+            "Action Category", "Action", "Label", "Input", "Device", "Edit", "Activation", ""
         ])
         self.controls_table.horizontalHeader().setStretchLastSection(False)
         self.controls_table.setAlternatingRowColors(True)
@@ -718,15 +718,17 @@ class MainWindow(QMainWindow):
 
         # Configure column visibility based on view mode
         if is_detailed:
-            # Detailed view: Show columns 0, 1, 2, 3, 4, 5
-            # 0: Action Category, 1: Action (original), 2: Label, 3: Input, 4: Device, 5: Edit
+            # Detailed view: Show columns 0, 1, 2, 3, 4, 5, 6
+            # 0: Action Category, 1: Action (original), 2: Label, 3: Input, 4: Device, 5: Edit, 6: Activation
             self.controls_table.setColumnHidden(1, False)
-            self.controls_table.setColumnHidden(6, True)   # Hide raw input code column
+            self.controls_table.setColumnHidden(6, False)  # Show activation mode column
+            self.controls_table.setColumnHidden(7, True)   # Hide raw input code column
         else:
             # Default view: Show columns 0, 2, 3, 4, 5
             # 0: Action Category, 2: Label, 3: Input, 4: Device, 5: Edit
             self.controls_table.setColumnHidden(1, True)   # Hide original Action
-            self.controls_table.setColumnHidden(6, True)   # Hide raw input code column
+            self.controls_table.setColumnHidden(6, True)   # Hide activation mode column
+            self.controls_table.setColumnHidden(7, True)   # Hide raw input code column
 
         # Populate table
         for row, (action_map_name, binding) in enumerate(self.all_bindings):
@@ -779,10 +781,16 @@ class MainWindow(QMainWindow):
             edit_btn.clicked.connect(lambda checked, r=row: self.on_edit_input_clicked(r))
             self.controls_table.setCellWidget(row, 5, edit_btn)
 
-            # Column 6: Raw input code (hidden, for reference)
+            # Column 6: Activation Mode (only visible in detailed view)
+            activation_text = binding.activation_mode if binding.activation_mode else ""
+            activation_item = QTableWidgetItem(activation_text)
+            activation_item.setFlags(activation_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            self.controls_table.setItem(row, 6, activation_item)
+
+            # Column 7: Raw input code (hidden, for reference)
             input_code_item = QTableWidgetItem(binding.input_code)
             input_code_item.setFlags(input_code_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            self.controls_table.setItem(row, 6, input_code_item)
+            self.controls_table.setItem(row, 7, input_code_item)
 
         # Re-enable signals
         self.controls_table.blockSignals(False)
@@ -801,6 +809,7 @@ class MainWindow(QMainWindow):
             self.controls_table.setColumnWidth(3, 200)  # Input
             self.controls_table.setColumnWidth(4, 120)  # Device
             self.controls_table.setColumnWidth(5, 50)   # Edit button
+            self.controls_table.setColumnWidth(6, 100)  # Activation Mode
         else:
             self.controls_table.setColumnWidth(0, 150)  # Action Category
             self.controls_table.setColumnWidth(2, 200)  # Label
@@ -930,9 +939,9 @@ class MainWindow(QMainWindow):
 
             # Unmapped keys filter - check if input code ends with underscore
             # Unmapped keys are stored as "js1_ ", "kb1_", "mouse_", etc. (ending with underscore+space or just underscore)
-            # Column 6 contains the raw input code (hidden column)
+            # Column 7 contains the raw input code (hidden column)
             if show_row and hide_unmapped:
-                input_code_item = self.controls_table.item(row, 6)  # Raw input code is now column 6
+                input_code_item = self.controls_table.item(row, 7)  # Raw input code is now column 7
                 if input_code_item:
                     input_code = input_code_item.text().strip()
                     # Hide rows where input code is empty or ends with underscore (unmapped)
