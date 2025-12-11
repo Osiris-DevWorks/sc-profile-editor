@@ -1,0 +1,28 @@
+{
+  "comment": "Mapping from PDF field names to button numbers for Thrustmaster TWCS Throttle",
+  "button_mapping": {
+    "button_1": 1,
+    "button_2": 2,
+    "button_3": 3,
+    "button_4": 4,
+    "button_5": 5,
+    "button_6": 6,
+    "button_7": 7,
+    "button_8": 8,
+    "button_9": 9,
+    "button_10": 10,
+    "button_11": 11,
+    "button_12": 12,
+    "button_13": 13,
+    "button_14": 14,
+    "hat_1_up": "hat_1_up",
+    "hat_1_right": "hat_1_right",
+    "hat_1_down": "hat_1_down",
+    "hat_1_left": "hat_1_left",
+    "axis_x": "axis_x",
+    "axis_y": "axis_y",
+    "axis_z": "axis_z",
+    "axis_rotz": "axis_rotz",
+    "slider_1": "slider_1"
+  }
+}

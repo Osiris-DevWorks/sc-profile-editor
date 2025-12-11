@@ -58,3 +58,5 @@ label_overrides_custom.json
 .env
 /visual-scratch/
 app_output.log
+/screenshots
+*.sla
