@@ -11,20 +11,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.7.0] - In Development
+## [0.7.0] - 2025-12-12
 
 ### Added
-- **10 Complete Device Templates** - Completing support for remaining Thrustmaster, VKB, and Virpil devices:
-  - Thrustmaster T.16000M FCS Joystick
-  - Thrustmaster TWCS Throttle Unit
-  - VKB STECS Throttle with variants (ATEM, Space Throttle Grip Left/Right, STEM)
-  - VKB Throttle Quadrant V (standard and WW2 module)
-  - Virpil MongoosT-50CM3 (Left and Right variants)
-- **Documentation Enhancements**:
-  - Comprehensive field_mapping.json documentation for complex button layouts
-  - .build-ignore file usage guide for managing incomplete templates
-  - v0.7.0 Development Plan with completion workflow for all devices
+- **Thrustmaster Device Templates** - Initial support for Thrustmaster HOTAS systems:
+  - Thrustmaster T.16000M FCS Joystick - Complete with 16 buttons, hat switch, and 6-axis support
+  - Thrustmaster TWCS Throttle Unit - Complete with 14 buttons, hat switch, and 4-axis support
+  - Both templates include comprehensive field_mapping.json for button/axis mapping
+- **Build System Enhancements**:
+  - `.build-ignore` file support for excluding incomplete templates from builds and installers
+  - Installer now copies from build output (dist/) instead of source, ensuring only complete templates are packaged
+  - Incomplete templates remain in repository for future 0.7.x releases
+- **Documentation Improvements**:
+  - Comprehensive field_mapping.json documentation for complex button layouts and custom mappings
+  - .build-ignore file usage guide for managing template development lifecycle
+  - v0.7.0 Development Plan with completion workflow for remaining devices
   - Consistent Version/Date/For headers across all documentation
+  - Clarified template completion workflow in CREATING_PDF_TEMPLATES.md
+
+### Changed
+- **Template Registry** - Updated to include new Thrustmaster device patterns for device matching
+- **Development Workflow** - Established clear separation between complete (released) and incomplete (0.7.x development) templates
+
+### Known Limitations for Future Releases (0.7.x)
+Remaining incomplete device templates planned for 0.7.x versions (marked with `.build-ignore`):
+- VKB STECS Throttle with variants (ATEM, Space Throttle Grip Left/Right, STEM module)
+- VKB Throttle Quadrant V (standard and WW2 module)
+- Virpil MongoosT-50CM3 (Left and Right stick variants)
+These templates have PDF assets and need field mapping refinement before inclusion.
 
 ## [0.6.1] - 2025-12-03
 

@@ -1,7 +1,7 @@
 # SC Profile Editor - Project Context
 
-**Version:** 0.6.1
-**Date:** 2025-12-04
+**Version:** 0.7.0
+**Date:** 2025-12-12
 **For:** AI assistants - Comprehensive project overview and development guidelines
 
 This document provides context for AI assistants working on this project.
@@ -12,9 +12,9 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 
 ## Current Status
 
-**Version:** 0.7.0 (in development)
-**Current Branch:** v0.7.0-development (active development)
-**Status:** Completing device template support for Thrustmaster, VKB, and Virpil devices
+**Version:** 0.7.0 (released 2025-12-12)
+**Current Branch:** main (stable)
+**Status:** v0.7.0 released with Thrustmaster device template support
 **Previous Release:** 0.6.1 (completed 2025-12-03)
 **Platform:** Windows (PyInstaller executable)
 
@@ -38,7 +38,7 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 - ✅ Native QtPdf rendering (lightweight, no browser engine)
 - ✅ Clickable PDF fields for easy label editing
 - ✅ Automatic label mapping to device buttons/controls
-- ✅ Supported devices (multiple VKB, VPC, Thrustmaster templates)
+- ✅ Supported devices (VKB, VPC, Thrustmaster templates)
   - VKB Gladiator (EVO and SCG variants)
   - VKB Space Sim Module (SEM and variants)
   - VKB F16 MFD
@@ -46,7 +46,8 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
   - VKB Gunfighter MCG Ultimate and SCG variants
   - VKB STECS throttle and grips
   - VPC MongoosT-50CM3 (Right)
-  - Thrustmaster TWCS Throttle
+  - Thrustmaster T.16000M FCS Joystick
+  - Thrustmaster TWCS Throttle Unit
 - ✅ Device splitter utility for composite devices (e.g., stick + SEM module)
 
 ### Input Detection
