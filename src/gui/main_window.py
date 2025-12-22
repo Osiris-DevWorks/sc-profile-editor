@@ -1070,6 +1070,8 @@ class MainWindow(QMainWindow):
                     # Hide rows where input code is empty or ends with underscore (unmapped)
                     if not input_code or input_code.endswith('_'):
                         show_row = False
+                        # DEBUG: Log which rows are being hidden
+                        logger.debug(f"Hiding unmapped row {row}: input_code='{input_code_item.text()}'")
 
             # Mapped keys filter - opposite of unmapped: hide rows with valid input codes
             # Hides rows where input code is NOT empty and does NOT end with underscore (mapped)
