@@ -1050,7 +1050,7 @@ class MainWindow(QMainWindow):
 
             # Device filter
             if show_row and device_filter != "All Devices":
-                device_item = self.controls_table.item(row, 4)  # Device is now column 4
+                device_item = self.controls_table.item(row, 6)  # Device is column 6
                 if device_item and device_item.text() != device_filter:
                     show_row = False
 
