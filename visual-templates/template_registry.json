@@ -136,6 +136,21 @@
       "buttons": {}
     },
     {
+      "id": "thrustmaster_t16000",
+      "name": "Thrustmaster T.16000M",
+      "pdf": "thrustmaster_t16000/thrustmaster_t16000.pdf",
+      "device_match_patterns": [
+        "T.16000M",
+        "Thrustmaster T.16000M",
+        "Thrustmaster T16000",
+        "T16000M",
+        "16000M"
+      ],
+      "type": "joystick",
+      "manufacturer": "Thrustmaster",
+      "notes": "Premium 16-button joystick with 4 axes and 1 hat switch"
+    },
+    {
       "id": "thrustmaster_twcs_throttle",
       "name": "Thrustmaster TWCS Throttle",
       "pdf": "thrustmaster_twcs_throttle/thrustmaster_twcs_throttle.pdf",
