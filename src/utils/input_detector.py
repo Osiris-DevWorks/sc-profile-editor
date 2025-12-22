@@ -36,6 +36,8 @@ class InputDetectorThread(QThread):
             "lshift": False,
             "rshift": False,
         }
+        self.modifier_press_time: Dict[str, float] = {}  # Track when each modifier was pressed
+        self.other_key_pressed = False  # Flag: was a non-modifier key pressed after a modifier?
 
     def run(self):
         """Run the input detection loop"""
@@ -66,7 +68,7 @@ class InputDetectorThread(QThread):
                 from pynput import keyboard
                 keyboard_listener = keyboard.Listener(
                     on_press=lambda key: self._on_keyboard_press(key, keyboard_detected, keyboard_result),
-                    on_release=lambda key: self._on_keyboard_release(key)
+                    on_release=lambda key: self._on_keyboard_release(key, keyboard_detected, keyboard_result)
                 )
                 keyboard_listener.start()
             except Exception as e:
@@ -299,9 +301,14 @@ class InputDetectorThread(QThread):
                 return True  # Continue listening
 
             # If this is a modifier key being pressed, track it and continue listening
-            if key in modifier_key_map:
-                self.active_modifiers[modifier_key_map[key]] = True
-                return True  # Continue listening
+            # This allows detection of modifiers alone (Shift, Ctrl, Alt) or in combinations
+            if key in modifier_key_map and modifier_key_map[key] in ["lctrl", "rctrl", "lalt", "ralt", "lshift", "rshift"]:
+                modifier_name = modifier_key_map[key]
+                self.active_modifiers[modifier_name] = True
+                self.modifier_press_time[modifier_name] = time.time()  # Record when pressed
+                self.other_key_pressed = False  # Reset flag for this modifier press
+                # Continue listening to see if another key follows
+                return True
 
             # Get the currently active modifier (if any)
             modifier = self._get_active_modifier_from_state()
@@ -312,6 +319,9 @@ class InputDetectorThread(QThread):
             # Skip if we couldn't determine a key name
             if not key_name:
                 return True  # Continue listening
+
+            # Mark that a non-modifier key was pressed (for tracking if we should emit modifier alone)
+            self.other_key_pressed = True
 
             # Map to Star Citizen format
             if modifier:
@@ -382,7 +392,7 @@ class InputDetectorThread(QThread):
             logger.debug(f"Error getting key name from pynput key: {e}")
             return None
 
-    def _on_keyboard_release(self, key):
+    def _on_keyboard_release(self, key, detected_event, result_dict):
         """Handle keyboard key release (callback from pynput)"""
         try:
             from pynput.keyboard import Key
@@ -412,7 +422,28 @@ class InputDetectorThread(QThread):
                 return True  # Continue listening
 
             if key in modifier_key_map:
-                self.active_modifiers[modifier_key_map[key]] = False
+                modifier_name = modifier_key_map[key]
+
+                # Check if this modifier was pressed alone (no other key pressed after it)
+                if self.active_modifiers[modifier_name] and not self.other_key_pressed:
+                    # Emit the modifier key alone
+                    modifier_description_map = {
+                        "lctrl": "Left Ctrl",
+                        "rctrl": "Right Ctrl",
+                        "lalt": "Left Alt",
+                        "ralt": "Right Alt",
+                        "lshift": "Left Shift",
+                        "rshift": "Right Shift",
+                    }
+
+                    input_code = f"kb1_{modifier_name}"
+                    result_dict["code"] = input_code
+                    result_dict["description"] = f"Keyboard {modifier_description_map.get(modifier_name, modifier_name)}"
+                    detected_event.set()
+                    logger.info(f"Detected modifier key alone: {input_code} - {result_dict['description']}")
+                    return False  # Stop listener
+
+                self.active_modifiers[modifier_name] = False
 
             return True  # Continue listening
 
