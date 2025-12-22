@@ -237,6 +237,11 @@ class MainWindow(QMainWindow):
         self.hide_unmapped_checkbox.stateChanged.connect(self.apply_filters)
         filter_layout.addWidget(self.hide_unmapped_checkbox)
 
+        # Hide mapped keys checkbox
+        self.hide_mapped_checkbox = QCheckBox("Hide Mapped Keys")
+        self.hide_mapped_checkbox.stateChanged.connect(self.apply_filters)
+        filter_layout.addWidget(self.hide_mapped_checkbox)
+
         # Show detailed checkbox
         self.show_detailed_checkbox = QCheckBox("Show Detailed")
         self.show_detailed_checkbox.stateChanged.connect(self.toggle_detailed_view)
@@ -1026,6 +1031,7 @@ class MainWindow(QMainWindow):
         device_filter = self.device_filter.currentText()
         actionmap_filter = self.actionmap_filter.currentText()
         hide_unmapped = self.hide_unmapped_checkbox.isChecked()
+        hide_mapped = self.hide_mapped_checkbox.isChecked()
 
         # Show/hide rows based on filters
         for row in range(self.controls_table.rowCount()):
@@ -1063,6 +1069,16 @@ class MainWindow(QMainWindow):
                     input_code = input_code_item.text().strip()
                     # Hide rows where input code is empty or ends with underscore (unmapped)
                     if not input_code or input_code.endswith('_'):
+                        show_row = False
+
+            # Mapped keys filter - opposite of unmapped: hide rows with valid input codes
+            # Hides rows where input code is NOT empty and does NOT end with underscore (mapped)
+            if show_row and hide_mapped:
+                input_code_item = self.controls_table.item(row, 4)  # Raw input code is in column 4
+                if input_code_item:
+                    input_code = input_code_item.text().strip()
+                    # Hide rows where input code is mapped (not empty and doesn't end with underscore)
+                    if input_code and not input_code.endswith('_'):
                         show_row = False
 
             self.controls_table.setRowHidden(row, not show_row)
@@ -1117,6 +1133,7 @@ class MainWindow(QMainWindow):
         self.device_filter.setCurrentIndex(0)
         self.actionmap_filter.setCurrentIndex(0)
         self.hide_unmapped_checkbox.setChecked(False)
+        self.hide_mapped_checkbox.setChecked(False)
         self.statusBar().showMessage(f"Filters cleared - showing all {self.controls_table.rowCount()} bindings")
 
     def on_tab_changed(self, index: int):
