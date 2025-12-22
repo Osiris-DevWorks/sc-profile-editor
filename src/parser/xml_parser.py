@@ -155,6 +155,36 @@ class ProfileParser:
                         product_name=product_name
                     ))
 
+        # Fallback: If no devices found and no CustomisationUIHeader, extract from options elements
+        # This handles preset profiles that don't have CustomisationUIHeader
+        if not devices:
+            for options in self.root.findall('options'):
+                device_type = options.get('type')
+                if not device_type:
+                    continue
+
+                instance = int(options.get('instance', 1))
+                product = options.get('Product', '')
+
+                product_id = None
+                product_name = None
+
+                if product:
+                    product_id = product
+                    # Extract readable name from product string
+                    # Format: " T.16000M" or "Thrustmaster TWCS Throttle {GUID}"
+                    if '{' in product:
+                        product_name = product.split('{')[0].strip()
+                    else:
+                        product_name = product.strip()
+
+                devices.append(Device(
+                    device_type=device_type,
+                    instance=instance,
+                    product_id=product_id,
+                    product_name=product_name
+                ))
+
         return devices
 
     def get_action_maps(self) -> List[ActionMap]:
