@@ -77,6 +77,13 @@ class ProfileParser:
         if self.root is None:
             return "Unknown"
 
+        # Try to get from ActionProfiles attribute
+        action_profiles = self.root.find('ActionProfiles')
+        if action_profiles is not None:
+            profile_name = action_profiles.get('profileName')
+            if profile_name:
+                return profile_name
+
         # Try to get from root attribute
         profile_name = self.root.get('profileName')
         if profile_name:
@@ -158,7 +165,12 @@ class ProfileParser:
 
         action_maps = []
 
-        for actionmap_elem in self.root.findall('actionmap'):
+        # Find ActionProfiles element (actionmaps are nested inside it)
+        action_profiles = self.root.find('ActionProfiles')
+        if action_profiles is None:
+            action_profiles = self.root
+
+        for actionmap_elem in action_profiles.findall('actionmap'):
             map_name = actionmap_elem.get('name', 'unknown')
             actions = []
 
@@ -214,8 +226,13 @@ class ProfileParser:
                     user_bindings_map[key] = []
                 user_bindings_map[key].append(binding)
 
+        # Find ActionProfiles element in default bindings
+        default_action_profiles = default_root.find('ActionProfiles')
+        if default_action_profiles is None:
+            default_action_profiles = default_root
+
         # Parse default bindings and merge
-        for actionmap_elem in default_root.findall('actionmap'):
+        for actionmap_elem in default_action_profiles.findall('actionmap'):
             map_name = actionmap_elem.get('name', '')
 
             # Find or create corresponding ActionMap in user profile
