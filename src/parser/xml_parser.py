@@ -38,6 +38,9 @@ class ProfileParser:
 
     def parse(self) -> ControlProfile:
         """Parse the XML file and return ControlProfile object"""
+        print(f"DEBUG: Parsing profile from: {self.xml_path}")
+        print(f"DEBUG: use_bundled_defaults={self.use_bundled_defaults}")
+
         try:
             self.tree = ET.parse(self.xml_path)
             self.root = self.tree.getroot()
@@ -50,6 +53,7 @@ class ProfileParser:
         devices = self.get_devices()
         categories = self.get_categories()
         action_maps = self.get_action_maps()
+        print(f"DEBUG: Parsed {len(action_maps)} action maps with {sum(len(am.actions) for am in action_maps)} total actions before merge")
 
         profile = ControlProfile(
             profile_name=profile_name,
@@ -188,10 +192,15 @@ class ProfileParser:
         Merge default bindings from actionmaps.xml where user bindings are unmapped.
         User bindings override defaults.
         """
+        print(f"DEBUG: Attempting to merge defaults from: {self.default_actionmaps_path}")
+        print(f"DEBUG: Default actionmaps exists: {os.path.exists(self.default_actionmaps_path)}")
+        print(f"DEBUG: User profile has {len(user_profile.action_maps)} action maps before merge")
+
         try:
             # Parse default actionmaps.xml
             default_tree = ET.parse(self.default_actionmaps_path)
             default_root = default_tree.getroot()
+            print(f"DEBUG: Successfully parsed default actionmaps")
         except (ET.ParseError, FileNotFoundError) as e:
             print(f"Warning: Could not parse default actionmaps: {e}")
             return
@@ -250,6 +259,10 @@ class ProfileParser:
 
                         # Add default bindings
                         user_action_map.actions.extend(default_bindings)
+
+        # Debug: show final profile state
+        total_actions = sum(len(am.actions) for am in user_profile.action_maps)
+        print(f"DEBUG: User profile has {len(user_profile.action_maps)} action maps after merge with {total_actions} total actions")
 
     def _find_or_create_actionmap(self, profile: ControlProfile, map_name: str) -> ActionMap:
         """Find existing action map or create new one"""
