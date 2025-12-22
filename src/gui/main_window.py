@@ -898,12 +898,10 @@ class MainWindow(QMainWindow):
             self.controls_table.setItem(row, 5, activation_item)
 
             # Column 6: Device (parsed from input code)
-            if is_unmapped:
-                # For unmapped actions, show blank
-                device_item = QTableWidgetItem("")
-            else:
-                device = self.parse_device_from_input(binding.input_code)
-                device_item = QTableWidgetItem(device)
+            # Always parse device from input code, even for unmapped actions
+            # For unmapped, input_code is like "js1_ " or "kb1_" so we can still extract device type
+            device = self.parse_device_from_input(binding.input_code)
+            device_item = QTableWidgetItem(device)
             device_item.setFlags(device_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             self.controls_table.setItem(row, 6, device_item)
 
