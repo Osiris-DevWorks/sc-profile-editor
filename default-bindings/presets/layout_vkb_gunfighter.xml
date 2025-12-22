@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ActionMaps>
+ <ActionProfiles version="1" optionsVersion="2" rebindVersion="2" profileName="VKB Gunfighter Preset">
+  <deviceoptions name="Mouse">
+   <option input="@pause_OptionsMouseSmoothing" saturation="0.044999994"/>
+   <option input="@pause_OptionsMouseAcceleration" acceleration="0.029999999"/>
+  </deviceoptions>
+  <options type="keyboard" instance="1" Product="Keyboard  {6F1D2B61-D5A0-11CF-BFC7-444553540000}"/>
+  <options type="joystick" instance="1" Product="VKBSim Gunfighter"/>
+  <modifiers />
+  <actionmap name="spaceship_movement">
+   <action name="v_strafe_forward">
+    <rebind input="js1_y"/>
+   </action>
+  </actionmap>
+ </ActionProfiles>
+</ActionMaps>
