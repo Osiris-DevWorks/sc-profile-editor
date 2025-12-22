@@ -27,64 +27,28 @@
    <action name="v_strafe_down">
     <rebind input="kb1_lctrl"/>
    </action>
-   <action name="v_afterburner">
-    <rebind input="kb1_lshift"/>
-   </action>
    <action name="v_toggle_landing_system">
-    <rebind input="kb1_l"/>
+    <rebind input="kb1_n"/>
    </action>
    <action name="v_autoland">
-    <rebind input="kb1_k"/>
+    <rebind input="kb1_n"/>
+   </action>
+  </actionmap>
+  <actionmap name="spaceship_quantum">
+   <action name="v_toggle_qdrive_engagement">
+    <rebind input="kb1_b"/>
    </action>
   </actionmap>
   <actionmap name="spaceship_targeting">
    <action name="v_target_toggle_lock_index_1">
-    <rebind input="kb1_t"/>
+    <rebind input="mouse1_button1"/>
    </action>
    <action name="v_target_toggle_lock_index_2">
-    <rebind input="kb1_y"/>
-   </action>
-   <action name="v_target_toggle_lock_index_3">
-    <rebind input="kb1_u"/>
-   </action>
-  </actionmap>
-  <actionmap name="spaceship_targeting_advanced">
-   <action name="v_target_cycle_hostile_reset">
-    <rebind input="kb1_tab"/>
-   </action>
-   <action name="v_target_cycle_in_view_fwd">
-    <rebind input="kb1_e"/>
-   </action>
-  </actionmap>
-  <actionmap name="spaceship_radar">
-   <action name="v_invoke_ping">
-    <rebind input="kb1_p"/>
+    <rebind input="mouse1_button2"/>
    </action>
   </actionmap>
   <actionmap name="spaceship_scanning">
    <action name="v_scanning_trigger_scan">
-    <rebind input="kb1_r"/>
-   </action>
-   <action name="v_dec_scan_focus_level">
-    <rebind input="kb1_minus"/>
-   </action>
-   <action name="v_inc_scan_focus_level">
-    <rebind input="kb1_equals"/>
-   </action>
-  </actionmap>
-  <actionmap name="spaceship_missiles">
-   <action name="v_weapon_increase_max_missiles">
-    <rebind input="kb1_m"/>
-   </action>
-  </actionmap>
-  <actionmap name="seat_general">
-   <action name="v_toggle_mining_mode">
-    <rebind input="kb1_z"/>
-   </action>
-   <action name="v_toggle_quantum_mode">
-    <rebind input="kb1_q"/>
-   </action>
-   <action name="v_toggle_scan_mode">
     <rebind input="kb1_x"/>
    </action>
   </actionmap>
