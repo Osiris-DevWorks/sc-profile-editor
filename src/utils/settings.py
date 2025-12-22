@@ -128,3 +128,25 @@ class AppSettings:
         self.settings.remove("sc_profiles_directory")
         self.settings.sync()
         logger.info("Cleared SC profiles directory")
+
+    def get_merge_defaults_enabled(self) -> bool:
+        """
+        Get whether default bindings merge is enabled
+
+        Returns:
+            True if merge defaults is enabled, False otherwise
+        """
+        enabled = self.settings.value("merge_defaults_enabled", True, type=bool)
+        logger.debug(f"Retrieved merge defaults enabled: {enabled}")
+        return enabled
+
+    def set_merge_defaults_enabled(self, enabled: bool):
+        """
+        Save whether default bindings merge is enabled
+
+        Args:
+            enabled: True to enable merge, False to disable
+        """
+        self.settings.setValue("merge_defaults_enabled", enabled)
+        self.settings.sync()
+        logger.info(f"Saved merge defaults enabled: {enabled}")

@@ -138,6 +138,12 @@ class MainWindow(QMainWindow):
         new_profile_btn.clicked.connect(self.create_new_profile)
         header_layout.addWidget(new_profile_btn)
 
+        # Load Preset Profile button
+        load_preset_btn = QPushButton("Load Preset Profile")
+        load_preset_btn.setStyleSheet("QPushButton { padding: 10px 20px; font-size: 14px; background-color: #9C27B0; color: white; border: none; border-radius: 4px; } QPushButton:hover { background-color: #7B1FA2; }")
+        load_preset_btn.clicked.connect(self.load_preset_profile)
+        header_layout.addWidget(load_preset_btn)
+
         # Save Profile button (for remapped controls)
         self.save_profile_btn = QPushButton("💾 Save Profile")
         self.save_profile_btn.setStyleSheet("QPushButton { padding: 10px 20px; font-size: 14px; background-color: #2196F3; color: white; border: none; border-radius: 4px; } QPushButton:hover { background-color: #0b7dda; }")
@@ -576,10 +582,11 @@ class MainWindow(QMainWindow):
             file_path: Path to the profile XML file
         """
         try:
-            # Parse the profile
+            # Parse the profile with optional default merge
             self.statusBar().showMessage(f"Loading profile: {file_path}")
             logger.info(f"Loading profile: {file_path}")
-            parser = ProfileParser(file_path)
+            use_defaults = self.settings.get_merge_defaults_enabled()
+            parser = ProfileParser(file_path, use_bundled_defaults=use_defaults)
             self.current_profile = parser.parse()
             self.current_profile_path = file_path
 
@@ -594,7 +601,11 @@ class MainWindow(QMainWindow):
             self.export_pdf_btn.setEnabled(True)
             self.export_word_btn.setEnabled(True)
 
-            self.statusBar().showMessage(f"Successfully loaded: {self.current_profile.profile_name}")
+            # Show merge status
+            status_msg = f"Successfully loaded: {self.current_profile.profile_name}"
+            if self.current_profile.merged_defaults:
+                status_msg += " (with default bindings merged)"
+            self.statusBar().showMessage(status_msg)
             logger.info(f"Successfully loaded profile: {self.current_profile.profile_name}")
 
         except FileNotFoundError:
@@ -641,6 +652,108 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to create new profile:\n{str(e)}")
             logger.error(f"Error creating new profile: {e}", exc_info=True)
+
+    def load_preset_profile(self):
+        """Show dialog to select and load a preset profile"""
+        try:
+            # Get bundled presets directory
+            if getattr(sys, 'frozen', False):
+                base_path = sys._MEIPASS
+            else:
+                base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+            presets_dir = os.path.join(base_path, 'default-bindings', 'presets')
+
+            if not os.path.exists(presets_dir):
+                QMessageBox.warning(
+                    self,
+                    "Presets Not Found",
+                    "Preset profiles directory not found. Please reinstall the application."
+                )
+                logger.warning(f"Presets directory not found: {presets_dir}")
+                return
+
+            # Get list of preset files
+            try:
+                preset_files = sorted([f for f in os.listdir(presets_dir) if f.endswith('.xml')])
+            except Exception as e:
+                QMessageBox.warning(
+                    self,
+                    "Error Reading Presets",
+                    f"Failed to read preset profiles directory:\n{str(e)}"
+                )
+                logger.error(f"Error reading presets directory: {e}", exc_info=True)
+                return
+
+            if not preset_files:
+                QMessageBox.information(
+                    self,
+                    "No Presets",
+                    "No preset profiles found."
+                )
+                return
+
+            # Create selection dialog
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Load Preset Profile")
+            dialog.setMinimumWidth(500)
+
+            layout = QVBoxLayout()
+
+            # Instructions
+            label = QLabel("Select a preset profile to load as your starting point:")
+            layout.addWidget(label)
+
+            # List of presets with friendly names
+            preset_list = QListWidget()
+            preset_mapping = {}
+
+            for filename in preset_files:
+                # Convert filename to friendly name
+                friendly_name = filename.replace('layout_', '').replace('.xml', '').replace('_', ' ').title()
+                preset_list.addItem(friendly_name)
+                preset_mapping[friendly_name] = filename
+
+            preset_list.itemDoubleClicked.connect(lambda: dialog.accept())
+            layout.addWidget(preset_list)
+
+            # Dialog buttons
+            buttons = QHBoxLayout()
+            ok_btn = QPushButton("Load")
+            cancel_btn = QPushButton("Cancel")
+            ok_btn.clicked.connect(dialog.accept)
+            cancel_btn.clicked.connect(dialog.reject)
+            buttons.addStretch()
+            buttons.addWidget(ok_btn)
+            buttons.addWidget(cancel_btn)
+            layout.addLayout(buttons)
+
+            dialog.setLayout(layout)
+
+            # Show dialog
+            if dialog.exec() == QDialog.DialogCode.Accepted:
+                selected_items = preset_list.selectedItems()
+                if selected_items:
+                    friendly_name = selected_items[0].text()
+                    filename = preset_mapping[friendly_name]
+                    preset_path = os.path.join(presets_dir, filename)
+
+                    # Load the preset profile
+                    self.load_profile_from_path(preset_path)
+
+                    # Mark as modified since it's a starting point for customization
+                    self.current_profile.mark_modified()
+                    self.save_profile_btn.setEnabled(True)
+
+                    # Update window title to indicate it's a preset
+                    self.setWindowTitle(f"Star Citizen Profile Editor v{self.version} - {friendly_name} (Preset - Modified)")
+
+                    self.statusBar().showMessage(f"Loaded preset: {friendly_name}", 3000)
+                    logger.info(f"Loaded preset profile: {friendly_name}")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to load preset profile:\n{str(e)}")
+            logger.error(f"Error loading preset profile: {e}", exc_info=True)
 
     def display_profile(self):
         """Display the loaded profile data"""

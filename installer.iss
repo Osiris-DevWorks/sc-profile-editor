@@ -49,6 +49,7 @@ Source: "label_overrides.json"; DestDir: "{app}"; Flags: ignoreversion
 ; Visual templates are embedded in the .onefile executable
 ; Source: "dist\visual-templates\*"; DestDir: "{app}\visual-templates"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "example-profiles\*"; DestDir: "{app}\example-profiles"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "default-bindings\*"; DestDir: "{app}\default-bindings"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\icon.ico"

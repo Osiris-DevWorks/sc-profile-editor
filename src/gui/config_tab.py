@@ -6,7 +6,7 @@ import sys
 import os
 import logging
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLabel, QPushButton,
-                              QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLineEdit, QFileDialog)
+                              QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLineEdit, QFileDialog, QCheckBox)
 from PyQt6.QtCore import Qt, pyqtSignal
 
 # Add parent directory to path
@@ -154,6 +154,29 @@ class ConfigTab(QWidget):
         sc_dir_layout.addLayout(sc_save_layout)
 
         layout.addWidget(sc_dir_group)
+
+        # === DEFAULT BINDINGS SECTION ===
+        defaults_group = QGroupBox("Default Bindings")
+        defaults_layout = QVBoxLayout()
+        defaults_group.setLayout(defaults_layout)
+
+        # Instructions
+        defaults_instructions = QLabel(
+            "Merge default bindings from Star Citizen when loading profiles.\n"
+            "Unmapped actions in your profile will be populated with Star Citizen's defaults."
+        )
+        defaults_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
+        defaults_instructions.setWordWrap(True)
+        defaults_layout.addWidget(defaults_instructions)
+        defaults_layout.addSpacing(10)
+
+        # Merge defaults checkbox
+        self.merge_defaults_checkbox = QCheckBox("Merge default bindings when loading profiles")
+        self.merge_defaults_checkbox.setChecked(self.settings.get_merge_defaults_enabled())
+        self.merge_defaults_checkbox.stateChanged.connect(self.on_merge_defaults_changed)
+        defaults_layout.addWidget(self.merge_defaults_checkbox)
+
+        layout.addWidget(defaults_group)
         layout.addStretch()
 
     def refresh_devices(self):
@@ -373,3 +396,13 @@ class ConfigTab(QWidget):
         except Exception as e:
             logger.error(f"Error saving SC directory: {e}", exc_info=True)
             QMessageBox.warning(self, "Save Error", f"Failed to save Star Citizen directory:\n{e}")
+
+    def on_merge_defaults_changed(self, state):
+        """Handle merge defaults checkbox state change"""
+        try:
+            enabled = state == Qt.CheckState.Checked.value
+            self.settings.set_merge_defaults_enabled(enabled)
+            status = "enabled" if enabled else "disabled"
+            logger.info(f"Default bindings merge: {status}")
+        except Exception as e:
+            logger.error(f"Error setting merge defaults: {e}", exc_info=True)

@@ -40,6 +40,7 @@ class ControlProfile:
     categories: List[str]
     is_modified: bool = False  # Track if profile has unsaved changes
     source_xml_path: Optional[str] = None  # Path to original XML file
+    merged_defaults: bool = False  # Track if default bindings were merged into this profile
 
     def get_all_bindings(self) -> List[ActionBinding]:
         """Get all action bindings across all action maps"""

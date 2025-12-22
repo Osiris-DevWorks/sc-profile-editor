@@ -2,12 +2,14 @@
 
 A desktop application for editing and exporting Star Citizen control profiles in human-readable formats. Create visual diagrams of your controller layouts and export your bindings to PDF, Word, CSV, and annotated device graphics.
 
-![Version](https://img.shields.io/badge/version-0.6.1-blue)
+![Version](https://img.shields.io/badge/version-0.7.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 
 ## Features
 
 - Import and customize Star Citizen control profiles
+- **Merge Default Bindings** - Automatically populate unmapped actions with Star Citizen's default bindings
+- **Load Preset Profiles** - Start with pre-configured profiles for popular HOTAS setups (T.16000M, Warthog, VKB, etc.)
 - **Table-based input editing** - Edit inputs directly from Controls Table
 - **Device Configuration** - Map physical devices to joystick slots with hot-swap detection
 - **Automatic input detection** - Detect joystick buttons, axes, keyboard keys, and mouse clicks
@@ -64,13 +66,13 @@ The application will automatically load the last profile you opened when you sta
 
 ## Main Features
 
-### Three Application Tabs
+### Four Application Tabs
 
-The application is organized into three main tabs:
+The application is organized into four main tabs:
 
 1. **Controls Table** - View and edit all your control bindings in a searchable, filterable table
 2. **Device View** - See & edit buttons in a visual representations of your controllers with labeled buttons
-3. **Config** - Manage connected devices and configure device-to-joystick mappings
+3. **Config** - Manage connected devices, configure device-to-joystick mappings, and toggle default bindings merge
 4. **About** - Project information and acknowledgements
 
 ### Two Viewing Modes
@@ -132,6 +134,45 @@ When you have multiple joysticks connected, Star Citizen assigns them joystick s
 Specify where your Star Citizen control profiles are stored. This helps the app quickly load profiles without browsing.
 
 **Default location:** `C:\Program Files\Roberts Space Industries\StarCitizen\LIVE\USER\Client\0\Controls\Mappings`
+
+### Default Bindings Merge
+
+The app can automatically populate unmapped actions with Star Citizen's default bindings. This is useful when you want to see what the default control scheme looks like and customize it.
+
+**How it works:**
+1. Go to the **Config** tab
+2. Check **"Merge default bindings when loading profiles"** to enable this feature
+3. When you load or create a profile, any unmapped actions (shown as empty or ending with `_`) will be filled with Star Citizen's defaults
+4. Your custom bindings always override defaults - no conflict!
+
+**Tips:**
+- Enable this feature when starting a new custom profile from scratch
+- Disable it if you want to see only your custom bindings
+- The setting persists between sessions
+
+---
+
+## Loading Preset Profiles
+
+Start with pre-configured profiles for popular HOTAS and joystick setups, then customize them for your needs.
+
+**Available Presets:**
+- **T.16000M** - Right stick, dual stick, with TWCS throttle
+- **Thrustmaster Warthog** - Premium HOTAS setup
+- **Thrustmaster X52/X55/X56** - Popular HOTAS variants
+- **VKB Gladiator** - Right/Left configurations, with/without OTA
+- **VKB Gunfighter** - Premium right/left/dual configurations
+- **VKB STECS** - Space Throttle Engine Control System
+- And many more!
+
+**How to use:**
+1. Click the **"Load Preset Profile"** button (purple button in the top menu)
+2. Select a preset that matches your hardware
+3. The profile loads as a starting point (marked as modified)
+4. Customize the bindings for your preferences
+5. Save your customized profile
+
+**Tip:** After loading a preset, customize the labels (especially for lesser-used actions) to make your graphics more readable!
 
 ---
 

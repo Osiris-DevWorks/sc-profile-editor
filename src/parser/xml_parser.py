@@ -16,10 +16,25 @@ from models.profile_model import ControlProfile, Device, ActionMap, ActionBindin
 class ProfileParser:
     """Parser for Star Citizen XML profile files"""
 
-    def __init__(self, xml_path: str):
+    def __init__(self, xml_path: str, use_bundled_defaults: bool = True):
         self.xml_path = xml_path
+        self.use_bundled_defaults = use_bundled_defaults
         self.tree = None
         self.root = None
+
+        # Path to bundled default bindings
+        if use_bundled_defaults:
+            # Get bundled defaults from app resources
+            if getattr(sys, 'frozen', False):
+                # Running as PyInstaller executable
+                base_path = sys._MEIPASS
+            else:
+                # Running as script
+                base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                base_path = os.path.dirname(base_path)  # Go up to project root
+            self.default_actionmaps_path = os.path.join(base_path, 'default-bindings', 'actionmaps.xml')
+        else:
+            self.default_actionmaps_path = None
 
     def parse(self) -> ControlProfile:
         """Parse the XML file and return ControlProfile object"""
@@ -36,14 +51,22 @@ class ProfileParser:
         categories = self.get_categories()
         action_maps = self.get_action_maps()
 
-        return ControlProfile(
+        profile = ControlProfile(
             profile_name=profile_name,
             devices=devices,
             action_maps=action_maps,
             categories=categories,
             is_modified=False,
-            source_xml_path=self.xml_path
+            source_xml_path=self.xml_path,
+            merged_defaults=False
         )
+
+        # Merge default bindings if configured and file exists
+        if self.default_actionmaps_path and os.path.exists(self.default_actionmaps_path):
+            self._merge_default_bindings(profile)
+            profile.merged_defaults = True
+
+        return profile
 
     def get_profile_name(self) -> str:
         """Extract profile name from XML"""
@@ -159,3 +182,82 @@ class ProfileParser:
                 ))
 
         return action_maps
+
+    def _merge_default_bindings(self, user_profile: ControlProfile):
+        """
+        Merge default bindings from actionmaps.xml where user bindings are unmapped.
+        User bindings override defaults.
+        """
+        try:
+            # Parse default actionmaps.xml
+            default_tree = ET.parse(self.default_actionmaps_path)
+            default_root = default_tree.getroot()
+        except (ET.ParseError, FileNotFoundError) as e:
+            print(f"Warning: Could not parse default actionmaps: {e}")
+            return
+
+        # Build lookup: (actionmap_name, action_name) -> List[ActionBinding]
+        user_bindings_map = {}
+        for action_map in user_profile.action_maps:
+            for binding in action_map.actions:
+                key = (action_map.name, binding.action_name)
+                if key not in user_bindings_map:
+                    user_bindings_map[key] = []
+                user_bindings_map[key].append(binding)
+
+        # Parse default bindings and merge
+        for actionmap_elem in default_root.findall('actionmap'):
+            map_name = actionmap_elem.get('name', '')
+
+            # Find or create corresponding ActionMap in user profile
+            user_action_map = self._find_or_create_actionmap(user_profile, map_name)
+
+            for action_elem in actionmap_elem.findall('action'):
+                action_name = action_elem.get('name', '')
+                key = (map_name, action_name)
+
+                # Check if user has this binding
+                user_bindings = user_bindings_map.get(key, [])
+
+                # Determine if we should use default bindings
+                # Use defaults only if ALL user bindings are unmapped (end with '_')
+                should_use_default = True
+                if user_bindings:
+                    for ub in user_bindings:
+                        if not ub.input_code.rstrip().endswith('_'):
+                            should_use_default = False
+                            break
+
+                if should_use_default:
+                    # Get default bindings for this action
+                    default_bindings = []
+                    for rebind_elem in action_elem.findall('rebind'):
+                        input_code = rebind_elem.get('input', '')
+                        activation_mode = rebind_elem.get('activationMode')
+                        if input_code and input_code.strip() and not input_code.rstrip().endswith('_'):
+                            default_bindings.append(ActionBinding(
+                                action_name=action_name,
+                                input_code=input_code,
+                                activation_mode=activation_mode
+                            ))
+
+                    # Replace unmapped user bindings with defaults
+                    if default_bindings:
+                        if user_bindings:
+                            # Remove unmapped user bindings
+                            for ub in user_bindings:
+                                user_action_map.actions.remove(ub)
+
+                        # Add default bindings
+                        user_action_map.actions.extend(default_bindings)
+
+    def _find_or_create_actionmap(self, profile: ControlProfile, map_name: str) -> ActionMap:
+        """Find existing action map or create new one"""
+        for action_map in profile.action_maps:
+            if action_map.name == map_name:
+                return action_map
+
+        # Create new action map
+        new_map = ActionMap(name=map_name, actions=[])
+        profile.action_maps.append(new_map)
+        return new_map
