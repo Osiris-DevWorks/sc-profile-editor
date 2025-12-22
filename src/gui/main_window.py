@@ -1031,9 +1031,6 @@ class MainWindow(QMainWindow):
         hide_unmapped = self.hide_unmapped_checkbox.isChecked()
         hide_mapped = self.hide_mapped_checkbox.isChecked()
 
-        # DEBUG: Log filter settings
-        logger.debug(f"apply_filters called: hide_unmapped={hide_unmapped}, hide_mapped={hide_mapped}, total_rows={self.controls_table.rowCount()}")
-
         # Show/hide rows based on filters
         for row in range(self.controls_table.rowCount()):
             show_row = True
@@ -1068,14 +1065,9 @@ class MainWindow(QMainWindow):
                 input_code_item = self.controls_table.item(row, 4)  # Raw input code is in column 4
                 if input_code_item:
                     input_code = input_code_item.text().strip()
-                    # Log first few rows for debugging
-                    if row < 5:
-                        logger.debug(f"Row {row}: input_code_item.text()='{input_code_item.text()}' (repr={repr(input_code_item.text())}), stripped='{input_code}', endswith('_')={input_code.endswith('_') if input_code else 'N/A'}")
                     # Hide rows where input code is empty or ends with underscore (unmapped)
                     if not input_code or input_code.endswith('_'):
                         show_row = False
-                        # DEBUG: Log which rows are being hidden
-                        logger.debug(f"Hiding unmapped row {row}: input_code='{input_code_item.text()}'")
 
             # Mapped keys filter - opposite of unmapped: hide rows with valid input codes
             # Hides rows where input code is NOT empty and does NOT end with underscore (mapped)
