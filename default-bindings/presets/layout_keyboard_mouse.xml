@@ -8,14 +8,89 @@
   <options type="keyboard" instance="1" Product="Keyboard  {6F1D2B61-D5A0-11CF-BFC7-444553540000}"/>
   <options type="mouse" instance="1" Product="Mouse"/>
   <modifiers />
+  <actionmap name="spaceship_movement">
+   <action name="v_strafe_forward">
+    <rebind input="kb1_w"/>
+   </action>
+   <action name="v_strafe_back">
+    <rebind input="kb1_s"/>
+   </action>
+   <action name="v_strafe_left">
+    <rebind input="kb1_a"/>
+   </action>
+   <action name="v_strafe_right">
+    <rebind input="kb1_d"/>
+   </action>
+   <action name="v_strafe_up">
+    <rebind input="kb1_space"/>
+   </action>
+   <action name="v_strafe_down">
+    <rebind input="kb1_lctrl"/>
+   </action>
+   <action name="v_afterburner">
+    <rebind input="kb1_lshift"/>
+   </action>
+   <action name="v_toggle_landing_system">
+    <rebind input="kb1_l"/>
+   </action>
+   <action name="v_autoland">
+    <rebind input="kb1_k"/>
+   </action>
+  </actionmap>
+  <actionmap name="spaceship_targeting">
+   <action name="v_target_toggle_lock_index_1">
+    <rebind input="kb1_t"/>
+   </action>
+   <action name="v_target_toggle_lock_index_2">
+    <rebind input="kb1_y"/>
+   </action>
+   <action name="v_target_toggle_lock_index_3">
+    <rebind input="kb1_u"/>
+   </action>
+  </actionmap>
+  <actionmap name="spaceship_targeting_advanced">
+   <action name="v_target_cycle_hostile_reset">
+    <rebind input="kb1_tab"/>
+   </action>
+   <action name="v_target_cycle_in_view_fwd">
+    <rebind input="kb1_e"/>
+   </action>
+  </actionmap>
+  <actionmap name="spaceship_radar">
+   <action name="v_invoke_ping">
+    <rebind input="kb1_p"/>
+   </action>
+  </actionmap>
+  <actionmap name="spaceship_scanning">
+   <action name="v_scanning_trigger_scan">
+    <rebind input="kb1_r"/>
+   </action>
+   <action name="v_dec_scan_focus_level">
+    <rebind input="kb1_minus"/>
+   </action>
+   <action name="v_inc_scan_focus_level">
+    <rebind input="kb1_equals"/>
+   </action>
+  </actionmap>
+  <actionmap name="spaceship_missiles">
+   <action name="v_weapon_increase_max_missiles">
+    <rebind input="kb1_m"/>
+   </action>
+  </actionmap>
+  <actionmap name="seat_general">
+   <action name="v_toggle_mining_mode">
+    <rebind input="kb1_z"/>
+   </action>
+   <action name="v_toggle_quantum_mode">
+    <rebind input="kb1_q"/>
+   </action>
+   <action name="v_toggle_scan_mode">
+    <rebind input="kb1_x"/>
+   </action>
+  </actionmap>
   <actionmap name="player">
    <action name="drop">
     <rebind input="kb1_lshift+backslash"/>
-   </action>
-  </actionmap>
-  <actionmap name="player_choice">
-   <action name="pc_select">
-    <rebind input="mouse1_button1"/>
    </action>
   </actionmap>
  </ActionProfiles>
