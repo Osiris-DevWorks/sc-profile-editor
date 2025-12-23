@@ -154,20 +154,13 @@ class ProfileParser:
                         product_id=product_id,
                         product_name=product_name
                     ))
-            logger.debug(f"get_devices: Found {len(devices)} devices from CustomisationUIHeader")
-        else:
-            logger.debug("get_devices: No CustomisationUIHeader found, checking for options elements")
-
         # Fallback: If no devices found and no CustomisationUIHeader, extract from options elements
         # This handles preset profiles that don't have CustomisationUIHeader
         if not devices:
-            logger.debug("get_devices: No devices found yet, attempting fallback from options elements")
-
             # Look for options inside ActionProfiles (preset format)
             action_profiles = self.root.find('ActionProfiles')
             if action_profiles is not None:
                 all_options = action_profiles.findall('options')
-                logger.debug(f"get_devices: Found {len(all_options)} options elements in ActionProfiles")
 
                 for options in all_options:
                     device_type = options.get('type')
@@ -189,19 +182,13 @@ class ProfileParser:
                         else:
                             product_name = product.strip()
 
-                    logger.debug(f"get_devices: Adding device - type={device_type}, instance={instance}, name={product_name}")
                     devices.append(Device(
                         device_type=device_type,
                         instance=instance,
                         product_id=product_id,
                         product_name=product_name
                     ))
-            else:
-                logger.debug("get_devices: No ActionProfiles element found")
 
-        logger.debug(f"get_devices: Returning {len(devices)} devices total")
-        for i, dev in enumerate(devices):
-            logger.debug(f"  Device {i}: type={dev.device_type}, instance={dev.instance}, name={dev.product_name}")
         return devices
 
     def get_action_maps(self) -> List[ActionMap]:

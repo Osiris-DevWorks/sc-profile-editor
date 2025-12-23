@@ -431,20 +431,15 @@ class QtPdfDeviceWidget(QWidget):
                 else:
                     # Regular device (no SEM) - show ALL matching templates
                     matching_templates = self.find_all_matching_templates(raw_device_name)
-                    logger.debug(f"load_profile: Device '{raw_device_name}' (instance {device.instance}) matched {len(matching_templates)} template(s)")
-                    for i, t in enumerate(matching_templates):
-                        logger.debug(f"  Template {i}: {t.name}")
 
                     if matching_templates:
                         for template in matching_templates:
                             # Store tuple: (device, template.name)
                             display_text = template.name + connection_status
-                            logger.debug(f"  Adding dropdown item: {display_text}")
                             self.device_combo.addItem(display_text, (device, template.name))
                     else:
                         device_name = get_friendly_device_name(raw_device_name)
                         display_text = f"{device_name} (No template){connection_status}"
-                        logger.debug(f"  Adding dropdown item (no template): {display_text}")
                         self.device_combo.addItem(display_text, device)
 
         if self.device_combo.count() == 0:
