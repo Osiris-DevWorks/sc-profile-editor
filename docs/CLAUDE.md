@@ -1,7 +1,7 @@
 # SC Profile Editor - Project Context
 
-**Version:** 0.7.0
-**Date:** 2025-12-12
+**Version:** 0.7.1
+**Date:** 2025-12-23
 **For:** AI assistants - Comprehensive project overview and development guidelines
 
 This document provides context for AI assistants working on this project.
@@ -12,10 +12,10 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 
 ## Current Status
 
-**Version:** 0.7.0 (released 2025-12-12)
+**Version:** 0.7.1 (released 2025-12-23)
 **Current Branch:** main (stable)
-**Status:** v0.7.0 released with Thrustmaster device template support
-**Previous Release:** 0.6.1 (completed 2025-12-03)
+**Status:** v0.7.1 released with system tray integration and Issue #15 feedback fixes
+**Previous Release:** 0.7.0 (completed 2025-12-12)
 **Platform:** Windows (PyInstaller executable)
 
 ## Implemented Features
@@ -70,7 +70,7 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 
 ### UI/UX
 - ✅ PyQt6-based modern GUI
-- ✅ Three tabs: Controls Table, Device View, About
+- ✅ Four tabs: Controls Table, Device View, Config, About
 - ✅ Filter by search text, device, action map
 - ✅ Hide unmapped keys option
 - ✅ Auto-select text when editing labels
@@ -79,6 +79,13 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 - ✅ Version display in window title and headers
 - ✅ About tab with project info and acknowledgements
 - ✅ Searchable dropdowns in remap dialog (substring matching with native Qt filtering)
+- ✅ System tray integration:
+  - Minimize-to-tray functionality (optional, disabled by default)
+  - System tray icon always visible when app is running
+  - Right-click context menu with Show and Exit options
+  - Click tray icon to restore window
+  - Notification balloon on first minimize-to-tray
+  - Setting persisted across app restarts
 
 ### Version Management
 - ✅ Semantic versioning (MAJOR.MINOR.PATCH)
@@ -286,12 +293,16 @@ cmd //c scripts\build\build_all.bat
 
 ### Recent Important Changes
 
-#### v0.7.0 (In Development)
-- **Device template completion**: Focus on completing 10 incomplete device templates (Thrustmaster, VKB, Virpil)
-- **Documentation enhancements**: Added field_mapping.json documentation for complex button layouts
-- **Build-ignore system**: Documented .build-ignore file usage for managing incomplete templates
-- **Development planning**: Created comprehensive v0.7.0 development plan with completion workflow
-- **Header standardization**: Added consistent Version/Date/For headers to all documentation files
+#### v0.7.1 (Released 2025-12-23)
+- **System Tray Integration**: Added minimize-to-tray functionality with user-configurable option in Config tab
+- **Device Template Fixes**: Fixed T.16000M and TWCS duplicate templates via precise pattern matching
+- **Device Extraction Enhancement**: Enhanced preset profile support with ActionProfiles-level options element parsing
+- **RemapDialog Layout**: Reorganized dialog sections for improved visual flow and button positioning
+
+#### v0.7.0 (Released 2025-12-12)
+- **Thrustmaster Device Templates**: Added complete support for Thrustmaster T.16000M and TWCS Throttle
+- **Build System Enhancements**: Implemented .build-ignore file support for managing incomplete templates
+- **Documentation Improvements**: Added field_mapping.json documentation and header standardization across all docs
 
 #### v0.6.1 (Released 2025-12-03)
 - **Device Configuration Tab**: New Config tab for managing connected devices and device-to-joystick mappings

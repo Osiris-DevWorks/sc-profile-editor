@@ -11,6 +11,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2025-12-23
+
+### Added
+- **System Tray Integration** - Minimize-to-tray functionality:
+  - New "System Tray" section in Config tab to enable/disable minimize-to-tray behavior
+  - Minimize-to-tray setting defaults to disabled for backward compatibility
+  - System tray icon always visible when app is running
+  - Right-click tray menu with "Show" and "Exit" options
+  - Click tray icon to restore window from tray
+  - Notification balloon on first minimize-to-tray (educates users about the feature)
+  - Tray icon setting persisted across app restarts
+
+### Fixed
+- **Device template matching** - Fixed T.16000M and TWCS duplicate templates:
+  - Removed overly broad "T.16000M Throttle" pattern from TWCS Throttle template
+  - Device matching now more precise, preventing false template matches
+  - Device View dropdown now shows correct number of templates (T.16000M and TWCS separately, not duplicated)
+- **Device extraction** - Fixed device detection for preset profiles:
+  - Enhanced get_devices() to extract from `<options>` elements in `<ActionProfiles>` for preset profiles
+  - Preset profiles without CustomisationUIHeader now correctly extract T.16000M and TWCS devices
+  - Device View properly populates and displays templates for preset configurations
+- **Input Binding Dialog Layout** - Reorganized RemapDialog for better UX:
+  - Moved "Current Actions for This Button" section to top of dialog (better visual flow)
+  - Moved "Change Input Binding" section below "Current Actions" (logical flow)
+  - Swapped "Detect Input" and "Select manually" order - dropdown now comes first
+  - "Detect Input" button now positioned to the right of dropdown (closer to OK button)
+  - Improved overall dialog usability
+
+### Changed
+- **Window icon** - Set application window icon to match system tray icon for visual consistency
+
 ## [0.7.0] - 2025-12-12
 
 ### Added
