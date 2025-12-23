@@ -177,6 +177,29 @@ class ConfigTab(QWidget):
         defaults_layout.addWidget(self.merge_defaults_checkbox)
 
         layout.addWidget(defaults_group)
+
+        # === SYSTEM TRAY SECTION ===
+        tray_group = QGroupBox("System Tray")
+        tray_layout = QVBoxLayout()
+        tray_group.setLayout(tray_layout)
+
+        # Instructions
+        tray_instructions = QLabel(
+            "Control minimize-to-tray behavior.\n"
+            "When enabled, minimizing the window will hide it to the system tray instead of the taskbar."
+        )
+        tray_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
+        tray_instructions.setWordWrap(True)
+        tray_layout.addWidget(tray_instructions)
+        tray_layout.addSpacing(10)
+
+        # Minimize to tray checkbox
+        self.minimize_to_tray_checkbox = QCheckBox("Minimize to system tray when window is minimized")
+        self.minimize_to_tray_checkbox.setChecked(self.settings.get_minimize_to_tray_enabled())
+        self.minimize_to_tray_checkbox.stateChanged.connect(self.on_minimize_to_tray_changed)
+        tray_layout.addWidget(self.minimize_to_tray_checkbox)
+
+        layout.addWidget(tray_group)
         layout.addStretch()
 
     def refresh_devices(self):
@@ -406,3 +429,13 @@ class ConfigTab(QWidget):
             logger.info(f"Default bindings merge: {status}")
         except Exception as e:
             logger.error(f"Error setting merge defaults: {e}", exc_info=True)
+
+    def on_minimize_to_tray_changed(self, state):
+        """Handle minimize to tray checkbox state change"""
+        try:
+            enabled = state == Qt.CheckState.Checked.value
+            self.settings.set_minimize_to_tray_enabled(enabled)
+            status = "enabled" if enabled else "disabled"
+            logger.info(f"Minimize to tray: {status}")
+        except Exception as e:
+            logger.error(f"Error setting minimize to tray: {e}", exc_info=True)
