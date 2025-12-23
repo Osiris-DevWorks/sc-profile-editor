@@ -154,11 +154,18 @@ class ProfileParser:
                         product_id=product_id,
                         product_name=product_name
                     ))
+            logger.debug(f"get_devices: Found {len(devices)} devices from CustomisationUIHeader")
+        else:
+            logger.debug("get_devices: No CustomisationUIHeader found, checking for options elements")
 
         # Fallback: If no devices found and no CustomisationUIHeader, extract from options elements
         # This handles preset profiles that don't have CustomisationUIHeader
         if not devices:
-            for options in self.root.findall('options'):
+            logger.debug("get_devices: No devices found yet, attempting fallback from options elements")
+            all_options = self.root.findall('options')
+            logger.debug(f"get_devices: Found {len(all_options)} options elements")
+
+            for options in all_options:
                 device_type = options.get('type')
                 if not device_type:
                     continue
@@ -178,6 +185,7 @@ class ProfileParser:
                     else:
                         product_name = product.strip()
 
+                logger.debug(f"get_devices: Adding device - type={device_type}, instance={instance}, name={product_name}")
                 devices.append(Device(
                     device_type=device_type,
                     instance=instance,
@@ -185,6 +193,7 @@ class ProfileParser:
                     product_name=product_name
                 ))
 
+        logger.debug(f"get_devices: Returning {len(devices)} devices total")
         return devices
 
     def get_action_maps(self) -> List[ActionMap]:
