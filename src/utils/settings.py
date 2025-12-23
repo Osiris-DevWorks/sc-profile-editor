@@ -150,3 +150,25 @@ class AppSettings:
         self.settings.setValue("merge_defaults_enabled", enabled)
         self.settings.sync()
         logger.info(f"Saved merge defaults enabled: {enabled}")
+
+    def get_minimize_to_tray_enabled(self) -> bool:
+        """
+        Get whether minimize-to-tray is enabled
+
+        Returns:
+            True if minimize-to-tray is enabled, False otherwise
+        """
+        enabled = self.settings.value("minimize_to_tray_enabled", False, type=bool)
+        logger.debug(f"Retrieved minimize to tray enabled: {enabled}")
+        return enabled
+
+    def set_minimize_to_tray_enabled(self, enabled: bool):
+        """
+        Save whether minimize-to-tray is enabled
+
+        Args:
+            enabled: True to enable minimize-to-tray, False to disable
+        """
+        self.settings.setValue("minimize_to_tray_enabled", enabled)
+        self.settings.sync()
+        logger.info(f"Saved minimize to tray enabled: {enabled}")
