@@ -200,6 +200,8 @@ class ProfileParser:
                 logger.debug("get_devices: No ActionProfiles element found")
 
         logger.debug(f"get_devices: Returning {len(devices)} devices total")
+        for i, dev in enumerate(devices):
+            logger.debug(f"  Device {i}: type={dev.device_type}, instance={dev.instance}, name={dev.product_name}")
         return devices
 
     def get_action_maps(self) -> List[ActionMap]:
