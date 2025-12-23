@@ -7,9 +7,10 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                               QTextEdit, QTableWidget, QTableWidgetItem, QSplitter,
                               QLineEdit, QComboBox, QGroupBox, QCheckBox, QTabWidget,
                               QStyledItemDelegate, QDialog, QTextBrowser, QInputDialog,
-                              QListWidget, QListWidgetItem)
+                              QListWidget, QListWidgetItem, QSystemTrayIcon, QMenu)
 from PyQt6.QtCore import Qt, QSortFilterProxyModel, QTimer, QUrl, QEvent
-from PyQt6.QtGui import QStandardItemModel, QStandardItem, QDesktopServices, QPixmap, QCursor
+from PyQt6.QtGui import QStandardItemModel, QStandardItem, QDesktopServices, QPixmap, QCursor, QIcon
+from PyQt6.QtGui import QAction
 import sys
 import os
 import logging
@@ -99,6 +100,15 @@ class MainWindow(QMainWindow):
 
         # Store all bindings for filtering
         self.all_bindings = []
+
+        # Initialize system tray icon
+        self.tray_icon = None
+        self.is_closing = False  # Flag to distinguish close from minimize
+        self.setup_tray_icon()
+
+        # Set window icon
+        icon_path = get_resource_path("assets/icon.ico")
+        self.setWindowIcon(QIcon(icon_path))
 
         # Create UI
         self.setup_ui()
@@ -537,11 +547,106 @@ class MainWindow(QMainWindow):
             self.restoreState(state)
             logger.debug("Restored window state")
 
+    def setup_tray_icon(self):
+        """Set up the system tray icon and its context menu"""
+        # Load application icon
+        icon_path = get_resource_path("assets/icon.ico")
+        icon = QIcon(icon_path)
+
+        # Create system tray icon
+        self.tray_icon = QSystemTrayIcon(icon, self)
+
+        # Create tray icon context menu
+        tray_menu = QMenu()
+
+        # Show/Restore action
+        show_action = QAction("Show Star Citizen Profile Editor", self)
+        show_action.triggered.connect(self.restore_from_tray)
+        tray_menu.addAction(show_action)
+
+        tray_menu.addSeparator()
+
+        # Exit action
+        exit_action = QAction("Exit", self)
+        exit_action.triggered.connect(self.quit_application)
+        tray_menu.addAction(exit_action)
+
+        # Set menu and connect activation signal
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.activated.connect(self.on_tray_icon_activated)
+
+        # Set tooltip
+        self.tray_icon.setToolTip("Star Citizen Profile Editor")
+
+        # Show tray icon immediately
+        self.tray_icon.show()
+
+        logger.info("System tray icon initialized and shown")
+
+    def on_tray_icon_activated(self, reason):
+        """
+        Handle tray icon activation (click)
+
+        Args:
+            reason: QSystemTrayIcon.ActivationReason enum value
+        """
+        # Restore window on left click or double click
+        if reason in (QSystemTrayIcon.ActivationReason.Trigger,
+                      QSystemTrayIcon.ActivationReason.DoubleClick):
+            self.restore_from_tray()
+
+    def restore_from_tray(self):
+        """Restore the window from system tray"""
+        self.show()
+        self.setWindowState(self.windowState() & ~Qt.WindowState.WindowMinimized | Qt.WindowState.WindowActive)
+        self.activateWindow()
+        self.raise_()
+        logger.debug("Window restored from system tray")
+
+    def quit_application(self):
+        """Quit the application cleanly"""
+        logger.info("Application quit requested from tray icon")
+        self.is_closing = True
+        if self.tray_icon:
+            self.tray_icon.hide()
+        self.close()
+
+    def changeEvent(self, event):
+        """Handle window state changes (minimize, maximize, etc.)"""
+        if event.type() == QEvent.Type.WindowStateChange:
+            # Check if window is being minimized
+            if self.windowState() & Qt.WindowState.WindowMinimized:
+                # Check if minimize-to-tray is enabled
+                if self.settings.get_minimize_to_tray_enabled():
+                    # Hide to tray instead of showing in taskbar
+                    QTimer.singleShot(0, self.hide)
+                    event.ignore()
+                    logger.debug("Window minimized to system tray")
+
+                    # Show notification on first minimize
+                    if self.tray_icon and not hasattr(self, '_tray_notification_shown'):
+                        self.tray_icon.showMessage(
+                            "Star Citizen Profile Editor",
+                            "Application minimized to system tray",
+                            QSystemTrayIcon.MessageIcon.Information,
+                            2000  # 2 seconds
+                        )
+                        self._tray_notification_shown = True
+                    return
+
+        # Call parent implementation for other events
+        super().changeEvent(event)
+
     def closeEvent(self, event):
         """Save window state before closing"""
         self.settings.set_window_geometry(self.saveGeometry())
         self.settings.set_window_state(self.saveState())
         logger.debug("Saved window state")
+
+        # Hide and clean up tray icon when closing
+        if self.tray_icon:
+            self.tray_icon.hide()
+
         event.accept()
 
     def auto_load_last_profile(self):
