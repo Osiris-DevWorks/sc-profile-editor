@@ -162,36 +162,42 @@ class ProfileParser:
         # This handles preset profiles that don't have CustomisationUIHeader
         if not devices:
             logger.debug("get_devices: No devices found yet, attempting fallback from options elements")
-            all_options = self.root.findall('options')
-            logger.debug(f"get_devices: Found {len(all_options)} options elements")
 
-            for options in all_options:
-                device_type = options.get('type')
-                if not device_type:
-                    continue
+            # Look for options inside ActionProfiles (preset format)
+            action_profiles = self.root.find('ActionProfiles')
+            if action_profiles is not None:
+                all_options = action_profiles.findall('options')
+                logger.debug(f"get_devices: Found {len(all_options)} options elements in ActionProfiles")
 
-                instance = int(options.get('instance', 1))
-                product = options.get('Product', '')
+                for options in all_options:
+                    device_type = options.get('type')
+                    if not device_type:
+                        continue
 
-                product_id = None
-                product_name = None
+                    instance = int(options.get('instance', 1))
+                    product = options.get('Product', '')
 
-                if product:
-                    product_id = product
-                    # Extract readable name from product string
-                    # Format: " T.16000M" or "Thrustmaster TWCS Throttle {GUID}"
-                    if '{' in product:
-                        product_name = product.split('{')[0].strip()
-                    else:
-                        product_name = product.strip()
+                    product_id = None
+                    product_name = None
 
-                logger.debug(f"get_devices: Adding device - type={device_type}, instance={instance}, name={product_name}")
-                devices.append(Device(
-                    device_type=device_type,
-                    instance=instance,
-                    product_id=product_id,
-                    product_name=product_name
-                ))
+                    if product:
+                        product_id = product
+                        # Extract readable name from product string
+                        # Format: " T.16000M" or "Thrustmaster TWCS Throttle {GUID}"
+                        if '{' in product:
+                            product_name = product.split('{')[0].strip()
+                        else:
+                            product_name = product.strip()
+
+                    logger.debug(f"get_devices: Adding device - type={device_type}, instance={instance}, name={product_name}")
+                    devices.append(Device(
+                        device_type=device_type,
+                        instance=instance,
+                        product_id=product_id,
+                        product_name=product_name
+                    ))
+            else:
+                logger.debug("get_devices: No ActionProfiles element found")
 
         logger.debug(f"get_devices: Returning {len(devices)} devices total")
         return devices
