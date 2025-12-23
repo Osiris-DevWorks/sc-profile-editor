@@ -157,7 +157,6 @@
       "device_match_patterns": [
         "Thrustmaster TWCS Throttle",
         "TWCS Throttle",
-        "T.16000M Throttle",
         "Thrustmaster Throttle"
       ],
       "type": "throttle",
