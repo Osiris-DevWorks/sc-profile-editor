@@ -318,49 +318,6 @@ class RemapDialog(QDialog):
         header_label.setFont(header_font)
         layout.addWidget(header_label)
 
-        # === CHANGE INPUT SECTION ===
-        change_input_group = QGroupBox("Change Input Binding")
-        change_input_layout = QVBoxLayout()
-        change_input_group.setLayout(change_input_layout)
-
-        # Show current input
-        current_input_text = self._get_current_input_display()
-        desc_label = QLabel(f"<b>Current:</b> {current_input_text}")
-        # Use a stylesheet that respects the system theme - works in both light and dark mode
-        desc_label.setStyleSheet("QLabel { color: palette(text); font-size: 10px; }")
-        self.desc_label = desc_label
-        change_input_layout.addWidget(desc_label)
-
-        # Input selection layout with detect button and dropdown
-        input_selection_layout = QHBoxLayout()
-
-        # Detect input button (left side)
-        self.detect_input_btn = QPushButton("Detect Input")
-        self.detect_input_btn.setMaximumWidth(120)
-        self.detect_input_btn.clicked.connect(self.on_detect_input_clicked)
-        input_selection_layout.addWidget(self.detect_input_btn)
-
-        # Or label
-        or_label = QLabel("or select manually:")
-        input_selection_layout.addWidget(or_label)
-
-        # Input code dropdown
-        self.input_code_combo = SearchableComboBox()
-        self.input_code_combo.addItem("-- Select Input Code --", None)
-        self._populate_input_codes()
-        self.input_code_combo.currentIndexChanged.connect(self.on_input_code_selected)
-        input_selection_layout.addWidget(self.input_code_combo, 1)  # Make dropdown stretch
-
-        change_input_layout.addLayout(input_selection_layout)
-
-        layout.addWidget(change_input_group)
-
-        # Hide "Change Input Binding" section when editing from device view
-        if not self.show_input_binding:
-            change_input_group.hide()
-
-        layout.addSpacing(10)
-
         # === CURRENT ACTIONS SECTION ===
         current_group = QGroupBox("Current Actions for This Button")
         current_layout = QVBoxLayout()
@@ -386,6 +343,49 @@ class RemapDialog(QDialog):
         self.actions_container_layout.addWidget(self.no_actions_label)
 
         layout.addWidget(current_group, 1)  # Stretch this section
+
+        layout.addSpacing(10)
+
+        # === CHANGE INPUT SECTION ===
+        change_input_group = QGroupBox("Change Input Binding")
+        change_input_layout = QVBoxLayout()
+        change_input_group.setLayout(change_input_layout)
+
+        # Show current input
+        current_input_text = self._get_current_input_display()
+        desc_label = QLabel(f"<b>Current:</b> {current_input_text}")
+        # Use a stylesheet that respects the system theme - works in both light and dark mode
+        desc_label.setStyleSheet("QLabel { color: palette(text); font-size: 10px; }")
+        self.desc_label = desc_label
+        change_input_layout.addWidget(desc_label)
+
+        # Input selection layout with dropdown and detect button
+        input_selection_layout = QHBoxLayout()
+
+        # Or label (select manually section first)
+        or_label = QLabel("or select manually:")
+        input_selection_layout.addWidget(or_label)
+
+        # Input code dropdown
+        self.input_code_combo = SearchableComboBox()
+        self.input_code_combo.addItem("-- Select Input Code --", None)
+        self._populate_input_codes()
+        self.input_code_combo.currentIndexChanged.connect(self.on_input_code_selected)
+        input_selection_layout.addWidget(self.input_code_combo, 1)  # Make dropdown stretch
+
+        # Detect input button (right side)
+        self.detect_input_btn = QPushButton("Detect Input")
+        self.detect_input_btn.setMaximumWidth(120)
+        self.detect_input_btn.clicked.connect(self.on_detect_input_clicked)
+        input_selection_layout.addWidget(self.detect_input_btn)
+
+        change_input_layout.addLayout(input_selection_layout)
+
+        layout.addWidget(change_input_group)
+
+        # Hide "Change Input Binding" section when editing from device view
+        if not self.show_input_binding:
+            change_input_group.hide()
 
         # === ADD NEW ACTION SECTION ===
         add_group = QGroupBox("Add New Action")
