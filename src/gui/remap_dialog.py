@@ -646,11 +646,15 @@ class RemapDialog(QDialog):
             List of (action_name, input_code) tuples for conflicting bindings
         """
         if not self.profile or not input_code:
+            logger.debug(f"_find_conflicting_bindings: profile={bool(self.profile)}, input_code={repr(input_code)}")
             return []
 
         try:
             conflicting = []
             current_action_names = {binding.action_name for binding in self.bindings_for_input}
+
+            logger.debug(f"_find_conflicting_bindings: Looking for conflicts with input_code={repr(input_code)}")
+            logger.debug(f"_find_conflicting_bindings: Current action names: {current_action_names}")
 
             # Check all bindings in the profile
             for action_map in self.profile.action_maps:
@@ -660,9 +664,16 @@ class RemapDialog(QDialog):
                         continue
 
                     # Check if this binding uses the same input code
-                    if binding.input_code and binding.input_code.rstrip() == input_code.rstrip():
-                        conflicting.append((binding.action_name, binding.input_code))
+                    if binding.input_code:
+                        binding_code_stripped = binding.input_code.rstrip()
+                        input_code_stripped = input_code.rstrip()
+                        logger.debug(f"  Checking: {binding.action_name} has {repr(binding_code_stripped)} vs {repr(input_code_stripped)}")
 
+                        if binding_code_stripped == input_code_stripped:
+                            logger.info(f"Found conflict: {binding.action_name} is mapped to {repr(binding.input_code)}")
+                            conflicting.append((binding.action_name, binding.input_code))
+
+            logger.debug(f"_find_conflicting_bindings: Found {len(conflicting)} conflicts")
             return conflicting
         except Exception as e:
             logger.error(f"Error finding conflicting bindings: {e}", exc_info=True)
@@ -670,13 +681,19 @@ class RemapDialog(QDialog):
 
     def accept_changes(self):
         """Accept and apply all changes"""
+        logger.debug(f"accept_changes: single_action_mode={self.single_action_mode}, input_code={repr(self.input_code)}")
+
         # For single_action_mode (editing from Controls Table), check for button conflicts
         if self.single_action_mode and self.input_code:
+            logger.debug(f"accept_changes: Checking for conflicting bindings")
             conflicting = self._find_conflicting_bindings(self.input_code)
+            logger.debug(f"accept_changes: Found {len(conflicting)} conflicting bindings")
+
             if conflicting:
                 # Show confirmation dialog with list of conflicting bindings
                 conflict_list = "\n".join([f"  • {action_name}" for action_name, _ in conflicting])
 
+                logger.info(f"Showing 'Button Already Mapped' dialog for {len(conflicting)} conflicts")
                 msg_box = QMessageBox(self)
                 msg_box.setWindowTitle("Button Already Mapped")
                 msg_box.setText(f"The button '{InputValidator.get_input_description(self.input_code)}' is already mapped to:")
@@ -692,6 +709,7 @@ class RemapDialog(QDialog):
                 msg_box.exec()
 
                 if msg_box.clickedButton() == cancel_btn:
+                    logger.info("User cancelled binding change")
                     return
 
         # Collect all modified bindings (with custom labels and updated input code)
