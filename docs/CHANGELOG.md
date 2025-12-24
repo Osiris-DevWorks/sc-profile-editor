@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2025-12-24
+
+### Added
+- **Virpil MongoosT-50CM3 Device Support** - Complete templates for left and right stick variants:
+  - VPC MT-50CM3 (Left) - 32-button joystick template with slider control
+  - VPC MT-50CM3 (Right) - 32-button joystick template with slider control
+  - Interactive PDF templates with form fields for all button mappings
+  - Comprehensive device matching patterns for various device name variations
+  - Full field_mapping.json files with button-to-axis mappings
+
+### Changed
+- **Template Registry**: Updated with Virpil device entries and field mapping references
+- **Device Template Build**: Now includes 21 device templates (up from 19)
+
 ## [0.7.1] - 2025-12-23
 
 ### Added
