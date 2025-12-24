@@ -1,0 +1,43 @@
+{
+  "comment": "Mapping from PDF field names to button/axis identifiers for VPC MT-50CM3 (Left)",
+  "button_mapping": {
+    "button_1": 1,
+    "button_2": 2,
+    "button_3": 3,
+    "button_4": 4,
+    "button_5": 5,
+    "button_6": 6,
+    "button_7": 7,
+    "button_8": 8,
+    "button_9": 9,
+    "button_10": 10,
+    "button_11": 11,
+    "button_12": 12,
+    "button_13": 13,
+    "button_14": 14,
+    "button_15": 15,
+    "button_16": 16,
+    "button_17": 17,
+    "button_18": 18,
+    "button_19": 19,
+    "button_20": 20,
+    "button_21": 21,
+    "button_22": 22,
+    "button_23": 23,
+    "button_24": 24,
+    "button_25": 25,
+    "button_26": 26,
+    "button_27": 27,
+    "button_28": 28,
+    "button_29": 29,
+    "button_30": 30,
+    "button_31": 31,
+    "button_32": 32,
+    "slider": "slider_1"
+  },
+  "axis_mapping": {
+    "axis_y": "y",
+    "axis_rx": "rx",
+    "axis_z": "z"
+  }
+}

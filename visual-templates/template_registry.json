@@ -123,17 +123,38 @@
       "notes": "Space Extension Module variant"
     },
     {
+      "id": "vpc_mt50cm3_left",
+      "name": "VPC MT-50CM3 (Left)",
+      "pdf": "vpc_mt50cm3_left/vpc_mt50cm3_left.pdf",
+      "device_match_patterns": [
+        "LEFT VPC Stick MT-50CM3",
+        "VPC MT-50CM3",
+        "VirPil MT-50CM3 Left",
+        "VPC Stick MT-50CM3 Left"
+      ],
+      "type": "joystick",
+      "manufacturer": "VPC",
+      "buttons": 32,
+      "button_range": [1, 32],
+      "field_mapping": "vpc_mt50cm3_left/field_mapping.json",
+      "notes": "Virpil MongoosT-50CM3 left stick configuration - 32 buttons with slider control"
+    },
+    {
       "id": "vpc_mt50cm3_right",
       "name": "VPC MT-50CM3 (Right)",
+      "pdf": "vpc_mt50cm3_right/vpc_mt50cm3_right.pdf",
       "device_match_patterns": [
         "RIGHT VPC Stick MT-50CM3",
         "VPC MT-50CM3",
         "VirPil MT-50CM3 Right",
-        "VPC Stick MT-50CM3"
+        "VPC Stick MT-50CM3 Right"
       ],
       "type": "joystick",
       "manufacturer": "VPC",
-      "buttons": {}
+      "buttons": 32,
+      "button_range": [1, 32],
+      "field_mapping": "vpc_mt50cm3_right/field_mapping.json",
+      "notes": "Virpil MongoosT-50CM3 right stick configuration - 32 buttons with slider control"
     },
     {
       "id": "thrustmaster_t16000",
