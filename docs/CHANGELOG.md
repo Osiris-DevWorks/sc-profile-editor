@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Interactive PDF templates with form fields for all button mappings
   - Comprehensive device matching patterns for various device name variations
   - Full field_mapping.json files with button-to-axis mappings
+- **Single Instance Protection** - Application now prevents multiple instances:
+  - Warning dialog if user tries to launch app while it's already running
+  - Brings existing window to focus if another instance is attempted
+  - Uses Qt LocalServer for cross-platform support
 
 ### Changed
 - **Template Registry**: Updated with Virpil device entries and field mapping references
