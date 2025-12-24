@@ -645,24 +645,28 @@ class RemapDialog(QDialog):
         Returns:
             List of (action_name, input_code) tuples for conflicting bindings
         """
-        if not self.current_profile or not input_code:
+        if not self.profile or not input_code:
             return []
 
-        conflicting = []
-        current_action_names = {binding.action_name for binding in self.bindings_for_input}
+        try:
+            conflicting = []
+            current_action_names = {binding.action_name for binding in self.bindings_for_input}
 
-        # Check all bindings in the profile
-        for action_map_name, action_map in self.current_profile.action_maps.items():
-            for binding in action_map.bindings:
-                # Skip if this binding is for one of the actions we're currently editing
-                if binding.action_name in current_action_names:
-                    continue
+            # Check all bindings in the profile
+            for action_map in self.profile.action_maps:
+                for binding in action_map.bindings:
+                    # Skip if this binding is for one of the actions we're currently editing
+                    if binding.action_name in current_action_names:
+                        continue
 
-                # Check if this binding uses the same input code
-                if binding.input_code and binding.input_code.rstrip() == input_code.rstrip():
-                    conflicting.append((binding.action_name, binding.input_code))
+                    # Check if this binding uses the same input code
+                    if binding.input_code and binding.input_code.rstrip() == input_code.rstrip():
+                        conflicting.append((binding.action_name, binding.input_code))
 
-        return conflicting
+            return conflicting
+        except Exception as e:
+            logger.error(f"Error finding conflicting bindings: {e}", exc_info=True)
+            return []
 
     def accept_changes(self):
         """Accept and apply all changes"""
