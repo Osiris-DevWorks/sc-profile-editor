@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.7.3] - In Development
+## [0.7.3] - 2025-12-24
 
 ### Added
 - **Button Already Mapped Dialog** - Confirmation dialog in Controls Table:
@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Lists all actions currently mapped to the button
   - Allows user to confirm the mapping change or cancel
   - Helps prevent accidental multi-action bindings by making conflicts visible
+
+### Fixed
+- **Virpil MT-50CM2 Device Matching** - Added support for MT-50CM2 hardware variant:
+  - Extended device match patterns to recognize both MT-50CM2 and MT-50CM3 versions
+  - Left and right stick templates now match correctly for both hardware versions
 
 ## [0.7.2] - 2025-12-24
 
