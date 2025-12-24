@@ -128,9 +128,13 @@
       "pdf": "vpc_mt50cm3_left/vpc_mt50cm3_left.pdf",
       "device_match_patterns": [
         "LEFT VPC Stick MT-50CM3",
+        "LEFT VPC Stick MT-50CM2",
         "VPC MT-50CM3",
+        "VPC MT-50CM2",
         "VirPil MT-50CM3 Left",
-        "VPC Stick MT-50CM3 Left"
+        "VirPil MT-50CM2 Left",
+        "VPC Stick MT-50CM3 Left",
+        "VPC Stick MT-50CM2 Left"
       ],
       "type": "joystick",
       "manufacturer": "VPC",
@@ -145,9 +149,13 @@
       "pdf": "vpc_mt50cm3_right/vpc_mt50cm3_right.pdf",
       "device_match_patterns": [
         "RIGHT VPC Stick MT-50CM3",
+        "RIGHT VPC Stick MT-50CM2",
         "VPC MT-50CM3",
+        "VPC MT-50CM2",
         "VirPil MT-50CM3 Right",
-        "VPC Stick MT-50CM3 Right"
+        "VirPil MT-50CM2 Right",
+        "VPC Stick MT-50CM3 Right",
+        "VPC Stick MT-50CM2 Right"
       ],
       "type": "joystick",
       "manufacturer": "VPC",
