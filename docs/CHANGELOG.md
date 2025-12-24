@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.3] - In Development
+
+### Added
+- **Button Already Mapped Dialog** - Confirmation dialog in Controls Table:
+  - When editing a binding in Controls Table, if the selected button is already mapped to other actions, a confirmation dialog appears
+  - Lists all actions currently mapped to the button
+  - Allows user to confirm the mapping change or cancel
+  - Helps prevent accidental multi-action bindings by making conflicts visible
+
 ## [0.7.2] - 2025-12-24
 
 ### Added

@@ -634,8 +634,62 @@ class RemapDialog(QDialog):
         self.action_map_combo.setCurrentIndex(0)
         self.action_combo.setCurrentIndex(0)
 
+    def _find_conflicting_bindings(self, input_code: str) -> list:
+        """
+        Find all bindings in the profile that are already mapped to the given input code
+        (excluding bindings for the current action being edited)
+
+        Args:
+            input_code: The input code to check (e.g., "js1_button1")
+
+        Returns:
+            List of (action_name, input_code) tuples for conflicting bindings
+        """
+        if not self.current_profile or not input_code:
+            return []
+
+        conflicting = []
+        current_action_names = {binding.action_name for binding in self.bindings_for_input}
+
+        # Check all bindings in the profile
+        for action_map_name, action_map in self.current_profile.action_maps.items():
+            for binding in action_map.bindings:
+                # Skip if this binding is for one of the actions we're currently editing
+                if binding.action_name in current_action_names:
+                    continue
+
+                # Check if this binding uses the same input code
+                if binding.input_code and binding.input_code.rstrip() == input_code.rstrip():
+                    conflicting.append((binding.action_name, binding.input_code))
+
+        return conflicting
+
     def accept_changes(self):
         """Accept and apply all changes"""
+        # For single_action_mode (editing from Controls Table), check for button conflicts
+        if self.single_action_mode and self.input_code:
+            conflicting = self._find_conflicting_bindings(self.input_code)
+            if conflicting:
+                # Show confirmation dialog with list of conflicting bindings
+                conflict_list = "\n".join([f"  • {action_name}" for action_name, _ in conflicting])
+
+                msg_box = QMessageBox(self)
+                msg_box.setWindowTitle("Button Already Mapped")
+                msg_box.setText(f"The button '{InputValidator.get_input_description(self.input_code)}' is already mapped to:")
+                msg_box.setInformativeText(
+                    f"{conflict_list}\n\n"
+                    f"Are you sure you want to bind this action to this button?"
+                )
+
+                # Add OK and Cancel buttons
+                ok_btn = msg_box.addButton("OK", QMessageBox.ButtonRole.AcceptRole)
+                cancel_btn = msg_box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+
+                msg_box.exec()
+
+                if msg_box.clickedButton() == cancel_btn:
+                    return
+
         # Collect all modified bindings (with custom labels and updated input code)
         modified_bindings = []
 
