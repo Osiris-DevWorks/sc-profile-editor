@@ -658,7 +658,7 @@ class RemapDialog(QDialog):
 
             # Check all bindings in the profile
             for action_map in self.profile.action_maps:
-                for binding in action_map.bindings:
+                for binding in action_map.actions:
                     # Skip if this binding is for one of the actions we're currently editing
                     if binding.action_name in current_action_names:
                         continue
