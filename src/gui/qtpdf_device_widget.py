@@ -22,6 +22,7 @@ from models.profile_model import ControlProfile, Device
 from parser.label_generator import LabelGenerator
 from utils.device_joystick_mapper import DeviceJoystickMapper
 from utils.device_splitter import get_friendly_device_name
+from utils.settings import AppSettings
 
 logger = logging.getLogger(__name__)
 
@@ -961,10 +962,21 @@ class QtPdfDeviceWidget(QWidget):
         device_name = (self.current_device.product_name or 'device').replace(' ', '_')
         default_filename = f"{device_name}_controls.png"
 
+        # Determine default directory with preference order:
+        # 1. Star Citizen profiles directory (if configured and exists)
+        # 2. Current directory
+        default_dir = ""
+        settings = AppSettings()
+        sc_profiles_dir = settings.get_sc_profiles_directory()
+        if sc_profiles_dir and os.path.exists(sc_profiles_dir):
+            default_dir = sc_profiles_dir
+
+        default_path = os.path.join(default_dir, default_filename) if default_dir else default_filename
+
         file_path, _ = QFileDialog.getSaveFileName(
             self,
             "Export Device Graphic",
-            default_filename,
+            default_path,
             "PNG Image (*.png);;PDF Document (*.pdf)"
         )
 

@@ -667,9 +667,19 @@ class MainWindow(QMainWindow):
 
     def import_profile(self):
         """Handle profile import button click"""
-        # Get last directory if available
-        last_path = self.settings.get_last_profile_path()
-        start_dir = os.path.dirname(last_path) if last_path and os.path.exists(last_path) else ""
+        # Determine starting directory with preference order:
+        # 1. Star Citizen profiles directory (if configured and exists)
+        # 2. Last profile directory (if available)
+        # 3. Empty (let dialog use default)
+        start_dir = ""
+
+        sc_profiles_dir = self.settings.get_sc_profiles_directory()
+        if sc_profiles_dir and os.path.exists(sc_profiles_dir):
+            start_dir = sc_profiles_dir
+        else:
+            last_path = self.settings.get_last_profile_path()
+            if last_path and os.path.exists(last_path):
+                start_dir = os.path.dirname(last_path)
 
         # Open file dialog
         file_path, _ = QFileDialog.getOpenFileName(
@@ -1552,10 +1562,24 @@ class MainWindow(QMainWindow):
         if not self.current_profile:
             return
 
+        # Determine default directory with preference order:
+        # 1. Star Citizen profiles directory (if configured and exists)
+        # 2. Source profile directory (if available)
+        # 3. Current directory
+        default_dir = ""
+
+        sc_profiles_dir = self.settings.get_sc_profiles_directory()
+        if sc_profiles_dir and os.path.exists(sc_profiles_dir):
+            default_dir = sc_profiles_dir
+        elif self.current_profile.source_xml_path:
+            default_dir = os.path.dirname(self.current_profile.source_xml_path)
+
+        default_path = os.path.join(default_dir, f"{self.current_profile.profile_name}.csv") if default_dir else f"{self.current_profile.profile_name}.csv"
+
         file_path, _ = QFileDialog.getSaveFileName(
             self,
             "Export to CSV",
-            f"{self.current_profile.profile_name}.csv",
+            default_path,
             "CSV Files (*.csv)"
         )
 
@@ -1600,10 +1624,24 @@ class MainWindow(QMainWindow):
         if not self.current_profile:
             return
 
+        # Determine default directory with preference order:
+        # 1. Star Citizen profiles directory (if configured and exists)
+        # 2. Source profile directory (if available)
+        # 3. Current directory
+        default_dir = ""
+
+        sc_profiles_dir = self.settings.get_sc_profiles_directory()
+        if sc_profiles_dir and os.path.exists(sc_profiles_dir):
+            default_dir = sc_profiles_dir
+        elif self.current_profile.source_xml_path:
+            default_dir = os.path.dirname(self.current_profile.source_xml_path)
+
+        default_path = os.path.join(default_dir, f"{self.current_profile.profile_name}.pdf") if default_dir else f"{self.current_profile.profile_name}.pdf"
+
         file_path, _ = QFileDialog.getSaveFileName(
             self,
             "Export to PDF",
-            f"{self.current_profile.profile_name}.pdf",
+            default_path,
             "PDF Files (*.pdf)"
         )
 
@@ -1687,10 +1725,24 @@ class MainWindow(QMainWindow):
         if not self.current_profile:
             return
 
+        # Determine default directory with preference order:
+        # 1. Star Citizen profiles directory (if configured and exists)
+        # 2. Source profile directory (if available)
+        # 3. Current directory
+        default_dir = ""
+
+        sc_profiles_dir = self.settings.get_sc_profiles_directory()
+        if sc_profiles_dir and os.path.exists(sc_profiles_dir):
+            default_dir = sc_profiles_dir
+        elif self.current_profile.source_xml_path:
+            default_dir = os.path.dirname(self.current_profile.source_xml_path)
+
+        default_path = os.path.join(default_dir, f"{self.current_profile.profile_name}.docx") if default_dir else f"{self.current_profile.profile_name}.docx"
+
         file_path, _ = QFileDialog.getSaveFileName(
             self,
             "Export to Word",
-            f"{self.current_profile.profile_name}.docx",
+            default_path,
             "Word Documents (*.docx)"
         )
 
@@ -1921,13 +1973,19 @@ class MainWindow(QMainWindow):
         # Generate filename using layout_<name>.xml pattern
         suggested_name = f"layout_{profile_name}.xml"
 
-        # Determine default directory
-        if self.current_profile.source_xml_path:
+        # Determine default directory with preference order:
+        # 1. Star Citizen profiles directory (if configured and exists)
+        # 2. Source profile directory (if available)
+        # 3. Current directory
+        suggested_dir = ""
+
+        sc_profiles_dir = self.settings.get_sc_profiles_directory()
+        if sc_profiles_dir and os.path.exists(sc_profiles_dir):
+            suggested_dir = sc_profiles_dir
+        elif self.current_profile.source_xml_path:
             suggested_dir = os.path.dirname(self.current_profile.source_xml_path)
-            default_path = os.path.join(suggested_dir, suggested_name)
-        else:
-            # No source path, use current directory
-            default_path = suggested_name
+
+        default_path = os.path.join(suggested_dir, suggested_name) if suggested_dir else suggested_name
 
         # Show save dialog with generated filename
         output_path, _ = QFileDialog.getSaveFileName(
