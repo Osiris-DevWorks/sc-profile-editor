@@ -27,6 +27,7 @@ class InputDetectorThread(QThread):
         super().__init__()
         self.timeout_ms = timeout_ms
         self.running = False
+        self.stop_listeners_flag = False  # Flag to forcefully stop listeners
         self.joystick_state: Dict[int, Dict] = {}  # Track joystick axis state for threshold detection
         self.active_modifiers: Dict[str, bool] = {  # Track which modifier keys are pressed
             "lctrl": False,
@@ -93,6 +94,20 @@ class InputDetectorThread(QThread):
 
             # Detection loop
             while self.running and elapsed_ms < self.timeout_ms:
+                # Check if any listener set the stop flag
+                if self.stop_listeners_flag:
+                    logger.debug("Stop listeners flag set, stopping all listeners")
+                    if keyboard_listener:
+                        try:
+                            keyboard_listener.stop()
+                        except:
+                            pass
+                    if mouse_listener:
+                        try:
+                            mouse_listener.stop()
+                        except:
+                            pass
+
                 # Check for joystick input
                 if joystick_detected.is_set():
                     if joystick_result["code"]:
@@ -346,6 +361,16 @@ class InputDetectorThread(QThread):
             detected_event.set()
             logger.info(f"Keyboard input detected: {input_code} - {result_dict['description']}")
 
+            # Set flag to stop all listeners
+            self.stop_listeners_flag = True
+
+            # Try to stop the listener immediately
+            if listener:
+                try:
+                    listener.stop()
+                except:
+                    pass
+
             return False  # Stop listener
 
         except Exception as e:
@@ -463,6 +488,16 @@ class InputDetectorThread(QThread):
                     detected_event.set()
                     logger.info(f"Detected modifier key alone: {input_code} - {result_dict['description']}")
 
+                    # Set flag to stop all listeners
+                    self.stop_listeners_flag = True
+
+                    # Try to stop the listener immediately
+                    if listener:
+                        try:
+                            listener.stop()
+                        except:
+                            pass
+
                     return False  # Stop listener
 
                 self.active_modifiers[modifier_name] = False
@@ -530,6 +565,16 @@ class InputDetectorThread(QThread):
                 result_dict["description"] = description
                 detected_event.set()
                 logger.info(f"Mouse input detected: {input_code} - {description}")
+
+                # Set flag to stop all listeners
+                self.stop_listeners_flag = True
+
+                # Try to stop the listener immediately
+                if listener:
+                    try:
+                        listener.stop()
+                    except:
+                        pass
 
                 return False  # Stop listener
 
