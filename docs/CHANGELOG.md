@@ -1,7 +1,7 @@
 # Changelog
 
-**Version:** 0.6.1
-**Date:** 2025-12-04
+**Version:** 0.7.4
+**Date:** 2025-12-27
 **For:** Users and developers - Version history and release notes
 
 All notable changes to SC Profile Editor will be documented in this file.
@@ -12,11 +12,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [0.7.4] - 2025-12-27
+
+### Added
 - **Complete Action Structure for All Profiles** - Master template overlay system:
   - All profiles now load with complete action structure (621 actions) using blank.xml as master template
   - Profile loading now overlays user customizations onto the blank template at runtime
   - Ensures all profiles have every bindable action available for customization
   - Works for presets, imported profiles, and user-created profiles
+- **All Official Star Citizen Preset Profiles** - Bundled with the application:
+  - All preset profiles from Star Citizen are included and accessible via the "Load Preset Profile" button
+  - Presets include common controller configurations (keyboard/mouse, HOTAS, etc.)
+  - Quick-load functionality for instant access to official starting configurations
+  - All presets now load with complete 621-action structure via the overlay system
 
 ### Changed
 - **Profile Loading System** - New overlay-based architecture:
@@ -33,6 +46,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Preset file updated to use complete action structure via overlay system
   - Bindings now include all keyboard and mouse actions that can be mapped
   - Updated preset contains 56 mapped keyboard/mouse inputs plus 565 unmapped placeholders
+- **Issue #15 - Input Detection Space Bar Hang** - Space bar (and other keys) no longer cause "Detect Input" dialog to hang:
+  - Root cause: pynput keyboard listeners were not stopping when `listener.stop()` was called from within their own callback
+  - Solution: Moved listener cleanup to main detection loop instead of callbacks
+  - Main loop now sets `stop_listeners_flag` when input detected, then stops all listeners from outside callback context
+  - Added 100ms delay after stopping listeners to ensure they fully halt
+  - Space bar now detects immediately and closes dialog without hanging
+- **Issue #15 - New Profiles Missing Joystick Devices** - New profiles now include connected joystick devices in header:
+  - When creating new profile from blank.xml, app now auto-detects connected joystick devices
+  - Joystick Device objects added to profile.devices list during creation
+  - New profiles now preserve complete device configuration (not just keyboard)
+  - Consistent with preset profile behavior
 
 ## [0.7.3] - 2025-12-24
 
