@@ -2,10 +2,10 @@
 ; Created with Inno Setup
 
 #define MyAppName "Star Citizen Profile Editor"
-#define MyAppVersion "0.7.3"
+#define MyAppVersion "0.7.4"
 #define MyAppPublisher "SC Profile Tools"
 #define MyAppURL "https://github.com/yourusername/scpe-releases"
-#define MyAppExeName "SCProfileEditor.exe"
+#define MyAppExeName "SCProfileEditor-v0.7.4.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -20,7 +20,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile=LICENSE
-OutputDir=installer_output
+OutputDir=dist
 OutputBaseFilename=SCProfileEditor-v{#MyAppVersion}-Setup
 SetupIconFile=assets\icon.ico
 Compression=lzma

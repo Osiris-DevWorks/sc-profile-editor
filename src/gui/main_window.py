@@ -101,6 +101,10 @@ class MainWindow(QMainWindow):
         # Store all bindings for filtering
         self.all_bindings = []
 
+        # Input detection for key filter
+        self.input_detector = None  # Lazy initialized when first used
+        self.detecting_input_for_filter = False  # Track detection state
+
         # Initialize system tray icon
         self.tray_icon = None
         self.is_closing = False  # Flag to distinguish close from minimize
@@ -241,6 +245,19 @@ class MainWindow(QMainWindow):
         self.actionmap_filter.addItem("All Action Categories")
         self.actionmap_filter.currentTextChanged.connect(self.apply_filters)
         filter_layout.addWidget(self.actionmap_filter, 1)
+
+        # Key filter
+        filter_layout.addWidget(QLabel("Key:"))
+        self.key_filter = QComboBox()
+        self.key_filter.addItem("All Keys")
+        self.key_filter.currentTextChanged.connect(self.apply_filters)
+        filter_layout.addWidget(self.key_filter, 1)
+
+        # Detect Key button
+        self.detect_key_btn = QPushButton("Detect Key")
+        self.detect_key_btn.setMaximumWidth(100)
+        self.detect_key_btn.clicked.connect(self.on_detect_key_clicked)
+        filter_layout.addWidget(self.detect_key_btn)
 
         # Hide unmapped keys checkbox
         self.hide_unmapped_checkbox = QCheckBox("Hide Unmapped Keys")
@@ -1115,12 +1132,18 @@ class MainWindow(QMainWindow):
         # Get unique devices
         devices = set()
         action_maps = set()
+        input_codes = set()  # Collect unique input codes for key filter
 
         for action_map_name, binding in self.all_bindings:
             device = self.parse_device_from_input(binding.input_code)
             devices.add(device)
             action_map_label = LabelGenerator.generate_actionmap_label(action_map_name)
             action_maps.add(action_map_label)
+
+            # Collect mapped input codes (exclude unmapped ones ending with '_')
+            input_code = binding.input_code.strip()
+            if input_code and not input_code.endswith('_'):
+                input_codes.add(input_code)
 
         # Always include keyboard, mouse, and joystick options
         devices.add("Keyboard")
@@ -1130,6 +1153,7 @@ class MainWindow(QMainWindow):
         # Save current selections before clearing
         current_device = self.device_filter.currentText()
         current_actionmap = self.actionmap_filter.currentText()
+        current_key = self.key_filter.currentText()
 
         # Update device filter
         self.device_filter.blockSignals(True)
@@ -1161,6 +1185,33 @@ class MainWindow(QMainWindow):
 
         self.actionmap_filter.blockSignals(False)
 
+        # Update key filter
+        self.key_filter.blockSignals(True)
+        self.key_filter.clear()
+        self.key_filter.addItem("All Keys")
+
+        # Group input codes by device type: keyboard, mouse, joystick
+        keyboard_codes = sorted([ic for ic in input_codes if ic.startswith('kb')])
+        mouse_codes = sorted([ic for ic in input_codes if ic.startswith('mouse')])
+        joystick_codes = sorted([ic for ic in input_codes if ic.startswith('js')])
+
+        # Add in order: keyboard, mouse, joystick
+        for input_code in keyboard_codes + mouse_codes + joystick_codes:
+            # Generate human-readable label
+            label = LabelGenerator.generate_input_label(input_code)
+            # Format: "Label (raw_code)" e.g., "Keyboard O (kb1_o)"
+            display_text = f"{label} ({input_code})"
+            # Store raw input code as user data for filtering
+            self.key_filter.addItem(display_text, input_code)
+
+        # Restore previous selection if it still exists
+        if current_key:
+            index = self.key_filter.findText(current_key)
+            if index >= 0:
+                self.key_filter.setCurrentIndex(index)
+
+        self.key_filter.blockSignals(False)
+
     def apply_filters(self):
         """Apply current filter settings to the table"""
         if not self.all_bindings:
@@ -1169,6 +1220,12 @@ class MainWindow(QMainWindow):
         search_text = self.search_box.text().lower()
         device_filter = self.device_filter.currentText()
         actionmap_filter = self.actionmap_filter.currentText()
+        key_filter = self.key_filter.currentText()
+        # Extract raw input code from dropdown (stored as user data)
+        key_filter_code = None
+        if key_filter != "All Keys":
+            current_index = self.key_filter.currentIndex()
+            key_filter_code = self.key_filter.itemData(current_index)
         hide_unmapped = self.hide_unmapped_checkbox.isChecked()
         hide_mapped = self.hide_mapped_checkbox.isChecked()
 
@@ -1198,6 +1255,15 @@ class MainWindow(QMainWindow):
                 actionmap_item = self.controls_table.item(row, 0)
                 if actionmap_item and actionmap_item.text() != actionmap_filter:
                     show_row = False
+
+            # Key filter - check if row's input code matches selected key
+            if show_row and key_filter != "All Keys" and key_filter_code:
+                input_code_item = self.controls_table.item(row, 4)  # Raw input code is column 4
+                if input_code_item:
+                    row_input_code = input_code_item.text().strip()
+                    # Only match exact input codes
+                    if row_input_code != key_filter_code:
+                        show_row = False
 
             # Unmapped keys filter - check if input code ends with underscore
             # Unmapped keys are stored as "js1_ ", "kb1_", "mouse_", etc. (ending with underscore+space or just underscore)
@@ -1266,11 +1332,98 @@ class MainWindow(QMainWindow):
         view_mode = "detailed" if self.show_detailed_checkbox.isChecked() else "default"
         self.statusBar().showMessage(f"Switched to {view_mode} view")
 
+    def on_detect_key_clicked(self):
+        """Handle Detect Key button click for key filter"""
+        if self.detecting_input_for_filter:
+            # Cancel ongoing detection
+            if self.input_detector:
+                self.input_detector.stop_detection()
+            self.detecting_input_for_filter = False
+            self.detect_key_btn.setText("Detect Key")
+            self.detect_key_btn.setEnabled(True)
+            logger.info("Key filter input detection cancelled")
+            return
+
+        # Start detection
+        try:
+            # Lazy initialization of InputDetector
+            if not self.input_detector:
+                from utils.input_detector import InputDetector
+                self.input_detector = InputDetector()
+
+            self.detecting_input_for_filter = True
+            self.detect_key_btn.setText("Listening... (Cancel)")
+            logger.info("Starting input detection for key filter")
+
+            # Start input detection with 10 second timeout
+            detector_thread = self.input_detector.start_detection(timeout_ms=10000)
+            detector_thread.input_detected.connect(self.on_key_filter_input_detected)
+            detector_thread.detection_cancelled.connect(self.on_key_filter_detection_cancelled)
+
+        except Exception as e:
+            logger.error(f"Error starting input detection for key filter: {e}", exc_info=True)
+            QMessageBox.critical(
+                self,
+                "Detection Error",
+                f"Failed to start input detection:\n{str(e)}"
+            )
+            self.detecting_input_for_filter = False
+            self.detect_key_btn.setText("Detect Key")
+
+    def on_key_filter_input_detected(self, input_code: str, description: str):
+        """Handle detected input for key filter"""
+        logger.info(f"Input detected for key filter: {input_code} - {description}")
+
+        # Reset button state
+        self.detecting_input_for_filter = False
+        self.detect_key_btn.setText("Detect Key")
+
+        # Find the detected input code in the dropdown
+        # Search by user data (raw input code)
+        for i in range(self.key_filter.count()):
+            item_data = self.key_filter.itemData(i)
+            if item_data == input_code:
+                self.key_filter.setCurrentIndex(i)
+                logger.info(f"Set key filter to: {self.key_filter.currentText()}")
+                # apply_filters() will be called automatically via currentTextChanged signal
+                return
+
+        # Input code not found in filter - might be unmapped or not in current profile
+        logger.warning(f"Detected input code '{input_code}' not found in key filter dropdown")
+        QMessageBox.information(
+            self,
+            "Key Not Found",
+            f"The detected key ({description}) is not currently mapped in your profile.\n\n"
+            f"Only mapped keys appear in the filter dropdown."
+        )
+
+    def on_key_filter_detection_cancelled(self):
+        """Handle input detection timeout/cancellation for key filter"""
+        logger.info("Key filter input detection timed out or cancelled")
+
+        self.detecting_input_for_filter = False
+        self.detect_key_btn.setText("Detect Key")
+
+        QMessageBox.information(
+            self,
+            "No Input Detected",
+            "No input was detected within 10 seconds.\n\nPlease try again."
+        )
+
     def clear_filters(self):
         """Clear all filters"""
         self.search_box.clear()
         self.device_filter.setCurrentIndex(0)
         self.actionmap_filter.setCurrentIndex(0)
+        self.key_filter.setCurrentIndex(0)  # Reset to "All Keys"
+
+        # Cancel any ongoing input detection for key filter
+        if self.detecting_input_for_filter:
+            if self.input_detector:
+                self.input_detector.stop_detection()
+            self.detecting_input_for_filter = False
+            self.detect_key_btn.setText("Detect Key")
+
         self.hide_unmapped_checkbox.setChecked(False)
         self.hide_mapped_checkbox.setChecked(False)
         self.statusBar().showMessage(f"Filters cleared - showing all {self.controls_table.rowCount()} bindings")
@@ -1391,10 +1544,12 @@ class MainWindow(QMainWindow):
     def on_bindings_changed_from_table(self, bindings: list):
         """Handle binding changes from RemapDialog opened via table Edit button"""
         # Bindings are already modified by RemapDialog, just refresh UI
+        logger.info(f"on_bindings_changed_from_table: Received {len(bindings)} bindings: {[(b.action_name, b.input_code) for b in bindings]}")
 
         # Mark profile as modified
         if self.current_profile:
             self.current_profile.mark_modified()
+            logger.info(f"on_bindings_changed_from_table: Marked profile as modified")
 
         # Reload override manager cache
         try:

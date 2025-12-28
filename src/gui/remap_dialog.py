@@ -574,6 +574,8 @@ class RemapDialog(QDialog):
         if not selected_binding:
             return
 
+        logger.info(f"on_add_action_clicked: action_name={selected_binding.action_name}, current_input_code={repr(selected_binding.input_code)}, new_input_code={repr(self.input_code)}")
+
         # Check if action is already bound elsewhere
         # Only show rebind warning if the action is bound to a different input
         # Unbound actions have input ending with underscore (e.g., "js1_ " or "js1_")
@@ -618,10 +620,12 @@ class RemapDialog(QDialog):
 
         # Bind the action to this button
         selected_binding.input_code = self.input_code
+        logger.info(f"on_add_action_clicked: Updated binding input_code to {repr(self.input_code)}, binding object id={id(selected_binding)}, is it in profile? checking...")
 
         # Add to our current bindings list
         if selected_binding not in self.bindings_for_input:
             self.bindings_for_input.append(selected_binding)
+            logger.info(f"on_add_action_clicked: Added binding to bindings_for_input")
 
         # Add widget to display
         self.add_action_widget(selected_binding)
@@ -684,13 +688,14 @@ class RemapDialog(QDialog):
         logger.debug(f"accept_changes: single_action_mode={self.single_action_mode}, input_code={repr(self.input_code)}")
 
         # For single_action_mode (editing from Controls Table), check for button conflicts
-        if self.single_action_mode and self.input_code:
+        # Only check for conflicts if we're actually setting a new binding (not clearing)
+        if self.single_action_mode and self.input_code and self.input_code.strip() and not self.input_code.rstrip().endswith('_'):
             logger.debug(f"accept_changes: Checking for conflicting bindings")
             conflicting = self._find_conflicting_bindings(self.input_code)
             logger.debug(f"accept_changes: Found {len(conflicting)} conflicting bindings")
 
             if conflicting:
-                # Show confirmation dialog with list of conflicting bindings
+                # Show enhanced dialog with multiple options
                 conflict_list = "\n".join([f"  • {action_name}" for action_name, _ in conflicting])
 
                 logger.info(f"Showing 'Button Already Mapped' dialog for {len(conflicting)} conflicts")
@@ -699,18 +704,33 @@ class RemapDialog(QDialog):
                 msg_box.setText(f"The button '{InputValidator.get_input_description(self.input_code)}' is already mapped to:")
                 msg_box.setInformativeText(
                     f"{conflict_list}\n\n"
-                    f"Are you sure you want to bind this action to this button?"
+                    f"What would you like to do?"
                 )
 
-                # Add OK and Cancel buttons
-                ok_btn = msg_box.addButton("OK", QMessageBox.ButtonRole.AcceptRole)
+                # Add three buttons with different roles
+                replace_btn = msg_box.addButton("Replace All", QMessageBox.ButtonRole.AcceptRole)
+                duplicate_btn = msg_box.addButton("Duplicate", QMessageBox.ButtonRole.ApplyRole)
                 cancel_btn = msg_box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
 
                 msg_box.exec()
 
-                if msg_box.clickedButton() == cancel_btn:
+                clicked_button = msg_box.clickedButton()
+
+                if clicked_button == cancel_btn:
                     logger.info("User cancelled binding change")
                     return
+                elif clicked_button == replace_btn:
+                    logger.info(f"User chose 'Replace All' - removing binding from {len(conflicting)} conflicting actions")
+                    # Remove the input binding from all conflicting actions
+                    for action_name, _ in conflicting:
+                        for action_map in self.profile.action_maps:
+                            for binding in action_map.actions:
+                                if binding.action_name == action_name and binding.input_code == self.input_code:
+                                    logger.debug(f"Removing binding from {action_name}")
+                                    binding.input_code = ""
+                elif clicked_button == duplicate_btn:
+                    logger.info("User chose 'Duplicate' - allowing multiple actions to use this button")
+                    # Just continue - this allows the binding to be added without removing others
 
         # Collect all modified bindings (with custom labels and updated input code)
         modified_bindings = []
@@ -720,6 +740,8 @@ class RemapDialog(QDialog):
             custom_label = widget.get_custom_label()
             activation_mode = widget.get_activation_mode()
             binding = widget.binding
+
+            logger.info(f"accept_changes: Processing binding {binding.action_name}, current input_code={repr(binding.input_code)}")
 
             # Set custom label
             default_label = LabelGenerator.generate_action_label(binding.action_name)
@@ -734,8 +756,13 @@ class RemapDialog(QDialog):
             # Update input code if it has changed
             # For single_action_mode (editing from table), apply the current input code to the binding
             if self.single_action_mode and binding in self.bindings_for_input:
+                old_code = binding.input_code
                 binding.input_code = self.input_code
+                logger.info(f"Updated binding {binding.action_name}: {old_code} → {self.input_code}")
+            elif self.single_action_mode:
+                logger.warning(f"Binding not in bindings_for_input! {binding.action_name}, action_name={binding.action_name}, input_code={binding.input_code}, bindings_for_input={[(b.action_name, b.input_code) for b in self.bindings_for_input]}")
 
+            logger.info(f"accept_changes: Final binding {binding.action_name}, input_code={repr(binding.input_code)}")
             modified_bindings.append(binding)
 
         # Clear input code for deleted bindings

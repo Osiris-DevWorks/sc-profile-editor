@@ -83,27 +83,69 @@ class XMLExporter:
                 if key not in binding_map:
                     binding_map[key] = []
                 binding_map[key].append(binding)
+                # Debug: Log all mouse5 bindings
+                if "mouse5" in binding.input_code:
+                    logger.info(f"EXPORT DEBUG: Found mouse5 binding: {binding.action_name} in {action_map.name} -> {binding.input_code}")
+
+        # Debug: Log emote_salute if found
+        emote_key = None
+        emote_found = False
+        for key in binding_map:
+            if key[1] == 'emote_salute':
+                emote_key = key
+                emote_found = True
+                logger.info(f"EXPORT DEBUG: Found emote_salute in binding_map: key={key}, bindings={[(b.action_name, b.input_code) for b in binding_map[key]]}")
+                break
+        if not emote_found:
+            logger.info("EXPORT DEBUG: emote_salute NOT found in binding_map!")
+
+        # Track which (action_map_name, action_name) pairs have been processed
+        processed_keys = set()
 
         # Iterate through XML and update matching bindings
-        for actionmap_elem in self.root.findall('actionmap'):
+        for actionmap_elem in self.root.findall('.//actionmap'):
             map_name = actionmap_elem.get('name', '')
 
-            for action_elem in actionmap_elem.findall('action'):
+            # Find ALL actions with this name in the actionmap (may have duplicates from overlay)
+            action_elems = actionmap_elem.findall('action')
+            for action_elem in action_elems:
                 action_name = action_elem.get('name', '')
+                key = (map_name, action_name)
+
+                # Skip if we've already processed this action in this actionmap
+                if key in processed_keys:
+                    continue
 
                 # Check if we have modified bindings for this action
-                key = (map_name, action_name)
                 if key not in binding_map:
                     continue
 
                 modified_bindings = binding_map[key]
+                # Debug: Log if this is a mouse5 action
+                if any("mouse5" in b.input_code for b in modified_bindings):
+                    logger.info(f"EXPORT DEBUG: Found mouse5 in XML at {map_name}.{action_name}")
+
+                # Debug log for emote_salute
+                if action_name == 'emote_salute':
+                    logger.info(f"EXPORT DEBUG: Found emote_salute in XML at {map_name}, modified_bindings={[(b.action_name, b.input_code) for b in modified_bindings]}")
+                    old_bindings = [r.get('input') for r in action_elem.findall('rebind')]
+                    logger.info(f"EXPORT DEBUG: Old bindings before clear: {old_bindings}")
 
                 # Clear existing rebind elements
                 for rebind_elem in list(action_elem.findall('rebind')):
                     action_elem.remove(rebind_elem)
 
-                # Add updated rebind elements
+                # Add updated rebind elements (skip empty ones)
                 for binding in modified_bindings:
+                    # Skip empty/unmapped bindings
+                    if not binding.input_code or binding.input_code.rstrip().endswith('_'):
+                        logger.debug(f"EXPORT DEBUG: Skipping empty/unbound binding: {binding.action_name} -> {repr(binding.input_code)}")
+                        continue
+
+                    # Debug: Log all mouse5 bindings being written
+                    if "mouse5" in binding.input_code:
+                        logger.info(f"EXPORT DEBUG: Writing mouse5 binding to XML: {binding.action_name} -> {binding.input_code}")
+
                     rebind_elem = ET.SubElement(action_elem, 'rebind')
                     rebind_elem.set('input', binding.input_code)
 
@@ -111,7 +153,65 @@ class XMLExporter:
                     if binding.activation_mode:
                         rebind_elem.set('activationMode', binding.activation_mode)
 
-                logger.debug(f"Updated binding: {map_name}.{action_name} -> {[b.input_code for b in modified_bindings]}")
+                    # Debug log for emote_salute
+                    if action_name == 'emote_salute':
+                        logger.info(f"EXPORT DEBUG: Set emote_salute rebind to: {binding.input_code}")
+                        new_bindings = [r.get('input') for r in action_elem.findall('rebind')]
+                        logger.info(f"EXPORT DEBUG: New bindings after update: {new_bindings}")
+
+                processed_keys.add(key)
+                logger.debug(f"Updated binding: {map_name}.{action_name} -> {[b.input_code for b in modified_bindings if b.input_code and not b.input_code.rstrip().endswith('_')]}")
+
+        # Remove empty/unmapped actions and duplicates from XML
+        for actionmap_elem in self.root.findall('.//actionmap'):
+            map_name = actionmap_elem.get('name', '')
+            # Track which action names we've seen in this actionmap
+            # Store as action_name -> list of (elem, has_binding, binding_input_code)
+            seen_actions = {}
+            actions_to_remove = []
+
+            for action_elem in actionmap_elem.findall('action'):
+                action_name = action_elem.get('name', '')
+
+                # Check if action has any non-empty bindings
+                rebinds = action_elem.findall('rebind')
+                has_binding = any(r.get('input', '').strip() and not r.get('input', '').rstrip().endswith('_') for r in rebinds)
+
+                # Get the actual binding input code if it exists
+                binding_input = None
+                if has_binding:
+                    for r in rebinds:
+                        inp = r.get('input', '')
+                        if inp.strip() and not inp.rstrip().endswith('_'):
+                            binding_input = inp
+                            break
+
+                if not has_binding:
+                    # Mark empty actions for removal
+                    actions_to_remove.append(action_elem)
+                elif action_name in seen_actions:
+                    # Duplicate action found - keep the one with actual mapped binding, remove unmapped
+                    prev_elem, prev_has_binding, prev_binding = seen_actions[action_name]
+
+                    if has_binding and not prev_has_binding:
+                        # Current has binding, previous doesn't - remove previous, keep current
+                        actions_to_remove.append(prev_elem)
+                        seen_actions[action_name] = (action_elem, has_binding, binding_input)
+                        logger.debug(f"Removing duplicate unmapped action: {map_name}.{action_name}, keeping mapped version")
+                    elif has_binding and prev_has_binding:
+                        # Both have bindings - keep first, remove second
+                        actions_to_remove.append(action_elem)
+                        logger.debug(f"Removing duplicate action: {map_name}.{action_name}")
+                    else:
+                        # Previous has binding or both are unmapped - keep previous
+                        actions_to_remove.append(action_elem)
+                        logger.debug(f"Removing duplicate action: {map_name}.{action_name}")
+                else:
+                    seen_actions[action_name] = (action_elem, has_binding, binding_input)
+
+            # Remove marked actions
+            for action_elem in actions_to_remove:
+                actionmap_elem.remove(action_elem)
 
     def write_formatted_xml(self, output_path: str):
         """Write XML with proper formatting and indentation"""
@@ -232,6 +332,40 @@ class XMLExporter:
             return False
 
 
+def _is_valid_star_citizen_profile_structure(xml_path: str) -> bool:
+    """
+    Check if XML file has a valid Star Citizen profile structure
+    Valid structure has ActionMaps as root with CustomisationUIHeader child
+    Invalid structure has ActionProfiles wrapper or other non-standard layouts
+
+    Returns:
+        True if structure is valid, False otherwise
+    """
+    try:
+        tree = ET.parse(xml_path)
+        root = tree.getroot()
+
+        # Star Citizen profiles have ActionMaps as root
+        if root.tag != 'ActionMaps':
+            logger.warning(f"Invalid root element: {root.tag} (expected ActionMaps)")
+            return False
+
+        # Should have CustomisationUIHeader child
+        if root.find('CustomisationUIHeader') is None:
+            logger.warning("Missing CustomisationUIHeader element")
+            return False
+
+        # Should NOT have ActionProfiles wrapper (that's invalid for SC)
+        if root.find('ActionProfiles') is not None:
+            logger.warning("Invalid structure: found ActionProfiles wrapper (preset format)")
+            return False
+
+        return True
+    except Exception as e:
+        logger.error(f"Error validating XML structure: {e}")
+        return False
+
+
 def export_profile(profile: ControlProfile, original_xml_path: str,
                   output_path: str) -> bool:
     """
@@ -245,5 +379,11 @@ def export_profile(profile: ControlProfile, original_xml_path: str,
     Returns:
         True if successful, False otherwise
     """
+    # Check if source XML has valid Star Citizen structure
+    # If not (e.g., preset format with ActionProfiles wrapper), create new profile instead
+    if not _is_valid_star_citizen_profile_structure(original_xml_path):
+        logger.info(f"Source XML has invalid Star Citizen structure, creating new profile instead")
+        return XMLExporter.create_new_profile(profile, output_path)
+
     exporter = XMLExporter(original_xml_path)
     return exporter.export(profile, output_path)

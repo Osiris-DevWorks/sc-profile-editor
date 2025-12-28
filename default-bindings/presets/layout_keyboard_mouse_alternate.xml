@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ActionMaps>
- <ActionProfiles version="1" optionsVersion="2" rebindVersion="2" profileName="Keyboard and Mouse - Complete">
+ <ActionProfiles version="1" optionsVersion="2" rebindVersion="2" profileName="Keyboard and Mouse - Alternate">
   <deviceoptions name="Mouse">
    <option input="@pause_OptionsMouseSmoothing" saturation="0.044999994"/>
    <option input="@pause_OptionsMouseAcceleration" acceleration="0.029999999"/>

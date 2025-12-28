@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ActionMaps version="1" optionsVersion="2" rebindVersion="2" profileName="Star Citizen KBM Default">
+ <CustomisationUIHeader label="Star Citizen KBM Default" description="" image="">
+  <devices>
+   <keyboard instance="1"/>
+   <mouse instance="1"/>
+  </devices>
+ </CustomisationUIHeader>
+ <deviceoptions name="Mouse">
+  <option input="@pause_OptionsMouseSmoothing" saturation="0.044999994"/>
+  <option input="@pause_OptionsMouseAcceleration" acceleration="0.029999999"/>
+ </deviceoptions>
+ <options type="keyboard" instance="1" Product="Keyboard  {6F1D2B61-D5A0-11CF-BFC7-444553540000}"/>
+ <options type="mouse" instance="1" Product="Mouse"/>
+ <modifiers/>
+ <!-- ON FOOT CONTROLS -->
+ <actionmap name="player">
+  <action name="moveforward">
+   <rebind input="kb1_w"/>
+  </action>
+  <action name="moveback">
+   <rebind input="kb1_s"/>
+  </action>
+  <action name="moveleft">
+   <rebind input="kb1_a"/>
+  </action>
+  <action name="moveright">
+   <rebind input="kb1_d"/>
+  </action>
+  <action name="jump">
+   <rebind input="kb1_space"/>
+  </action>
+  <action name="sprint">
+   <rebind input="kb1_lshift"/>
+  </action>
+  <action name="leanleft">
+   <rebind input="kb1_q"/>
+  </action>
+  <action name="leanright">
+   <rebind input="kb1_e"/>
+  </action>
+  <action name="crouch">
+   <rebind input="kb1_lctrl"/>
+  </action>
+  <action name="prone">
+   <rebind input="kb1_x"/>
+  </action>
+  <action name="interact_with_scope">
+   <rebind input="kb1_f"/>
+  </action>
+  <action name="reload">
+   <rebind input="kb1_r"/>
+  </action>
+  <action name="holster">
+   <rebind input="kb1_r" activationMode="Hold"/>
+  </action>
+  <action name="throw_grenade">
+   <rebind input="kb1_g"/>
+  </action>
+  <action name="use_medpen">
+   <rebind input="kb1_c"/>
+  </action>
+  <action name="visor_wipe">
+   <rebind input="kb1_lalt+x"/>
+  </action>
+  <action name="toggle_suit_lights">
+   <rebind input="kb1_t"/>
+  </action>
+  <action name="equip_sidearm">
+   <rebind input="kb1_1"/>
+  </action>
+  <action name="equip_primary_weapon">
+   <rebind input="kb1_2"/>
+  </action>
+  <action name="equip_secondary_weapon">
+   <rebind input="kb1_3"/>
+  </action>
+  <action name="melee_attack">
+   <rebind input="mouse1"/>
+  </action>
+  <action name="melee_attack_heavy">
+   <rebind input="mouse1" activationMode="Hold"/>
+  </action>
+  <action name="aim_down_sights">
+   <rebind input="mouse2"/>
+  </action>
+  <action name="toggle_headlights">
+   <rebind input="kb1_l"/>
+  </action>
+ </actionmap>
+ <!-- ON FOOT EMOTES -->
+ <actionmap name="player_emotes">
+  <action name="emote_forward">
+   <rebind input="kb1_np_5"/>
+  </action>
+  <action name="emote_left">
+   <rebind input="kb1_np_1"/>
+  </action>
+  <action name="emote_right">
+   <rebind input="kb1_np_3"/>
+  </action>
+  <action name="emote_wave">
+   <rebind input="kb1_w"/>
+  </action>
+  <action name="emote_salute">
+   <rebind input="kb1_s"/>
+  </action>
+ </actionmap>
+ <!-- EVA CONTROLS -->
+ <actionmap name="zero_gravity_eva">
+  <action name="eva_strafe_forward">
+   <rebind input="kb1_w"/>
+  </action>
+  <action name="eva_strafe_back">
+   <rebind input="kb1_s"/>
+  </action>
+  <action name="eva_strafe_left">
+   <rebind input="kb1_a"/>
+  </action>
+  <action name="eva_strafe_right">
+   <rebind input="kb1_d"/>
+  </action>
+  <action name="eva_roll_left">
+   <rebind input="kb1_q"/>
+  </action>
+  <action name="eva_roll_right">
+   <rebind input="kb1_e"/>
+  </action>
+  <action name="eva_boost">
+   <rebind input="kb1_lshift"/>
+  </action>
+  <action name="eva_brake">
+   <rebind input="kb1_x"/>
+  </action>
+ </actionmap>
+ <!-- SHIP FLIGHT CONTROLS -->
+ <actionmap name="spaceship_control">
+  <action name="v_throttle_up">
+   <rebind input="kb1_w"/>
+  </action>
+  <action name="v_throttle_down">
+   <rebind input="kb1_s"/>
+  </action>
+  <action name="v_boost_assist">
+   <rebind input="kb1_lshift"/>
+  </action>
+  <action name="v_space_brake">
+   <rebind input="kb1_x"/>
+  </action>
+  <action name="v_strafe_left">
+   <rebind input="kb1_a"/>
+  </action>
+  <action name="v_strafe_right">
+   <rebind input="kb1_d"/>
+  </action>
+  <action name="v_roll_left">
+   <rebind input="kb1_q"/>
+  </action>
+  <action name="v_roll_right">
+   <rebind input="kb1_e"/>
+  </action>
+  <action name="v_flight_ready">
+   <rebind input="kb1_r"/>
+  </action>
+  <action name="v_cruise_control">
+   <rebind input="kb1_c"/>
+  </action>
+  <action name="v_quantum_drive_engage">
+   <rebind input="kb1_b"/>
+  </action>
+  <action name="v_quantum_drive_activate">
+   <rebind input="kb1_b" activationMode="Hold"/>
+  </action>
+  <action name="v_exit_seat">
+   <rebind input="kb1_y" activationMode="Hold"/>
+  </action>
+  <action name="v_landing_mode">
+   <rebind input="kb1_n"/>
+  </action>
+  <action name="v_request_landing">
+   <rebind input="kb1_lalt+n"/>
+  </action>
+  <action name="v_auto_land">
+   <rebind input="kb1_lctrl" activationMode="Hold"/>
+  </action>
+  <action name="v_decouple_mode">
+   <rebind input="kb1_lalt+c"/>
+  </action>
+  <action name="v_eject">
+   <rebind input="kb1_ralt+y"/>
+  </action>
+  <action name="v_self_destruct">
+   <rebind input="kb1_backspace"/>
+  </action>
+  <action name="v_emergency_exit_seat">
+   <rebind input="kb1_u+lshift"/>
+  </action>
+  <action name="v_view_mode">
+   <rebind input="kb1_f1"/>
+  </action>
+  <action name="v_freelook">
+   <rebind input="kb1_z" activationMode="Hold"/>
+  </action>
+  <action name="v_cycle_camera">
+   <rebind input="kb1_f4"/>
+  </action>
+  <action name="v_speed_limiter_up">
+   <rebind input="kb1_mwheel_up"/>
+  </action>
+  <action name="v_speed_limiter_down">
+   <rebind input="kb1_mwheel_down"/>
+  </action>
+ </actionmap>
+ <!-- SHIP WEAPONS -->
+ <actionmap name="spaceship_weapons">
+  <action name="v_weapon_fire_group_1">
+   <rebind input="mouse1"/>
+  </action>
+  <action name="v_weapon_fire_group_2">
+   <rebind input="mouse2"/>
+  </action>
+  <action name="v_cycle_gimbal_assist">
+   <rebind input="kb1_g"/>
+  </action>
+  <action name="v_missile_operator_mode">
+   <rebind input="mouse3"/>
+  </action>
+  <action name="v_missile_system_reset">
+   <rebind input="kb1_lalt+g"/>
+  </action>
+ </actionmap>
+ <!-- SHIP TARGETING -->
+ <actionmap name="spaceship_targeting">
+  <action name="v_target_lock_pin_1">
+   <rebind input="kb1_1"/>
+  </action>
+  <action name="v_target_lock_pin_2">
+   <rebind input="kb1_2"/>
+  </action>
+  <action name="v_target_lock_pin_3">
+   <rebind input="kb1_3"/>
+  </action>
+  <action name="v_target_cycle_forward">
+   <rebind input="kb1_r"/>
+  </action>
+  <action name="v_target_cycle_reset">
+   <rebind input="kb1_lalt+r"/>
+  </action>
+  <action name="v_target_cycle_lock_forward">
+   <rebind input="kb1_t"/>
+  </action>
+  <action name="v_target_unlock">
+   <rebind input="kb1_lalt+t"/>
+  </action>
+ </actionmap>
+ <!-- SHIP POWER & SHIELDS -->
+ <actionmap name="spaceship_power">
+  <action name="v_countermeasure_noise">
+   <rebind input="kb1_j"/>
+  </action>
+  <action name="v_countermeasure_decoy">
+   <rebind input="kb1_h" activationMode="Hold"/>
+  </action>
+  <action name="v_shield_raise_front">
+   <rebind input="kb1_np_8"/>
+  </action>
+  <action name="v_shield_raise_back">
+   <rebind input="kb1_np_2"/>
+  </action>
+  <action name="v_shield_raise_left">
+   <rebind input="kb1_np_4"/>
+  </action>
+  <action name="v_shield_raise_right">
+   <rebind input="kb1_np_6"/>
+  </action>
+  <action name="v_shield_raise_top">
+   <rebind input="kb1_np_7"/>
+  </action>
+  <action name="v_shield_raise_bottom">
+   <rebind input="kb1_np_1"/>
+  </action>
+  <action name="v_shield_reset">
+   <rebind input="kb1_np_5"/>
+  </action>
+  <action name="v_power_all">
+   <rebind input="kb1_u"/>
+  </action>
+  <action name="v_power_thrusters">
+   <rebind input="kb1_i"/>
+  </action>
+  <action name="v_power_shields">
+   <rebind input="kb1_o"/>
+  </action>
+  <action name="v_power_weapons">
+   <rebind input="kb1_p"/>
+  </action>
+  <action name="v_power_raise_weapon">
+   <rebind input="kb1_f5"/>
+  </action>
+  <action name="v_power_raise_thruster">
+   <rebind input="kb1_f6"/>
+  </action>
+  <action name="v_power_raise_shield">
+   <rebind input="kb1_f7"/>
+  </action>
+  <action name="v_power_reset">
+   <rebind input="kb1_f8"/>
+  </action>
+ </actionmap>
+ <!-- SHIP SCANNING -->
+ <actionmap name="spaceship_scanning">
+  <action name="v_scanning_activate">
+   <rebind input="kb1_tab"/>
+  </action>
+  <action name="v_scanning_fire">
+   <rebind input="mouse1"/>
+  </action>
+  <action name="v_scanning_ping">
+   <rebind input="mouse2"/>
+  </action>
+ </actionmap>
+ <!-- MINING -->
+ <actionmap name="spaceship_mining">
+  <action name="v_mining_mode">
+   <rebind input="kb1_m"/>
+  </action>
+  <action name="v_mining_fire">
+   <rebind input="mouse1"/>
+  </action>
+  <action name="v_mining_laser_switch">
+   <rebind input="mouse2"/>
+  </action>
+  <action name="v_mining_laser_power_up">
+   <rebind input="kb1_lalt+mwheel_up"/>
+  </action>
+  <action name="v_mining_laser_power_down">
+   <rebind input="kb1_lalt+mwheel_down"/>
+  </action>
+  <action name="v_jettison_cargo">
+   <rebind input="kb1_lalt+j"/>
+  </action>
+ </actionmap>
+ <!-- UI CONTROLS -->
+ <actionmap name="ui">
+  <action name="ui_mobiglas">
+   <rebind input="kb1_f1"/>
+  </action>
+  <action name="ui_starmap">
+   <rebind input="kb1_f2"/>
+  </action>
+  <action name="ui_comms_menu">
+   <rebind input="kb1_f11"/>
+  </action>
+  <action name="ui_chat_window">
+   <rebind input="kb1_f12"/>
+  </action>
+  <action name="ui_chat_focus">
+   <rebind input="kb1_return"/>
+  </action>
+  <action name="ui_scoreboard">
+   <rebind input="kb1_tab"/>
+  </action>
+ </actionmap>
+</ActionMaps>
