@@ -282,11 +282,6 @@ class InputDetectorThread(QThread):
 
             # If input already detected, stop processing further events
             if detected_event.is_set():
-                if listener:
-                    try:
-                        listener.stop()
-                    except:
-                        pass
                 return False
 
             # Track modifier keys
@@ -326,13 +321,21 @@ class InputDetectorThread(QThread):
 
             # Get key name
             key_name = self._get_key_name_from_pynput_key(key, modifier)
+            logger.debug(f"Key press: raw key={key}, key_name={repr(key_name)}, modifier={modifier}")
 
             # Skip if we couldn't determine a key name
             if not key_name:
+                logger.debug(f"Could not determine key name, continuing listener")
                 return True  # Continue listening
 
             # Mark that a non-modifier key was pressed (for tracking if we should emit modifier alone)
             self.other_key_pressed = True
+            logger.debug(f"Non-modifier key pressed: {repr(key_name)}")
+
+            # Special handling for space key - normalize it
+            if key_name == ' ':
+                key_name = 'space'
+                logger.info(f"Space key detected, normalized to 'space'")
 
             # Map to Star Citizen format
             if modifier:
@@ -345,18 +348,13 @@ class InputDetectorThread(QThread):
                 result_dict["description"] = f"Keyboard {key_name.upper()}"
 
             detected_event.set()
-
-            # Explicitly stop the listener to ensure it halts immediately
-            if listener:
-                try:
-                    listener.stop()
-                except:
-                    pass
+            logger.info(f"Keyboard input detected: {input_code} - {result_dict['description']}")
+            self.running = False  # Signal the main loop to stop
 
             return False  # Stop listener
 
         except Exception as e:
-            logger.debug(f"Error handling keyboard press: {e}")
+            logger.error(f"Error handling keyboard press: {e}", exc_info=True)
             return True  # Continue listening
 
     def _get_key_name_from_pynput_key(self, key, active_modifier: Optional[str] = None) -> Optional[str]:
@@ -469,13 +467,7 @@ class InputDetectorThread(QThread):
                     result_dict["description"] = f"Keyboard {modifier_description_map.get(modifier_name, modifier_name)}"
                     detected_event.set()
                     logger.info(f"Detected modifier key alone: {input_code} - {result_dict['description']}")
-
-                    # Explicitly stop the listener to ensure it halts immediately
-                    if listener:
-                        try:
-                            listener.stop()
-                        except:
-                            pass
+                    self.running = False  # Signal the main loop to stop
 
                     return False  # Stop listener
 
@@ -543,20 +535,15 @@ class InputDetectorThread(QThread):
                 result_dict["code"] = input_code
                 result_dict["description"] = description
                 detected_event.set()
-
-                # Explicitly stop the listener to ensure it halts immediately
-                if listener:
-                    try:
-                        listener.stop()
-                    except:
-                        pass
+                logger.info(f"Mouse input detected: {input_code} - {description}")
+                self.running = False  # Signal the main loop to stop
 
                 return False  # Stop listener
 
             return True  # Continue listening
 
         except Exception as e:
-            logger.debug(f"Error handling mouse click: {e}")
+            logger.error(f"Error handling mouse click: {e}", exc_info=True)
             return True  # Continue listening
 
     def stop(self):
