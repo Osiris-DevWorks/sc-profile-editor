@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ActionMaps version="1">
+  <CustomisationUIHeader device="joystick" label="@ui_CMJoystickXRoll" description="@ui_CMJoystickXRollDesc" image="JoystickXRoll" />
+  <actionmap name="spaceship_movement">
+    <action name="v_yaw">
+      <rebind device="joystick" input="js1_rotz" />
+    </action>
+    <action name="v_roll">
+      <rebind device="joystick" input="js1_x" />
+    </action>
+  </actionmap>
+</ActionMaps>

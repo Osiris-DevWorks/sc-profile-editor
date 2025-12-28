@@ -1,0 +1,297 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ActionMaps version="1" optionsVersion="2" rebindVersion="2" profileName="gameglass_keyboard">
+  <CustomisationUIHeader label="@ui_input_gameglass_keyboard" description="@ui_input_gameglass_keyboard_desc" image="empty">
+    <devices>
+      <keyboard instance="1" />
+    </devices>
+    <categories>
+      <category label="@ui_CCSpaceFlight" />
+      <category label="@ui_CCFPS" />
+      <category label="@ui_CCVehicle" />
+      <category label="@ui_CGEASpectator" />
+      <category label="@ui_CGInteraction" />
+    </categories>
+  </CustomisationUIHeader>
+  <options type="keyboard" instance="1" Product="Keyboard {6F1D2B61-D5A0-11CF-BFC7-444553540000}" />
+  <modifiers />
+  <actionmap name="spaceship_general">
+    <action name="v_close_all_doors">
+      <rebind input="kb1_lalt+k" />
+    </action>
+    <action name="v_lock_all_doors">
+      <rebind input="kb1_lalt+l" />
+    </action>
+    <action name="v_toggle_all_doors">
+      <rebind input="kb1_lctrl+k" />
+    </action>
+    <action name="v_open_all_doors">
+      <rebind input="kb1_lalt+o" />
+    </action>
+    <action name="v_unlock_all_doors">
+      <rebind input="kb1_lalt+u" />
+    </action>
+    <action name="v_toggle_all_doorlocks">
+      <rebind input="kb1_lctrl+l" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_power">
+    <action name="v_power_set_on">
+      <rebind input="kb1_lctrl+u" />
+    </action>
+    <action name="v_power_set_off">
+      <rebind input="kb1_lctrl+u" activationMode="double_tap" />
+    </action>
+    <action name="v_power_set_thrusters_on">
+      <rebind input="kb1_lctrl+i" />
+    </action>
+    <action name="v_power_set_thrusters_off">
+      <rebind input="kb1_lctrl+i" activationMode="double_tap" />
+    </action>
+    <action name="v_power_set_shields_on">
+      <rebind input="kb1_lctrl+o" />
+    </action>
+    <action name="v_power_set_shields_off">
+      <rebind input="kb1_lctrl+o" activationMode="double_tap" />
+    </action>
+    <action name="v_power_set_weapons_on">
+      <rebind input="kb1_lctrl+p" />
+    </action>
+    <action name="v_power_set_weapons_off">
+      <rebind input="kb1_lctrl+p" activationMode="double_tap" />
+    </action>
+  </actionmap>
+  <actionmap name="player">
+    <action name="toggleEquipHelmet">
+      <rebind input="kb1_rctrl+h" />
+    </action>
+    <action name="walk">
+      <rebind input="kb1_ralt+w" />
+    </action>
+    <action name="drop">
+      <rebind input="kb1_ralt+d" />
+    </action>
+    <action name="inspect">
+      <rebind input="kb1_ralt+i" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_view">
+    <action name="v_view_look_behind">
+      <rebind input="kb1_lalt+period" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_movement">
+    <action name="v_atc_request">
+      <rebind input="kb1_lalt+n" />
+    </action>
+    <action name="v_atc_loading_area_request">
+      <rebind input="kb1_lalt+l" />
+    </action>
+    <action name="v_ifcs_speed_limiter_reset_scm">
+      <rebind input="kb1_lalt+s" />
+    </action>
+    <action name="v_ifcs_toggle_speed_limiter">
+      <rebind input="kb1_lalt+minus" />
+    </action>
+    <action name="v_speed_range_up">
+      <rebind input="kb1_lalt+y" />
+    </action>
+    <action name="v_speed_range_down">
+      <rebind input="kb1_lctrl+y" />
+    </action>
+    <action name="v_target_match_vel">
+      <rebind input="kb1_lctrl+v" />
+    </action>
+    <action name="v_ifcs_toggle_gforce_safety">
+      <rebind input="kb1_lalt+i" />
+    </action>
+    <action name="v_ifcs_toggle_esp">
+      <rebind input="kb1_lalt+e" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_targeting">
+    <action name="v_target_pin_selected">
+      <rebind input="kb1_1" multiTap="2" />
+    </action>
+    <action name="v_enter_remote_turret_1">
+      <rebind input="kb1_lctrl+num1" />
+    </action>
+    <action name="v_enter_remote_turret_2">
+      <rebind input="kb1_lctrl+num2" />
+    </action>
+    <action name="v_target_lock_selected">
+      <rebind input="kb1_lctrl+t" />
+    </action>
+    <action name="v_target_unpin_selected">
+      <rebind input="kb1_lctrl+1" />
+    </action>
+    <action name="v_target_cycle_reticle_mode">
+      <rebind input="kb1_lctrl+r" />
+    </action>
+    <action name="v_transform_cycle">
+      <rebind input="kb1_lctrl+m" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_targeting_advanced">
+    <action name="v_target_cycle_friendly_back">
+      <rebind input="kb1_lctrl+6" />
+    </action>
+    <action name="v_target_cycle_hostile_back">
+      <rebind input="kb1_lctrl+5" />
+    </action>
+    <action name="v_target_cycle_pinned_back">
+      <rebind input="kb1_2" multiTap="2" />
+    </action>
+    <action name="v_target_cycle_pinned_fwd">
+      <rebind input="kb1_3" multiTap="2" />
+    </action>
+    <action name="v_target_cycle_subitem_back">
+      <rebind input="kb1_lctrl+8" />
+    </action>
+    <action name="v_target_cycle_in_view_back">
+      <rebind input="kb1_lalt+v" />
+    </action>
+    <action name="v_target_cycle_attacker_back">
+      <rebind input="kb1_lctrl+4" />
+    </action>
+    <action name="v_target_cycle_all_back">
+      <rebind input="kb1_lctrl+7" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_defensive">
+    <action name="v_weapon_countermeasure_decoy_launch_panic">
+      <rebind input="kb1_lctrl+h" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_missiles">
+    <action name="v_weapon_cycle_missile_back">
+      <rebind input="mo1_lctrl+mouse2" />
+    </action>
+    <action name="v_weapon_decrease_max_missiles">
+      <rebind input="kb1_lctrl+g" />
+    </action>
+  </actionmap>
+  <actionmap name="vehicle_general">
+    <action name="v_close_all_doors">
+      <rebind input="kb1_lalt+k" />
+    </action>
+    <action name="v_lock_all_doors">
+      <rebind input="kb1_lalt+l" />
+    </action>
+    <action name="v_toggle_all_doorlocks">
+      <rebind input="kb1_lctrl+l" />
+    </action>
+    <action name="v_open_all_doors">
+      <rebind input="kb1_lalt+o" />
+    </action>
+    <action name="v_unlock_all_doors">
+      <rebind input="kb1_lalt+u" />
+    </action>
+    <action name="v_view_look_behind">
+      <rebind input="kb1_lalt+period" />
+    </action>
+  </actionmap>
+  <actionmap name="player_emotes">
+    <action name="emote_agree">
+      <rebind input="kb1_ralt+np_1" />
+    </action>
+    <action name="emote_angry">
+      <rebind input="kb1_ralt+np_2" />
+    </action>
+    <action name="emote_atease">
+      <rebind input="kb1_ralt+np_3" />
+    </action>
+    <action name="emote_attention">
+      <rebind input="kb1_ralt+np_4" />
+    </action>
+    <action name="emote_blah">
+      <rebind input="kb1_ralt+np_5" />
+    </action>
+    <action name="emote_bored">
+      <rebind input="kb1_ralt+np_6" />
+    </action>
+    <action name="emote_bow">
+      <rebind input="kb1_ralt+np_7" />
+    </action>
+    <action name="emote_burp">
+      <rebind input="kb1_ralt+np_8" />
+    </action>
+    <action name="emote_cheer">
+      <rebind input="kb1_ralt+np_9" />
+    </action>
+    <action name="emote_chicken">
+      <rebind input="kb1_ralt+p" />
+    </action>
+    <action name="emote_clap">
+      <rebind input="kb1_ralt+o" />
+    </action>
+    <action name="emote_come">
+      <rebind input="kb1_ralt+i" />
+    </action>
+    <action name="emote_cry">
+      <rebind input="kb1_ralt+u" />
+    </action>
+    <action name="emote_dance">
+      <rebind input="kb1_ralt+y" />
+    </action>
+    <action name="emote_disagree">
+      <rebind input="kb1_ralt+l" />
+    </action>
+    <action name="emote_failure">
+      <rebind input="kb1_ralt+k" />
+    </action>
+    <action name="emote_flex">
+      <rebind input="kb1_ralt+end" />
+    </action>
+    <action name="emote_flirt">
+      <rebind input="kb1_ralt+h" />
+    </action>
+    <action name="emote_gasp">
+      <rebind input="kb1_ralt+g" />
+    </action>
+    <action name="emote_gloat">
+      <rebind input="kb1_ralt+m" />
+    </action>
+    <action name="emote_greet">
+      <rebind input="kb1_ralt+n" />
+    </action>
+    <action name="emote_laugh">
+      <rebind input="kb1_ralt+b" />
+    </action>
+    <action name="emote_launch">
+      <rebind input="kb1_ralt+f5" />
+    </action>
+    <action name="emote_point">
+      <rebind input="kb1_ralt+f6" />
+    </action>
+    <action name="emote_rude">
+      <rebind input="kb1_ralt+f7" />
+    </action>
+    <action name="emote_salute">
+      <rebind input="kb1_ralt+f10" />
+    </action>
+    <action name="emote_sit">
+      <rebind input="kb1_ralt+f11" />
+    </action>
+    <action name="emote_sleep">
+      <rebind input="kb1_ralt+pgup" />
+    </action>
+    <action name="emote_smell">
+      <rebind input="kb1_ralt+minus" />
+    </action>
+    <action name="emote_taunt">
+      <rebind input="kb1_ralt+backslash" />
+    </action>
+    <action name="emote_threaten">
+      <rebind input="kb1_ralt+backspace" />
+    </action>
+    <action name="emote_wait">
+      <rebind input="kb1_ralt+7" />
+    </action>
+    <action name="emote_wave">
+      <rebind input="kb1_ralt+f9" />
+    </action>
+    <action name="emote_whistle">
+      <rebind input="kb1_ralt+8" />
+    </action>
+  </actionmap>
+</ActionMaps>

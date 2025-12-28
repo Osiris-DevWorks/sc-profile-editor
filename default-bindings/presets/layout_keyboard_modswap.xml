@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ActionMaps version="1">
+  <CustomisationUIHeader device="keyboard" label="@ui_CMKeyboardModSwap" description="@ui_CMKeyboardModSwap" image=" " />
+  <actionmap>
+    <action name=" ">
+      <rebind device="keyboard" input=" " />
+    </action>
+  </actionmap>
+  <modifiers>
+    <mod input="kb_lctrl" />
+  </modifiers>
+  <actionmap name="spaceship_general">
+    <action name="v_eject">
+      <rebind device="keyboard" input="lctrl+l" />
+    </action>
+    <action name="v_eject_cinematic">
+      <rebind device="keyboard" input="lctrl+l" />
+    </action>
+    <action name="v_exit">
+      <rebind device="keyboard" input="lctrl+f" />
+    </action>
+    <action name="v_self_destruct">
+      <rebind device="keyboard" input="lctrl+backspace" />
+    </action>
+    <action name="v_toggle_cabin_lights">
+      <rebind device="keyboard" input="lctrl+t" />
+    </action>
+    <action name="v_toggle_running_lights">
+      <rebind device="keyboard" input="lctrl+t" />
+    </action>
+    <action name="v_cooler_throttle_up">
+      <rebind device="keyboard" input="lctrl+np_8" />
+    </action>
+    <action name="v_cooler_throttle_down">
+      <rebind device="keyboard" input="lctrl+np_7" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_view">
+    <action name="v_view_mode">
+      <rebind device="keyboard" input="lctrl+z" />
+    </action>
+    <action name="v_view_look_behind">
+      <rebind device="keyboard" input="lctrl+z" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_movement">
+    <action name="v_strafe_down">
+      <rebind device="keyboard" input="lalt" />
+    </action>
+    <action name="v_brake">
+      <rebind device="keyboard" input="lctrl+x" />
+    </action>
+    <action name="v_strafe_forward_abs">
+      <rebind device="keyboard" input="lctrl+w" />
+    </action>
+    <action name="v_strafe_back">
+      <rebind device="mouse" input="lctrl+s" />
+    </action>
+    <action name="v_decoupled_brake">
+      <rebind device="keyboard" input="lctrl+x" />
+    </action>
+    <action name="v_decoupled_strafe_down">
+      <rebind device="keyboard" input="lalt" />
+    </action>
+    <action name="v_toggle_relative_mouse_mode">
+      <rebind device="keyboard" input="lctrl+comma" />
+    </action>
+    <action name="v_toggle_yaw_roll_swap">
+      <rebind device="keyboard" input="lctrl+period" />
+    </action>
+    <action name="v_ifcs_toggle_esp">
+      <rebind device="keyboard" input="lctrl+o" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_targeting">
+    <action name="v_look_ahead_start_target_tracking">
+      <rebind device="keyboard" input="lctrl+r" />
+    </action>
+    <action name="v_look_ahead_enable">
+      <rebind device="keyboard" input="lctrl+m" />
+    </action>
+    <action name="v_toggle_weapon_gimbal_lock">
+      <rebind device="keyboard" input="lctrl+j" />
+    </action>
+    <action name="v_target_cycle_reticle_mode">
+      <rebind device="keyboard" input="lctrl+k" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_power">
+    <action name="v_power_throttle_up">
+      <rebind device="keyboard" input="lctrl+np_5" />
+    </action>
+    <action name="v_power_throttle_down">
+      <rebind device="keyboard" input="lctrl+np_4" />
+    </action>
+    <action name="v_power_throttle_max">
+      <rebind device="keyboard" input="lctrl+np_5" />
+    </action>
+    <action name="v_power_throttle_min">
+      <rebind device="keyboard" input="lctrl+np_4" />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_turret">
+    <action name="v_toggle_weapon_gimbal_lock">
+      <rebind device="keyboard" input="lctrl+j" />
+    </action>
+  </actionmap>
+  <actionmap name="player">
+    <action name="crouch">
+      <rebind device="keyboard" input="lalt" />
+    </action>
+    <action name="v_eject">
+      <rebind device="keyboard" input="lctrl+l" />
+    </action>
+    <action name="v_eject_cinematic">
+      <rebind device="keyboard" input="lctrl+l" />
+    </action>
+  </actionmap>
+  <actionmap name="zero_gravity_eva">
+    <action name="eva_pitch_up">
+      <rebind device="keyboard" input="lctrl+w" />
+    </action>
+    <action name="eva_pitch_down">
+      <rebind device="keyboard" input="lctrl+s" />
+    </action>
+    <action name="eva_yaw_left">
+      <rebind device="keyboard" input="lctrl+a" />
+    </action>
+    <action name="eva_yaw_right">
+      <rebind device="keyboard" input="lctrl+d" />
+    </action>
+    <action name="eva_strafe_down">
+      <rebind device="keyboard" input="lalt" />
+    </action>
+  </actionmap>
+  <actionmap name="vehicle_general">
+    <action name="v_exit">
+      <rebind device="keyboard" input="lctrl+f" />
+    </action>
+    <action name="v_view_look_behind">
+      <rebind device="keyboard" input="lctrl+z" />
+    </action>
+  </actionmap>
+  <actionmap name="multiplayer">
+    <action name="force_respawn">
+      <rebind device="keyboard" input="lctrl+backspace" />
+    </action>
+  </actionmap>
+  <actionmap name="spectator">
+    <action name="spectate_movedown">
+      <rebind device="keyboard" input=" " />
+    </action>
+  </actionmap>
+</ActionMaps>

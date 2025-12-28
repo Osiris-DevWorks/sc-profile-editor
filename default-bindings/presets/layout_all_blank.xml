@@ -1,0 +1,4126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ActionMaps version="1">
+  <CustomisationUIHeader label="@ui_CMBlank" description="@ui_CMBlank" image=" ">
+    <Devices>
+      <Keyboard instance="1" />
+      <Mouse instance="1" />
+      <gamepad instance="1" />
+      <Joystick instance="1" />
+      <Joystick instance="2" />
+      <Joystick instance="3" />
+    </Devices>
+  </CustomisationUIHeader>
+  <modifiers>
+    <mod input=" " />
+  </modifiers>
+  <actionmap name="spaceship_general">
+    <action name="v_eject">
+      <rebind device="gamepad" activationMode="press" input=" " />
+      <rebind device="keyboard" activationMode="press" input=" " />
+      <rebind device="mouse" activationMode="press" input=" " />
+      <rebind device="joystick" activationMode="press" input="js1_ " />
+      <rebind device="joystick" activationMode="press" input="js2_ " />
+      <rebind device="joystick" activationMode="press" input="js3_ " />
+    </action>
+    <action name="v_eject_cinematic">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_exit">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_self_destruct">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_starmap">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_cooler_throttle_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_cooler_throttle_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_flightready">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_all_doors">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_open_all_doors">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_close_all_doors">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_all_doorlocks">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_lock_all_doors">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_unlock_all_doors">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_all_portlocks">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_lock_all_ports">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_unlock_all_ports">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_view">
+    <action name="v_view_yaw_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_yaw_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_yaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_yaw_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_yaw_absolute">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_pitch_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_pitch_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_pitch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_pitch_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_pitch_absolute">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_cycle_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_cycle_internal_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_option">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_zoom_in">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_zoom_out">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_interact">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_freelook_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_dynamic_zoom_rel">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_dynamic_zoom_rel_in">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_dynamic_zoom_rel_out">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_dynamic_zoom_abs">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_dynamic_zoom_abs_toggle">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_look_behind">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_screen_focus_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_screen_focus_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_screen_focus_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_screen_focus_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_movement">
+    <action name="v_pitch_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_pitch_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_pitch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_pitch_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_yaw_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_yaw_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_yaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_yaw_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_relative_mouse_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_roll_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_roll_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_roll">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_yaw_roll_swap">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_match_vel">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_brake">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_accel_scale_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_accel_scale_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_accel_scale_rel">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_accel_scale_abs">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_speed_range_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_speed_range_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_speed_range_rel">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_speed_range_abs">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_longitudinal_invert">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_ifcs_toggle_vector_decoupling">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_vertical">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_lateral">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_forward_abs">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_back_abs">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_longitudinal_abs">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_forward_rel">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_back_rel">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_strafe_longitudinal_rel">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_ifcs_toggle_speed_limiter">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_ifcs_toggle_gforce_safety">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_ifcs_toggle_esp">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_ifcs_toggle_cruise_control">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_afterburner">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_boost">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_landing_system">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_autoland">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_qdrive_spooling">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_qdrive_engagement">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_targeting">
+    <action name="v_look_ahead_enable">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_weapon_gimbal_lock">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_toggle_lock_selected">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_reset_lock">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_nearest_hostile">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_toggle_pin_selected">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_pinned_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_pinned_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_toggle_lock_index_1">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_toggle_lock_index_2">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_toggle_lock_index_3">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_toggle_pin_index_1">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_toggle_pin_index_2">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_toggle_pin_index_3">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_remove_all_pins">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_hostile_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_hostile_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_friendly_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_friendly_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_all_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_all_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_reset_selection">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_subitem_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_subitem_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_subitem_category_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_subitem_category_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_reset_subtargeting">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_reticle_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_look_ahead_start_target_tracking">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_invoke_ping">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_scanning">
+    <action name="v_toggle_scan_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_scanning_trigger_scan">
+      <rebind device="xboxpad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_mining">
+    <action name="v_toggle_mining_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_mining_laser_type">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_mining_laser_fire">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_increase_mining_throttle">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_decrease_mining_throttle">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_mining_throttle">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_turret">
+    <action name="v_toggle_weapon_gimbal_lock">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_aim_yaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_aim_yaw_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_aim_yaw_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_aim_yaw_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_aim_pitch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_aim_pitch_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_aim_pitch_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_aim_pitch_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_aim_snap">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_toggle_lock_selected">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_toggle_reset_lock">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_all_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_all_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_friendly_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_friendly_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_toggle_pin_selected">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_hostile_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_selection_hostile_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_nearest_hostile">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_nearest_friendly">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_subitem_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_subitem_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_weapons">
+    <action name="v_attack_all">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_attack_group1">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_attack_group2">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_weapon_cycle_ammo_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_weapon_cycle_ammo_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_turret_gyromode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_missiles">
+    <action name="v_weapon_launch_missile">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_weapon_toggle_missile_lock">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_defensive">
+    <action name="v_weapon_countermeasure_cinematic">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_weapon_countermeasure_launch_decoy">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_weapon_countermeasure_launch_noise">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_weapon_countermeasure_launch_all">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_shield_raise_level_forward">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_shield_raise_level_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_shield_raise_level_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_shield_raise_level_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_shield_raise_level_up">
+      <rebind device="gamepad" activationMode="press" input=" " />
+      <rebind device="keyboard" activationMode="press" input=" " />
+      <rebind device="mouse" activationMode="press" input=" " />
+      <rebind device="joystick" activationMode="press" input="js1_ " />
+      <rebind device="joystick" activationMode="press" input="js2_ " />
+      <rebind device="joystick" activationMode="press" input="js3_ " />
+    </action>
+    <action name="v_shield_raise_level_down">
+      <rebind device="gamepad" activationMode="press" input=" " />
+      <rebind device="keyboard" activationMode="press" input=" " />
+      <rebind device="mouse" activationMode="press" input=" " />
+      <rebind device="joystick" activationMode="press" input="js1_ " />
+      <rebind device="joystick" activationMode="press" input="js2_ " />
+      <rebind device="joystick" activationMode="press" input="js3_ " />
+    </action>
+    <action name="v_shield_reset_level">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_power">
+    <action name="v_power_focus_weapons">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_power_focus_shields">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_power_focus_thrusters">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_power_reset_focus">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_power_throttle_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_power_throttle_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_power_throttle_max">
+      <rebind device="gamepad" activationMode="press" input=" " />
+      <rebind device="keyboard" activationMode="press" input=" " />
+      <rebind device="mouse" activationMode="press" input=" " />
+      <rebind device="joystick" activationMode="press" input="js1_ " />
+      <rebind device="joystick" activationMode="press" input="js2_ " />
+      <rebind device="joystick" activationMode="press" input="js3_ " />
+    </action>
+    <action name="v_power_throttle_min">
+      <rebind device="gamepad" activationMode="press" input=" " />
+      <rebind device="keyboard" activationMode="press" input=" " />
+      <rebind device="mouse" activationMode="press" input=" " />
+      <rebind device="joystick" activationMode="press" input="js1_ " />
+      <rebind device="joystick" activationMode="press" input="js2_ " />
+      <rebind device="joystick" activationMode="press" input="js3_ " />
+    </action>
+    <action name="v_power_toggle_weapons">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_power_toggle_shields">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_power_toggle_thrusters">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_power_toggle">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_radar">
+    <action name="v_radar_toggle_onoff">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_radar_toggle_active_or_passive">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_radar_cycle_mode_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_radar_cycle_mode_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_radar_cycle_zoom_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_radar_cycle_zoom_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_radar_cycle_focus_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_radar_cycle_focus_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_radar_toggle_view_focus">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spaceship_hud">
+    <action name="mobiglas">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="toggle_ar_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_open_scoreboard">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_interact_toggle">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_cycle_mode_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_cycle_mode_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_focused_cycle_mode_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_focused_cycle_mode_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_left_panel_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_left_panel_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_left_panel_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_left_panel_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_confirm">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_cancel">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_stick_x">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_hud_stick_y">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_comm_open_chat">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_comm_show_chat">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_comm_open_precanned">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_comm_select_precanned_1">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_comm_select_precanned_2">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_comm_select_precanned_3">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_comm_select_precanned_4">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_comm_select_precanned_5">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_starmap">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="lights_controller">
+    <action name="v_lights">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_cabin_lights">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_running_lights">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="player">
+    <action name="moveleft">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="moveright">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="moveforward">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="moveback">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="rotateyaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="rotatepitch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="gp_movex">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="gp_movey">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="gp_rotateyaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="gp_rotatepitch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="jump">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="gp_jump">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="crouch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="gp_crouch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="prone">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="sprint">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="walk">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="leanleft">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="leanright">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="toggle_lowered">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="attack1">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="weapon_melee">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="grenade">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="zoom">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="zoom_out">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="zoom_in">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="zoom_in_out">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="decelerate">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="selectpistol">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="selectprimary">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="selectsecondary">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="selectgadget">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="nextweapon">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="prevweapon">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="nextitem">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="prevItem">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="reload">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="holster">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="drop">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="inspect">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="stabilize">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="weapon_change_firemode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="fixed_speed_increment">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="fixed_speed_decrement">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="use">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="interact">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="useAttachmentBottom">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="useAttachmentTop">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="toggle_flashlight">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="combathealtarget">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="visor_next_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="visor_prev_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="selectitem">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="cancelselect">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="thirdperson">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="toggle_cursor_input">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="free_thirdperson_camera">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pan_thirdperson_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pan_thirdperson_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="break_conversation_effects">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="hmd_rotateyaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="hmd_rotatepitch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="hmd_rotateroll">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="mobiglas">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pl_hud_open_scoreboard">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pl_hud_confirm">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="toggle_ar_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="ar_mode_scroll_action_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="ar_mode_scroll_action_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="shop_camera_zoom_in">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="shop_camera_zoom_out">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_eject">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_eject_cinematic">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_enterpuremode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="port_modification_select">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_starmap">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="force_respawn">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="prone">
+    <action name="prone_rollleft">
+      <rebind device="gamepad" activationMode="press" input=" " />
+      <rebind device="keyboard" activationMode="press" input=" " />
+      <rebind device="mouse" activationMode="press" input=" " />
+      <rebind device="joystick" activationMode="press" input="js1_ " />
+      <rebind device="joystick" activationMode="press" input="js2_ " />
+      <rebind device="joystick" activationMode="press" input="js3_ " />
+    </action>
+    <action name="prone_rollright">
+      <rebind device="gamepad" activationMode="press" input=" " />
+      <rebind device="keyboard" activationMode="press" input=" " />
+      <rebind device="mouse" activationMode="press" input=" " />
+      <rebind device="joystick" activationMode="press" input="js1_ " />
+      <rebind device="joystick" activationMode="press" input="js2_ " />
+      <rebind device="joystick" activationMode="press" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="zero_gravity_eva">
+    <action name="eva_view_yaw_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_view_yaw_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_view_yaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_view_yaw_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_view_pitch_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_view_pitch_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_view_pitch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_view_pitch_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_pitch_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_pitch_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_pitch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_yaw_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_yaw_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_yaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_roll_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_roll_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_roll">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_strafe_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_strafe_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_strafe_vertical">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_strafe_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_strafe_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_strafe_lateral">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_strafe_forward">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_strafe_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_strafe_longitudinal">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_brake">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_boost">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="eva_toggle_headlook_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="vehicle_general">
+    <action name="v_exit">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_horn">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_lights">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_cycle_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_option">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_zoom_in">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_zoom_out">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_yaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_yaw_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_pitch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_pitch_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_look_behind">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_toggle_cursor_input">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_target_cycle_all_fwd">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_yaw_absolute">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_pitch_absolute">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_roll_absolute">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="mobiglas">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_self_destruct">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_eject">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_attack_all">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_attack_group1">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_attack_group2">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_starmap">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="vehicle_driver">
+    <action name="v_yaw_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_yaw_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_yaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_roll_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_roll_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_move_forward">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_move_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_brake">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_attack_all">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_attack_group1">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_attack_group2">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_dynamic_zoom_rel">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_dynamic_zoom_rel_in">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_dynamic_zoom_rel_out">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_dynamic_zoom_abs">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_view_dynamic_zoom_abs_toggle">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_boost">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="vehicle_gunner">
+    <action name="v_attack_all">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_attack_group1">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="v_attack_group2">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="multiplayer">
+    <action name="respawn">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="force_respawn">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="retry">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="ready">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="spectator">
+    <action name="spectate_next_target">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_prev_target">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_toggle_lock_target">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_zoom">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_zoom_in">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_zoom_out">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_rotateyaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_rotateyaw_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_rotatepitch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_rotatepitch_mouse">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_toggle_hud">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_gen_nextcamera">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_gen_nextmode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_gen_prevmode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_moveleft">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_moveright">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_moveforward">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_moveback">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_moveup">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_movedown">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_freecam_sprint">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="spectate_toggle_freecam">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="default">
+    <action name="toggle_contact">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="toggle_chat">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="focus_on_chat_textinput">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="foip_pushtotalk">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="foip_pushtotalk_proximity">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="foip_pushtoheadtrack">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="foip_viewownplayer">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="foip_recalibrate">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="foip_cyclechannel">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="ui_notification">
+    <action name="ui_notification_accept">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="ui_notification_decline">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="ui_notification_ignore">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="player_emotes">
+    <action name="emote_cs_forward">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_cs_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_cs_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_cs_stop">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_cs_yes">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_cs_no">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_agree">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_angry">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_atease">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_attention">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_blah">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_bored">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_bow">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_burp">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_cheer">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_chicken">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_clap">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_come">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_cry">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_dance">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_disagree">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_failure">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_flex">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_flirt">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_gasp">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_gloat">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_greet">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_laugh">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_point">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_rude">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_salute">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_sit">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_sleep">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_smell">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_taunt">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_threaten">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_wait">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_wave">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="emote_whistle">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="player_choice">
+    <action name="pc_primary_interaction">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_secondary_interactions">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_radial_xaxis">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_radial_yaxis">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_throw_decrease">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_zoom_in">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_zoom_out">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_interaction_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_select">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_focus">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_yaw">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_pitch">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_screen_focus_left">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_screen_focus_right">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_screen_focus_up">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_screen_focus_down">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_personal_thought">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_personal_index1">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_personal_index2">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_personal_index3">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_personal_index4">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_personal_index5">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_personal_index6">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_personal_back">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="pc_interaction_quick">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+  <actionmap name="view_director_mode">
+    <action name="view_enable_camview_mode">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_switch_to_alternative">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_save_view_1">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_save_view_2">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_save_view_3">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_save_view_4">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_save_view_5">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_save_view_6">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_save_view_7">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_save_view_8">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_save_view_9">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_load_view_1">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_load_view_2">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_load_view_3">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_load_view_4">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_load_view_5">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_load_view_6">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_load_view_7">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_load_view_8">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_load_view_9">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_reset_saved">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_move_target_X_pos">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_move_target_X_neg">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_move_target_Y_pos">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_move_target_Y_neg">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_move_target_Z_pos">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_move_target_Z_neg">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_fov_in">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_fov_out">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_fstop_in">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_fstop_out">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+    <action name="view_restore_defaults">
+      <rebind device="gamepad" input=" " />
+      <rebind device="keyboard" input=" " />
+      <rebind device="mouse" input=" " />
+      <rebind device="joystick" input="js1_ " />
+      <rebind device="joystick" input="js2_ " />
+      <rebind device="joystick" input="js3_ " />
+    </action>
+  </actionmap>
+</ActionMaps>
