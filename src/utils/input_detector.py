@@ -321,21 +321,17 @@ class InputDetectorThread(QThread):
 
             # Get key name
             key_name = self._get_key_name_from_pynput_key(key, modifier)
-            logger.debug(f"Key press: raw key={key}, key_name={repr(key_name)}, modifier={modifier}")
 
             # Skip if we couldn't determine a key name
             if not key_name:
-                logger.debug(f"Could not determine key name, continuing listener")
                 return True  # Continue listening
 
             # Mark that a non-modifier key was pressed (for tracking if we should emit modifier alone)
             self.other_key_pressed = True
-            logger.debug(f"Non-modifier key pressed: {repr(key_name)}")
 
             # Special handling for space key - normalize it
             if key_name == ' ':
                 key_name = 'space'
-                logger.info(f"Space key detected, normalized to 'space'")
 
             # Map to Star Citizen format
             if modifier:
@@ -540,7 +536,7 @@ class InputDetectorThread(QThread):
             return True  # Continue listening
 
         except Exception as e:
-            logger.error(f"Error handling mouse click: {e}", exc_info=True)
+            logger.debug(f"Error handling mouse click: {e}")
             return True  # Continue listening
 
     def stop(self):
