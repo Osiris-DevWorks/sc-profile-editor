@@ -63,12 +63,13 @@ class InputDetectorThread(QThread):
             # Start keyboard detection listener
             keyboard_detected = threading.Event()
             keyboard_result = {"code": None, "description": None}
+            keyboard_listener = None  # Will be set below
 
             try:
                 from pynput import keyboard
                 keyboard_listener = keyboard.Listener(
-                    on_press=lambda key: self._on_keyboard_press(key, keyboard_detected, keyboard_result),
-                    on_release=lambda key: self._on_keyboard_release(key, keyboard_detected, keyboard_result)
+                    on_press=lambda key: self._on_keyboard_press(key, keyboard_detected, keyboard_result, keyboard_listener),
+                    on_release=lambda key: self._on_keyboard_release(key, keyboard_detected, keyboard_result, keyboard_listener)
                 )
                 keyboard_listener.start()
             except Exception as e:
@@ -78,11 +79,12 @@ class InputDetectorThread(QThread):
             # Start mouse detection listener
             mouse_detected = threading.Event()
             mouse_result = {"code": None, "description": None}
+            mouse_listener = None  # Will be set below
 
             try:
                 from pynput import mouse
                 mouse_listener = mouse.Listener(
-                    on_click=lambda x, y, button, pressed: self._on_mouse_click(button, pressed, mouse_detected, mouse_result)
+                    on_click=lambda x, y, button, pressed: self._on_mouse_click(button, pressed, mouse_detected, mouse_result, mouse_listener)
                 )
                 mouse_listener.start()
             except Exception as e:
@@ -270,7 +272,7 @@ class InputDetectorThread(QThread):
         except Exception as e:
             logger.error(f"Error in joystick detection: {e}", exc_info=True)
 
-    def _on_keyboard_press(self, key, detected_event, result_dict):
+    def _on_keyboard_press(self, key, detected_event, result_dict, listener=None):
         """Handle keyboard key press (callback from pynput)"""
         try:
             from pynput.keyboard import Key
@@ -280,6 +282,11 @@ class InputDetectorThread(QThread):
 
             # If input already detected, stop processing further events
             if detected_event.is_set():
+                if listener:
+                    try:
+                        listener.stop()
+                    except:
+                        pass
                 return False
 
             # Track modifier keys
@@ -338,6 +345,14 @@ class InputDetectorThread(QThread):
                 result_dict["description"] = f"Keyboard {key_name.upper()}"
 
             detected_event.set()
+
+            # Explicitly stop the listener to ensure it halts immediately
+            if listener:
+                try:
+                    listener.stop()
+                except:
+                    pass
+
             return False  # Stop listener
 
         except Exception as e:
@@ -396,7 +411,7 @@ class InputDetectorThread(QThread):
             logger.debug(f"Error getting key name from pynput key: {e}")
             return None
 
-    def _on_keyboard_release(self, key, detected_event, result_dict):
+    def _on_keyboard_release(self, key, detected_event, result_dict, listener=None):
         """Handle keyboard key release (callback from pynput)"""
         try:
             from pynput.keyboard import Key
@@ -406,6 +421,11 @@ class InputDetectorThread(QThread):
 
             # If input already detected, stop processing further events
             if detected_event.is_set():
+                if listener:
+                    try:
+                        listener.stop()
+                    except:
+                        pass
                 return False
 
             # Track modifier keys being released
@@ -449,6 +469,14 @@ class InputDetectorThread(QThread):
                     result_dict["description"] = f"Keyboard {modifier_description_map.get(modifier_name, modifier_name)}"
                     detected_event.set()
                     logger.info(f"Detected modifier key alone: {input_code} - {result_dict['description']}")
+
+                    # Explicitly stop the listener to ensure it halts immediately
+                    if listener:
+                        try:
+                            listener.stop()
+                        except:
+                            pass
+
                     return False  # Stop listener
 
                 self.active_modifiers[modifier_name] = False
@@ -483,7 +511,7 @@ class InputDetectorThread(QThread):
         }
         return modifier_map.get(modifier, modifier)
 
-    def _on_mouse_click(self, button, pressed, detected_event, result_dict):
+    def _on_mouse_click(self, button, pressed, detected_event, result_dict, listener=None):
         """Handle mouse button click (callback from pynput)"""
         try:
             from pynput.mouse import Button
@@ -493,6 +521,11 @@ class InputDetectorThread(QThread):
 
             # If input already detected, stop processing further events
             if detected_event.is_set():
+                if listener:
+                    try:
+                        listener.stop()
+                    except:
+                        pass
                 return False
 
             # Get button name
@@ -510,6 +543,14 @@ class InputDetectorThread(QThread):
                 result_dict["code"] = input_code
                 result_dict["description"] = description
                 detected_event.set()
+
+                # Explicitly stop the listener to ensure it halts immediately
+                if listener:
+                    try:
+                        listener.stop()
+                    except:
+                        pass
+
                 return False  # Stop listener
 
             return True  # Continue listening
