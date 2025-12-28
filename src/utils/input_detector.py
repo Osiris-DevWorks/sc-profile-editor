@@ -278,6 +278,10 @@ class InputDetectorThread(QThread):
             if not self.running:
                 return False  # Stop listener
 
+            # If input already detected, stop processing further events
+            if detected_event.is_set():
+                return False
+
             # Track modifier keys
             modifier_key_map = {
                 Key.ctrl_l: "lctrl",
@@ -400,6 +404,10 @@ class InputDetectorThread(QThread):
             if not self.running:
                 return False  # Stop listener
 
+            # If input already detected, stop processing further events
+            if detected_event.is_set():
+                return False
+
             # Track modifier keys being released
             modifier_key_map = {
                 Key.ctrl_l: "lctrl",
@@ -482,6 +490,10 @@ class InputDetectorThread(QThread):
 
             if not self.running or not pressed:
                 return True  # Continue listening
+
+            # If input already detected, stop processing further events
+            if detected_event.is_set():
+                return False
 
             # Get button name
             # Standard mouse button mapping: left=1, right=2, middle=3, x1=4, x2=5

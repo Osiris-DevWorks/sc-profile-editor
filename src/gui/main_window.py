@@ -760,6 +760,33 @@ class MainWindow(QMainWindow):
             # Load the blank profile
             self.load_profile_from_path(blank_profile_path)
 
+            # Add currently connected joystick devices to the new profile
+            if self.current_profile:
+                try:
+                    from src.utils.input_detector import InputDetector
+                    connected_devices = InputDetector.get_available_devices()
+
+                    # Add joystick devices to the profile
+                    for device in connected_devices:
+                        if device.get('type') == 'joystick':
+                            # Create a Device object for the joystick
+                            from src.models.profile_model import Device
+                            joystick_device = Device(
+                                device_type='joystick',
+                                instance=device.get('instance', 1),
+                                product_name=device.get('name', f"Joystick {device.get('instance', 1)}")
+                            )
+
+                            # Add to profile's devices list if not already present
+                            if not any(d.device_type == 'joystick' and d.instance == joystick_device.instance
+                                      for d in self.current_profile.devices):
+                                self.current_profile.devices.append(joystick_device)
+                                logger.info(f"Added joystick device to new profile: {joystick_device.product_name} (js{joystick_device.instance})")
+
+                except Exception as e:
+                    logger.warning(f"Could not add joystick devices to new profile: {e}")
+                    # Continue anyway - this is not critical
+
             # Set a default filename for save
             from datetime import datetime
             default_name = f"new_profile_{datetime.now().strftime('%Y%m%d')}.xml"
