@@ -349,7 +349,6 @@ class InputDetectorThread(QThread):
 
             detected_event.set()
             logger.info(f"Keyboard input detected: {input_code} - {result_dict['description']}")
-            self.running = False  # Signal the main loop to stop
 
             return False  # Stop listener
 
@@ -467,7 +466,6 @@ class InputDetectorThread(QThread):
                     result_dict["description"] = f"Keyboard {modifier_description_map.get(modifier_name, modifier_name)}"
                     detected_event.set()
                     logger.info(f"Detected modifier key alone: {input_code} - {result_dict['description']}")
-                    self.running = False  # Signal the main loop to stop
 
                     return False  # Stop listener
 
@@ -536,7 +534,6 @@ class InputDetectorThread(QThread):
                 result_dict["description"] = description
                 detected_event.set()
                 logger.info(f"Mouse input detected: {input_code} - {description}")
-                self.running = False  # Signal the main loop to stop
 
                 return False  # Stop listener
 
