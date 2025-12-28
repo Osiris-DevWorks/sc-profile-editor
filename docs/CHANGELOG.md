@@ -11,6 +11,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Complete Action Structure for All Profiles** - Master template overlay system:
+  - All profiles now load with complete action structure (621 actions) using blank.xml as master template
+  - Profile loading now overlays user customizations onto the blank template at runtime
+  - Ensures all profiles have every bindable action available for customization
+  - Works for presets, imported profiles, and user-created profiles
+
+### Changed
+- **Profile Loading System** - New overlay-based architecture:
+  - Replaced merge defaults system with runtime overlay using blank.xml as master template
+  - Profiles always use blank.xml as base structure with source customizations overlaid
+  - Removed "Merge default bindings" setting and toggle (always active via overlay system)
+  - Simplified Config tab by disabling deprecated merge defaults checkbox
+  - Main loading logic simplified - no longer conditional based on settings
+  - `default-bindings/actionmaps.xml` now only used as fallback if blank.xml unavailable
+  - ProfileParser gracefully falls back to legacy behavior if blank.xml is missing
+
+### Fixed
+- **Issue #16** - Keyboard & Mouse preset now loads all 621 actions instead of just 26:
+  - Preset file updated to use complete action structure via overlay system
+  - Bindings now include all keyboard and mouse actions that can be mapped
+  - Updated preset contains 56 mapped keyboard/mouse inputs plus 565 unmapped placeholders
+
 ## [0.7.3] - 2025-12-24
 
 ### Added

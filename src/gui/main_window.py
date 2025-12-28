@@ -692,11 +692,12 @@ class MainWindow(QMainWindow):
             file_path: Path to the profile XML file
         """
         try:
-            # Parse the profile with optional default merge
+            # Parse the profile with overlay system (always enabled)
             self.statusBar().showMessage(f"Loading profile: {file_path}")
             logger.info(f"Loading profile: {file_path}")
-            use_defaults = self.settings.get_merge_defaults_enabled()
-            parser = ProfileParser(file_path, use_bundled_defaults=use_defaults)
+
+            # Always use overlay system with blank.xml as master template
+            parser = ProfileParser(file_path, use_bundled_defaults=True)
             self.current_profile = parser.parse()
             self.current_profile_path = file_path
 
@@ -711,10 +712,8 @@ class MainWindow(QMainWindow):
             self.export_pdf_btn.setEnabled(True)
             self.export_word_btn.setEnabled(True)
 
-            # Show merge status
+            # Show status
             status_msg = f"Successfully loaded: {self.current_profile.profile_name}"
-            if self.current_profile.merged_defaults:
-                status_msg += " (with default bindings merged)"
             self.statusBar().showMessage(status_msg)
             logger.info(f"Successfully loaded profile: {self.current_profile.profile_name}")
 

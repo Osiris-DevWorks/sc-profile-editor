@@ -41,6 +41,10 @@ class ControlProfile:
     is_modified: bool = False  # Track if profile has unsaved changes
     source_xml_path: Optional[str] = None  # Path to original XML file
     merged_defaults: bool = False  # Track if default bindings were merged into this profile
+    # Device configuration preservation fields (for export)
+    _source_deviceoptions: Optional[object] = None  # Raw ElementTree element for deviceoptions
+    _source_options: Optional[List[object]] = None  # Raw ElementTree elements for options
+    _source_modifiers: Optional[object] = None  # Raw ElementTree element for modifiers
 
     def get_all_bindings(self) -> List[ActionBinding]:
         """Get all action bindings across all action maps"""

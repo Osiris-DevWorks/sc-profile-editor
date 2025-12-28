@@ -131,25 +131,33 @@ class AppSettings:
 
     def get_merge_defaults_enabled(self) -> bool:
         """
-        Get whether default bindings merge is enabled
+        DEPRECATED: Get whether default bindings merge is enabled.
+
+        This setting is deprecated as the overlay system with blank.xml is always active.
+        The overlay system provides a more comprehensive solution with complete action coverage.
+
+        This method now always returns True for backwards compatibility.
 
         Returns:
-            True if merge defaults is enabled, False otherwise
+            Always returns True (overlay system always enabled)
         """
-        enabled = self.settings.value("merge_defaults_enabled", True, type=bool)
-        logger.debug(f"Retrieved merge defaults enabled: {enabled}")
-        return enabled
+        logger.debug("get_merge_defaults_enabled called (deprecated, always returns True)")
+        return True
 
     def set_merge_defaults_enabled(self, enabled: bool):
         """
-        Save whether default bindings merge is enabled
+        DEPRECATED: Save whether default bindings merge is enabled.
+
+        This setting no longer has any effect. The overlay system with blank.xml
+        is always active and provides complete action coverage.
+
+        This method is kept for backwards compatibility but is a no-op.
 
         Args:
-            enabled: True to enable merge, False to disable
+            enabled: (ignored - has no effect)
         """
-        self.settings.setValue("merge_defaults_enabled", enabled)
-        self.settings.sync()
-        logger.info(f"Saved merge defaults enabled: {enabled}")
+        logger.warning("set_merge_defaults_enabled called but has no effect (deprecated)")
+        # Don't save anything - this setting is deprecated
 
     def get_minimize_to_tray_enabled(self) -> bool:
         """

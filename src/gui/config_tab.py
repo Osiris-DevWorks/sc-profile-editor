@@ -160,20 +160,21 @@ class ConfigTab(QWidget):
         defaults_layout = QVBoxLayout()
         defaults_group.setLayout(defaults_layout)
 
-        # Instructions
+        # Instructions about new overlay system
         defaults_instructions = QLabel(
-            "Merge default bindings from Star Citizen when loading profiles.\n"
-            "Unmapped actions in your profile will be populated with Star Citizen's defaults."
+            "The profile editor now automatically uses blank.xml as the master template.\n"
+            "All profiles will have complete action structure with all bindable actions.\n\n"
+            "This setting is deprecated and the system is always enabled."
         )
         defaults_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
         defaults_instructions.setWordWrap(True)
         defaults_layout.addWidget(defaults_instructions)
         defaults_layout.addSpacing(10)
 
-        # Merge defaults checkbox
-        self.merge_defaults_checkbox = QCheckBox("Merge default bindings when loading profiles")
-        self.merge_defaults_checkbox.setChecked(self.settings.get_merge_defaults_enabled())
-        self.merge_defaults_checkbox.stateChanged.connect(self.on_merge_defaults_changed)
+        # Merge defaults checkbox (disabled - always on)
+        self.merge_defaults_checkbox = QCheckBox("Merge default bindings when loading profiles (Always On)")
+        self.merge_defaults_checkbox.setChecked(True)
+        self.merge_defaults_checkbox.setEnabled(False)  # Disabled - overlay system always active
         defaults_layout.addWidget(self.merge_defaults_checkbox)
 
         layout.addWidget(defaults_group)
@@ -420,15 +421,12 @@ class ConfigTab(QWidget):
             logger.error(f"Error saving SC directory: {e}", exc_info=True)
             QMessageBox.warning(self, "Save Error", f"Failed to save Star Citizen directory:\n{e}")
 
-    def on_merge_defaults_changed(self, state):
-        """Handle merge defaults checkbox state change"""
-        try:
-            enabled = state == Qt.CheckState.Checked.value
-            self.settings.set_merge_defaults_enabled(enabled)
-            status = "enabled" if enabled else "disabled"
-            logger.info(f"Default bindings merge: {status}")
-        except Exception as e:
-            logger.error(f"Error setting merge defaults: {e}", exc_info=True)
+    # DEPRECATED: This method is no longer used as the merge defaults checkbox is disabled
+    # The overlay system with blank.xml is always active
+    # def on_merge_defaults_changed(self, state):
+    #     """Handle merge defaults checkbox state change (DEPRECATED)"""
+    #     # This method is deprecated - the overlay system is always enabled
+    #     pass
 
     def on_minimize_to_tray_changed(self, state):
         """Handle minimize to tray checkbox state change"""
