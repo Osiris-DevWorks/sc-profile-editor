@@ -108,6 +108,9 @@ class InputDetectorThread(QThread):
                         except:
                             pass
 
+                    # Give listeners a moment to actually stop
+                    time.sleep(0.1)
+
                 # Check for joystick input
                 if joystick_detected.is_set():
                     if joystick_result["code"]:
@@ -364,13 +367,6 @@ class InputDetectorThread(QThread):
             # Set flag to stop all listeners
             self.stop_listeners_flag = True
 
-            # Try to stop the listener immediately
-            if listener:
-                try:
-                    listener.stop()
-                except:
-                    pass
-
             return False  # Stop listener
 
         except Exception as e:
@@ -491,13 +487,6 @@ class InputDetectorThread(QThread):
                     # Set flag to stop all listeners
                     self.stop_listeners_flag = True
 
-                    # Try to stop the listener immediately
-                    if listener:
-                        try:
-                            listener.stop()
-                        except:
-                            pass
-
                     return False  # Stop listener
 
                 self.active_modifiers[modifier_name] = False
@@ -568,13 +557,6 @@ class InputDetectorThread(QThread):
 
                 # Set flag to stop all listeners
                 self.stop_listeners_flag = True
-
-                # Try to stop the listener immediately
-                if listener:
-                    try:
-                        listener.stop()
-                    except:
-                        pass
 
                 return False  # Stop listener
 
