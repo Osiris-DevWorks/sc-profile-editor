@@ -551,8 +551,12 @@ class QtPdfDeviceWidget(QWidget):
                 # Fallback: try as device name pattern
                 template = self.pdf_manager.find_template(self.current_template_search_name)
         else:
-            # No specific template selected, use device name
-            template = self.pdf_manager.find_template(self.current_device.product_name or "")
+            # No specific template selected, use device name and product_id for matching
+            # Product ID is the primary matching method (via find_template)
+            template = self.pdf_manager.find_template(
+                self.current_device.product_name or "",
+                product_id=self.current_device.product_id
+            )
 
         if not template:
             self.scene.clear()

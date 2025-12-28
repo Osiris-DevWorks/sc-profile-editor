@@ -33,7 +33,10 @@
       ],
       "type": "joystick",
       "manufacturer": "VKB",
-      "notes": "SCG grip - standard right hand configuration. Matches SCG, EVO, and NXT base variants."
+      "notes": "SCG grip - standard right hand configuration. Matches SCG, EVO, and NXT base variants.",
+      "product_ids": [
+        "0200231D-0000-0000-0000-504944564944"
+      ]
     },
     {
       "id": "vkb_gladiator_scg_lh",
@@ -54,7 +57,10 @@
       ],
       "type": "joystick",
       "manufacturer": "VKB",
-      "notes": "SCG grip - standard left hand configuration (no OTA). Matches SCG, EVO, and NXT base variants with or without SEM module."
+      "notes": "SCG grip - standard left hand configuration (no OTA). Matches SCG, EVO, and NXT base variants with or without SEM module.",
+      "product_ids": [
+        "0201231D-0000-0000-0000-504944564944"
+      ]
     },
     {
       "id": "vkb_gladiator_scg_ota_rh",
@@ -94,7 +100,11 @@
       ],
       "type": "joystick",
       "manufacturer": "VKB",
-      "notes": "SCG with Omni Throttle Adapter - left hand. Matches SCG, EVO, and NXT base variants with or without SEM module."
+      "notes": "SCG with Omni Throttle Adapter - left hand. Matches SCG, EVO, and NXT base variants with or without SEM module.",
+      "product_ids": [
+        "3205231D-0000-0000-0000-504944564944",
+        "0205231D-0000-0000-0000-504944564944"
+      ]
     },
     {
       "id": "vkb_sem",
@@ -106,7 +116,10 @@
       ],
       "type": "module",
       "manufacturer": "VKB",
-      "button_range": [41, 78],
+      "button_range": [
+        41,
+        78
+      ],
       "notes": "Space Extension Module - attaches to Gladiator sticks. Buttons 41-78."
     },
     {
@@ -139,9 +152,16 @@
       "type": "joystick",
       "manufacturer": "VPC",
       "buttons": 32,
-      "button_range": [1, 32],
+      "button_range": [
+        1,
+        32
+      ],
       "field_mapping": "vpc_mt50cm3_left/field_mapping.json",
-      "notes": "Virpil MongoosT-50CM3 left stick configuration - 32 buttons with slider control"
+      "notes": "Virpil MongoosT-50CM3 left stick configuration - 32 buttons with slider control",
+      "product_ids": [
+        "83903344-0000-0000-0000-504944564944",
+        "80CB3344-0000-0000-0000-504944564944"
+      ]
     },
     {
       "id": "vpc_mt50cm3_right",
@@ -160,9 +180,16 @@
       "type": "joystick",
       "manufacturer": "VPC",
       "buttons": 32,
-      "button_range": [1, 32],
+      "button_range": [
+        1,
+        32
+      ],
       "field_mapping": "vpc_mt50cm3_right/field_mapping.json",
-      "notes": "Virpil MongoosT-50CM3 right stick configuration - 32 buttons with slider control"
+      "notes": "Virpil MongoosT-50CM3 right stick configuration - 32 buttons with slider control",
+      "product_ids": [
+        "43873344-0000-0000-0000-504944564944",
+        "43903344-0000-0000-0000-504944564944"
+      ]
     },
     {
       "id": "thrustmaster_t16000",
@@ -177,7 +204,10 @@
       ],
       "type": "joystick",
       "manufacturer": "Thrustmaster",
-      "notes": "Premium 16-button joystick with 4 axes and 1 hat switch"
+      "notes": "Premium 16-button joystick with 4 axes and 1 hat switch",
+      "product_ids": [
+        "B10A044F-0000-0000-0000-504944564944"
+      ]
     },
     {
       "id": "thrustmaster_twcs_throttle",
@@ -215,7 +245,10 @@
         "Axis_Z": "Z Axis (Up/Down)",
         "Axis_ROTZ": "ROTZ Axis (Rotation)",
         "Slider_1": "Slider 1 (Main Throttle)"
-      }
+      },
+      "product_ids": [
+        "B687044F-0000-0000-0000-504944564944"
+      ]
     },
     {
       "id": "vkb_fsm_ga",
@@ -234,7 +267,10 @@
       "axis_count": 0,
       "hat_count": 0,
       "buttons": {},
-      "button_range": [1, 25]
+      "button_range": [
+        1,
+        25
+      ]
     },
     {
       "id": "vkb_thq",
@@ -249,7 +285,10 @@
       "type": "throttle",
       "manufacturer": "VKB",
       "buttons": {},
-      "button_range": [1, 8]
+      "button_range": [
+        1,
+        8
+      ]
     },
     {
       "id": "vkb_thq_v",
@@ -303,7 +342,13 @@
       "type": "joystick",
       "manufacturer": "VKB",
       "buttons": {},
-      "button_range": [1, 39]
+      "button_range": [
+        1,
+        39
+      ],
+      "product_ids": [
+        "0125231D-0000-0000-0000-504944564944"
+      ]
     },
     {
       "id": "vkb_gunfighter_scg_rh",
@@ -315,7 +360,10 @@
         "VKB Gunfighter SCG Right"
       ],
       "type": "joystick",
-      "manufacturer": "VKB"
+      "manufacturer": "VKB",
+      "product_ids": [
+        "0126231D-0000-0000-0000-504944564944"
+      ]
     },
     {
       "id": "vkb_gunfighter_scg_lh",
@@ -327,7 +375,10 @@
         "VKB Gunfighter SCG Left"
       ],
       "type": "joystick",
-      "manufacturer": "VKB"
+      "manufacturer": "VKB",
+      "product_ids": [
+        "0127231D-0000-0000-0000-504944564944"
+      ]
     },
     {
       "id": "vkb_gunfighter_scg_ota_rh",
@@ -379,7 +430,10 @@
       ],
       "type": "module",
       "manufacturer": "VKB",
-      "notes": "Space Throttle Extension Module for STECS"
+      "notes": "Space Throttle Extension Module for STECS",
+      "product_ids": [
+        "012E231D-0000-0000-0000-504944564944"
+      ]
     },
     {
       "id": "vkb_stecs_atem",

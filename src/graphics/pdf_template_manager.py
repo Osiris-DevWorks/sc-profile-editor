@@ -30,6 +30,7 @@ class PDFDeviceTemplate:
     default_joystick_index: Optional[int] = None
     notes: Optional[str] = None
     deprecated: bool = False
+    product_ids: Optional[List[str]] = None  # Product IDs for primary matching
 
 
 class PDFTemplateManager:
@@ -86,7 +87,8 @@ class PDFTemplateManager:
                     hat_count=template_data.get('hat_count'),
                     default_joystick_index=template_data.get('default_joystick_index'),
                     notes=template_data.get('notes'),
-                    deprecated=template_data.get('deprecated', False)
+                    deprecated=template_data.get('deprecated', False),
+                    product_ids=template_data.get('product_ids')
                 )
                 self.templates.append(template)
 
@@ -95,12 +97,13 @@ class PDFTemplateManager:
         except Exception as e:
             logger.error(f"Error loading template registry: {e}", exc_info=True)
 
-    def find_template(self, device_name: str) -> Optional[PDFDeviceTemplate]:
+    def find_template(self, device_name: str, product_id: Optional[str] = None) -> Optional[PDFDeviceTemplate]:
         """
-        Find a template that matches the device name
+        Find a template that matches the device by product ID (primary) or device name (fallback)
 
         Args:
             device_name: Device name from XML (e.g., "VKBsim Gladiator EVO R")
+            product_id: Optional product ID from device options (e.g., "0200231D-0000-0000-0000-504944564944")
 
         Returns:
             Matching PDFDeviceTemplate or None
@@ -108,19 +111,37 @@ class PDFTemplateManager:
         if not device_name:
             return None
 
-        device_name_lower = device_name.lower()
+        # Normalize product ID for comparison (remove whitespace/braces)
+        if product_id:
+            product_id = product_id.strip().strip('{}')
 
-        # Try pattern matching (skip deprecated templates)
+        # Primary matching: Try product ID first (skip deprecated templates)
+        if product_id:
+            for template in self.templates:
+                if template.deprecated:
+                    continue
+
+                if template.product_ids:
+                    for pid in template.product_ids:
+                        if pid.strip().strip('{}') == product_id:
+                            logger.debug(f"Matched device '{device_name}' to template '{template.name}' via product ID {product_id}")
+                            return template
+
+        # Fallback matching: Try device name pattern matching (skip deprecated templates)
+        device_name_lower = device_name.lower()
         for template in self.templates:
             if template.deprecated:
                 continue
 
             for pattern in template.device_match_patterns:
                 if pattern.lower() in device_name_lower:
-                    logger.debug(f"Matched device '{device_name}' to template '{template.name}'")
+                    if product_id:
+                        logger.debug(f"Matched device '{device_name}' to template '{template.name}' via name pattern (product ID {product_id} not found in templates)")
+                    else:
+                        logger.debug(f"Matched device '{device_name}' to template '{template.name}' via name pattern")
                     return template
 
-        logger.debug(f"No template found for device: {device_name}")
+        logger.debug(f"No template found for device: {device_name}" + (f" (product ID: {product_id})" if product_id else ""))
         return None
 
     def get_template_by_id(self, template_id: str) -> Optional[PDFDeviceTemplate]:
