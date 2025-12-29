@@ -172,6 +172,46 @@ class XMLExporter:
                 processed_keys.add(key)
                 logger.debug(f"Updated binding: {map_name}.{action_name} -> {[b.input_code for b in modified_bindings if b.input_code and not b.input_code.rstrip().endswith('_')]}")
 
+        # Handle bindings that weren't found in the XML (create missing actions)
+        for (map_name, action_name), bindings in binding_map.items():
+            key = (map_name, action_name)
+            if key in processed_keys:
+                continue  # Already processed
+
+            # This binding exists in the profile but not in the source XML
+            # We need to find the actionmap in the XML and add the action
+            logger.info(f"EXPORT DEBUG: Binding {action_name} in {map_name} not found in XML, creating it")
+
+            # Find the actionmap in the XML
+            actionmap_elem = None
+            for am_elem in self.root.findall('.//actionmap'):
+                if am_elem.get('name', '') == map_name:
+                    actionmap_elem = am_elem
+                    break
+
+            if not actionmap_elem:
+                logger.warning(f"EXPORT DEBUG: Could not find actionmap {map_name} in XML, skipping binding {action_name}")
+                continue
+
+            # Create new action element
+            action_elem = ET.SubElement(actionmap_elem, 'action')
+            action_elem.set('name', action_name)
+            logger.info(f"EXPORT DEBUG: Created new action element for {action_name} in {map_name}")
+
+            # Add rebind elements for this binding
+            for binding in bindings:
+                # Skip empty/unmapped bindings
+                if not binding.input_code or binding.input_code.rstrip().endswith('_'):
+                    logger.debug(f"EXPORT DEBUG: Skipping empty binding for {action_name}: {repr(binding.input_code)}")
+                    continue
+
+                logger.info(f"EXPORT DEBUG: Adding binding to new action {action_name}: {binding.input_code}")
+                rebind_elem = ET.SubElement(action_elem, 'rebind')
+                rebind_elem.set('input', binding.input_code)
+
+                if binding.activation_mode:
+                    rebind_elem.set('activationMode', binding.activation_mode)
+
         # Remove empty/unmapped actions and duplicates from XML
         for actionmap_elem in self.root.findall('.//actionmap'):
             map_name = actionmap_elem.get('name', '')
