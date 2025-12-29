@@ -417,6 +417,37 @@ class InputDetectorThread(QThread):
                     if char in ctrl_char_map:
                         return ctrl_char_map[char]
 
+                # When Shift is pressed, pynput reports the shifted character instead of the base key
+                # We need to map shifted characters back to their base key names
+                if active_modifier and active_modifier in ("lshift", "rshift"):
+                    # Map shifted characters back to their base keys
+                    shift_char_map = {
+                        '!': '1',
+                        '@': '2',
+                        '#': '3',
+                        '$': '4',
+                        '%': '5',
+                        '^': '6',
+                        '&': '7',
+                        '*': '8',
+                        '(': '9',
+                        ')': '0',
+                        '_': 'minus',
+                        '+': 'equal',
+                        '{': 'bracketleft',
+                        '}': 'bracketright',
+                        '|': 'backslash',
+                        ':': 'semicolon',
+                        '"': 'apostrophe',
+                        '<': 'comma',
+                        '>': 'period',
+                        '?': 'slash',
+                        '~': 'grave',
+                    }
+
+                    if char in shift_char_map:
+                        return shift_char_map[char]
+
                 return char
 
             return str(key) if key else None
