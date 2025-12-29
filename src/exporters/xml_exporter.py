@@ -76,6 +76,10 @@ class XMLExporter:
         # Key: (action_map_name, action_name) -> ActionBinding
         binding_map = {}
 
+        # Debug: Count all bindings in profile
+        total_bindings = sum(len(am.actions) for am in profile.action_maps)
+        logger.info(f"EXPORT DEBUG: Starting update_bindings with {total_bindings} total bindings in profile")
+
         for action_map in profile.action_maps:
             for binding in action_map.actions:
                 key = (action_map.name, binding.action_name)
@@ -86,6 +90,9 @@ class XMLExporter:
                 # Debug: Log all mouse5 bindings
                 if "mouse5" in binding.input_code:
                     logger.info(f"EXPORT DEBUG: Found mouse5 binding: {binding.action_name} in {action_map.name} -> {binding.input_code}")
+                # Debug: Log all shift+equals bindings
+                if "lshift+equals" in binding.input_code or "rshift+equals" in binding.input_code:
+                    logger.info(f"EXPORT DEBUG: Found shift+equals binding: {binding.action_name} in {action_map.name} -> {binding.input_code}")
 
         # Debug: Log emote_salute if found
         emote_key = None
@@ -145,6 +152,9 @@ class XMLExporter:
                     # Debug: Log all mouse5 bindings being written
                     if "mouse5" in binding.input_code:
                         logger.info(f"EXPORT DEBUG: Writing mouse5 binding to XML: {binding.action_name} -> {binding.input_code}")
+                    # Debug: Log all shift+equals bindings being written
+                    if "lshift+equals" in binding.input_code or "rshift+equals" in binding.input_code:
+                        logger.info(f"EXPORT DEBUG: Writing shift+equals binding to XML: {binding.action_name} -> {binding.input_code}")
 
                     rebind_elem = ET.SubElement(action_elem, 'rebind')
                     rebind_elem.set('input', binding.input_code)
