@@ -73,6 +73,10 @@
   "v_invoke_flashlight": "Flashlight",
   "v_toggle_eva_magnetboots": "Mag Boots",
   "v_toggle_mining_mode": "Mining Mode",
+  "v_weapon_countermeasure_noise_launch": "Launch Noise",
+  "v_weapon_countermeasure_launch_noise": "Noise Launch (Alt)",
+  "v_weapon_countermeasure_decoy_launch": "Launch Decoy",
+  "v_weapon_countermeasure_launch_decoy": "Decoy Launch (Alt)",
   "gp_rotatepitch": "Pitch",
   "gp_rotateyaw": "Yaw"
 }
