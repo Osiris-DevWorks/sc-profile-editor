@@ -892,6 +892,36 @@ class QtPdfDeviceWidget(QWidget):
 
         # Mark profile as modified
         if self.current_profile:
+            # Check if any bindings are not in the profile and add them
+            for binding in bindings:
+                binding_found = False
+                for action_map in self.current_profile.action_maps:
+                    for existing_binding in action_map.actions:
+                        if existing_binding is binding:
+                            binding_found = True
+                            break
+                    if binding_found:
+                        break
+
+                # If binding is not in profile, add it to the appropriate action map
+                if not binding_found:
+                    logger.info(f"on_bindings_changed: Binding {binding.action_name} not in profile, finding correct actionmap...")
+                    # Find the correct action map for this action
+                    added = False
+                    for action_map in self.current_profile.action_maps:
+                        for existing_binding in action_map.actions:
+                            if existing_binding.action_name == binding.action_name:
+                                # Add the new binding to this action map
+                                action_map.actions.append(binding)
+                                logger.info(f"on_bindings_changed: Added binding {binding.action_name} to {action_map.name}")
+                                added = True
+                                break
+                        if added:
+                            break
+
+                    if not added:
+                        logger.warning(f"on_bindings_changed: Could not find actionmap for action {binding.action_name}")
+
             self.current_profile.mark_modified()
 
         # Reload override manager cache

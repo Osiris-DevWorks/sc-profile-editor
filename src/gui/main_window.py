@@ -1056,10 +1056,12 @@ class MainWindow(QMainWindow):
             self.controls_table.setItem(row, 5, activation_item)
 
             # Column 6: Device (parsed from input code)
-            # Always parse device from input code, even for unmapped actions
-            # For unmapped, input_code is like "js1_ " or "kb1_" so we can still extract device type
-            device = self.parse_device_from_input(binding.input_code)
-            device_item = QTableWidgetItem(device)
+            # Only show device for mapped actions; unmapped actions should be blank
+            if is_unmapped:
+                device_item = QTableWidgetItem("")
+            else:
+                device = self.parse_device_from_input(binding.input_code)
+                device_item = QTableWidgetItem(device)
             device_item.setFlags(device_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             self.controls_table.setItem(row, 6, device_item)
 
@@ -1548,6 +1550,36 @@ class MainWindow(QMainWindow):
 
         # Mark profile as modified
         if self.current_profile:
+            # Check if any bindings are not in the profile and add them
+            for binding in bindings:
+                binding_found = False
+                for action_map in self.current_profile.action_maps:
+                    for existing_binding in action_map.actions:
+                        if existing_binding is binding:
+                            binding_found = True
+                            break
+                    if binding_found:
+                        break
+
+                # If binding is not in profile, add it to the appropriate action map
+                if not binding_found:
+                    logger.info(f"on_bindings_changed_from_table: Binding {binding.action_name} not in profile, finding correct actionmap...")
+                    # Find the correct action map for this action
+                    added = False
+                    for action_map in self.current_profile.action_maps:
+                        for existing_binding in action_map.actions:
+                            if existing_binding.action_name == binding.action_name:
+                                # Add the new binding to this action map
+                                action_map.actions.append(binding)
+                                logger.info(f"on_bindings_changed_from_table: Added binding {binding.action_name} to {action_map.name}")
+                                added = True
+                                break
+                        if added:
+                            break
+
+                    if not added:
+                        logger.warning(f"on_bindings_changed_from_table: Could not find actionmap for action {binding.action_name}")
+
             self.current_profile.mark_modified()
             logger.info(f"on_bindings_changed_from_table: Marked profile as modified")
 
