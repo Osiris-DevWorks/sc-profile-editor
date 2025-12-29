@@ -253,14 +253,17 @@
    <rebind input="kb1_lalt+t"/>
   </action>
  </actionmap>
- <!-- SHIP POWER & SHIELDS -->
- <actionmap name="spaceship_power">
-  <action name="v_countermeasure_noise">
+ <!-- SHIP DEFENSIVE -->
+ <actionmap name="spaceship_defensive">
+  <action name="v_weapon_countermeasure_noise_launch">
    <rebind input="kb1_j"/>
   </action>
-  <action name="v_countermeasure_decoy">
+  <action name="v_weapon_countermeasure_decoy_launch">
    <rebind input="kb1_h" activationMode="Hold"/>
   </action>
+ </actionmap>
+ <!-- SHIP POWER & SHIELDS -->
+ <actionmap name="spaceship_power">
   <action name="v_shield_raise_front">
    <rebind input="kb1_np_8"/>
   </action>
