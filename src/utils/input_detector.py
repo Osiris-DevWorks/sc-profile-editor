@@ -421,6 +421,7 @@ class InputDetectorThread(QThread):
                 # We need to map shifted characters back to their base key names
                 if active_modifier and active_modifier in ("lshift", "rshift"):
                     # Map shifted characters back to their base keys
+                    # These map to Star Citizen's key names (kb1_equals not kb1_equal, etc.)
                     shift_char_map = {
                         '!': '1',
                         '@': '2',
@@ -433,7 +434,7 @@ class InputDetectorThread(QThread):
                         '(': '9',
                         ')': '0',
                         '_': 'minus',
-                        '+': 'equal',
+                        '+': 'equals',
                         '{': 'bracketleft',
                         '}': 'bracketright',
                         '|': 'backslash',
