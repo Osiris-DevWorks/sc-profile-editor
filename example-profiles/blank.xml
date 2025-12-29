@@ -569,7 +569,7 @@
     <action name="v_weapon_countermeasure_decoy_launch_panic">
       <rebind input="js1_ " />
     </action>
-  <action name="v_weapon_countermeasure_cinematic"><rebind input="js1_ " /></action><action name="v_weapon_countermeasure_launch_all"><rebind input="js1_ " /></action><action name="v_weapon_countermeasure_launch_decoy"><rebind input="js1_ " /></action><action name="v_weapon_countermeasure_launch_noise"><rebind input="js1_ " /></action></actionmap>
+  <action name="v_weapon_countermeasure_cinematic"><rebind input="js1_ " /></action><action name="v_weapon_countermeasure_launch_all"><rebind input="js1_ " /></action></actionmap>
   <actionmap name="spaceship_power">
     <action name="v_power_throttle_max">
       <rebind input="js1_ " activationMode="press" />
