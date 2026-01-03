@@ -56,6 +56,9 @@ class XMLExporter:
                 if header is not None:
                     header.set('label', profile.profile_name)
 
+            # Update devices in CustomisationUIHeader
+            self.update_devices(profile)
+
             # Update all rebind elements with modified bindings
             self.update_bindings(profile)
 
@@ -68,6 +71,51 @@ class XMLExporter:
         except Exception as e:
             logger.error(f"Failed to export profile: {e}", exc_info=True)
             return False
+
+    def update_devices(self, profile: ControlProfile):
+        """
+        Update devices in CustomisationUIHeader to match profile.devices
+        This ensures newly detected joystick devices are saved to the XML
+        """
+        try:
+            header = self.root.find('CustomisationUIHeader')
+            if header is None:
+                logger.debug("CustomisationUIHeader not found, skipping device update")
+                return
+
+            # Find existing devices element
+            devices_elem = header.find('devices')
+            if devices_elem is None:
+                # Create devices element if it doesn't exist
+                devices_elem = ET.Element('devices')
+                # Insert after label but before categories (typical order)
+                header_children = list(header)
+                insert_idx = 0
+                for i, child in enumerate(header_children):
+                    if child.tag in ('label', 'description', 'image'):
+                        insert_idx = i + 1
+                    else:
+                        break
+                header.insert(insert_idx, devices_elem)
+                logger.debug("Created new devices element in CustomisationUIHeader")
+            else:
+                # Clear existing device elements
+                for device_elem in list(devices_elem):
+                    devices_elem.remove(device_elem)
+                logger.debug("Cleared existing device elements")
+
+            # Add devices from profile.devices
+            for device in profile.devices:
+                device_elem = ET.SubElement(devices_elem, device.device_type)
+                device_elem.set('instance', str(device.instance))
+                if device.product_id:
+                    device_elem.set('Product', device.product_id)
+
+            logger.info(f"Updated devices in CustomisationUIHeader: {len(profile.devices)} devices")
+
+        except Exception as e:
+            logger.warning(f"Error updating devices in CustomisationUIHeader: {e}")
+            # Continue export anyway - device update is not critical
 
     def update_bindings(self, profile: ControlProfile):
         """Update all rebind elements in the XML tree"""

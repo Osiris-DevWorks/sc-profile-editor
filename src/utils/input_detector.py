@@ -321,8 +321,12 @@ class InputDetectorThread(QThread):
                 pass  # Key.alt_gr not available on this system
 
             if alt_gr_key and key == alt_gr_key:
+                # Detect AltGr as RALT key if pressed alone (for non-US keyboards)
+                # Check if we should emit it as a standalone key or continue listening
                 self.active_modifiers["ralt"] = True
-                return True  # Continue listening
+                self.modifier_press_time["ralt"] = time.time()
+                self.other_key_pressed = False  # Reset flag for this modifier press
+                return True  # Continue listening to see if another key follows
 
             # If this is a modifier key being pressed, track it and continue listening
             # This allows detection of modifiers alone (Shift, Ctrl, Alt) or in combinations
@@ -377,6 +381,7 @@ class InputDetectorThread(QThread):
         """
         Extract key name from pynput key object.
         Handles special cases like Ctrl+letter combinations which pynput reports as control characters.
+        Also handles numpad keys and RALT detection.
 
         Args:
             key: pynput key object
@@ -394,6 +399,28 @@ class InputDetectorThread(QThread):
                 # Skip pure modifier-like keys
                 if key_name in ("ctrl", "alt", "shift", "cmd"):
                     return None
+
+                # Map numpad Key names to Star Citizen numpad format
+                # pynput may report numpad keys with different names depending on platform
+                numpad_key_map = {
+                    # Standard pynput numpad names
+                    'num_lock': 'num_lock',
+                    'numlock': 'num_lock',
+                    'np_0': 'np_0', 'np_1': 'np_1', 'np_2': 'np_2', 'np_3': 'np_3',
+                    'np_4': 'np_4', 'np_5': 'np_5', 'np_6': 'np_6', 'np_7': 'np_7',
+                    'np_8': 'np_8', 'np_9': 'np_9',
+                    'np_multiply': 'np_multiply', 'multiply': 'np_multiply',
+                    'np_add': 'np_add', 'add': 'np_add',
+                    'np_subtract': 'np_subtract', 'subtract': 'np_subtract',
+                    'np_divide': 'np_divide', 'divide': 'np_divide',
+                    'np_decimal': 'np_period', 'decimal': 'np_period',
+                    'np_enter': 'np_enter',
+                }
+
+                # Check if this is a mapped numpad key
+                if key_name in numpad_key_map:
+                    return numpad_key_map[key_name]
+
                 return key_name
 
             # Handle regular character keys
@@ -448,6 +475,20 @@ class InputDetectorThread(QThread):
 
                     if char in shift_char_map:
                         return shift_char_map[char]
+
+                # Handle numpad character keys that pynput reports as characters
+                # Note: pynput doesn't always distinguish between numpad and regular keyboard for numbers
+                # We assume these characters come from the numpad when no other modifier is active
+                if not active_modifier:
+                    numpad_char_map = {
+                        '0': 'np_0', '1': 'np_1', '2': 'np_2', '3': 'np_3', '4': 'np_4',
+                        '5': 'np_5', '6': 'np_6', '7': 'np_7', '8': 'np_8', '9': 'np_9',
+                        '.': 'np_period',
+                        '\r': 'np_enter',  # Numpad enter reports as carriage return
+                    }
+
+                    if char in numpad_char_map:
+                        return numpad_char_map[char]
 
                 return char
 
