@@ -302,15 +302,21 @@ class InputDetectorThread(QThread):
             if detected_event.is_set():
                 return False
 
-            # Track modifier keys
+            # Track modifier keys - build map safely to handle missing Key attributes
             modifier_key_map = {
                 Key.ctrl_l: "lctrl",
                 Key.ctrl_r: "rctrl",
                 Key.alt_l: "lalt",
-                Key.alt_r: "ralt",
                 Key.shift_l: "lshift",
                 Key.shift_r: "rshift",
             }
+
+            # Add alt_r if it exists on this system
+            if hasattr(Key, 'alt_r'):
+                try:
+                    modifier_key_map[Key.alt_r] = "ralt"
+                except AttributeError:
+                    pass  # Key.alt_r not available on this system
 
             # Handle AltGr (Right Alt on non-US keyboards) - treat it as ralt
             # pynput reports it as Key.alt_gr on some systems
@@ -515,15 +521,21 @@ class InputDetectorThread(QThread):
                         pass
                 return False
 
-            # Track modifier keys being released
+            # Track modifier keys being released - build map safely to handle missing Key attributes
             modifier_key_map = {
                 Key.ctrl_l: "lctrl",
                 Key.ctrl_r: "rctrl",
                 Key.alt_l: "lalt",
-                Key.alt_r: "ralt",
                 Key.shift_l: "lshift",
                 Key.shift_r: "rshift",
             }
+
+            # Add alt_r if it exists on this system
+            if hasattr(Key, 'alt_r'):
+                try:
+                    modifier_key_map[Key.alt_r] = "ralt"
+                except AttributeError:
+                    pass  # Key.alt_r not available on this system
 
             # Handle AltGr (Right Alt on non-US keyboards) - treat it as ralt
             alt_gr_key = None
@@ -533,6 +545,19 @@ class InputDetectorThread(QThread):
                 pass  # Key.alt_gr not available on this system
 
             if alt_gr_key and key == alt_gr_key:
+                # Check if AltGr/RALT was pressed alone (no other key pressed after it)
+                if self.active_modifiers["ralt"] and not self.other_key_pressed:
+                    # Emit the RALT key alone
+                    input_code = "kb1_ralt"
+                    result_dict["code"] = input_code
+                    result_dict["description"] = "Keyboard Right Alt"
+                    detected_event.set()
+                    logger.info(f"Detected AltGr/RALT key alone: {input_code}")
+
+                    # Set flag to stop all listeners
+                    self.stop_listeners_flag = True
+                    return False  # Stop listener
+
                 self.active_modifiers["ralt"] = False
                 return True  # Continue listening
 
