@@ -1,7 +1,7 @@
 # Changelog
 
-**Version:** 0.7.5
-**Date:** 2026-01-06
+**Version:** 0.8.0
+**Date:** In Development
 **For:** Users and developers - Version history and release notes
 
 All notable changes to SC Profile Editor will be documented in this file.
@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+
+## [0.8.0] - In Development
+
+Development branch for v0.8.0 release. Features and improvements will be added here as development progresses.
 
 ## [0.7.5] - 2026-01-06
 
