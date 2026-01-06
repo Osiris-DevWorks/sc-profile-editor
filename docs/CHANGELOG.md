@@ -1,7 +1,7 @@
 # Changelog
 
-**Version:** 0.7.4
-**Date:** 2025-12-27
+**Version:** 0.7.5
+**Date:** 2026-01-06
 **For:** Users and developers - Version history and release notes
 
 All notable changes to SC Profile Editor will be documented in this file.
@@ -16,6 +16,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+
+## [0.7.5] - 2026-01-06
+
+### Fixed
+- **Issue #15 - Device View Hat Switch, Axis, and Slider Labels** - Hat, axis, and slider fields now display action labels in Device View:
+  - Fixed field mapping structure for Thrustmaster T.16000 and TWCS Throttle templates
+  - Separated button, hat, and axis mappings into distinct sections (button_mapping, hat_mapping, axis_mapping)
+  - Fixed `map_pdf_field_to_input_code()` to check all three mapping types instead of only button_mapping
+  - Hat fields (up/down/left/right) now properly map to input codes and display labels
+  - Axis fields (x, y, z, rotz) now properly map to input codes and display labels
+  - Slider fields now properly map to input codes and display labels
+- **PDF Field Population Regex** - Fixed regex patterns in `populate_pdf()` to handle all field types:
+  - Updated axis regex to capture numbered axes (e.g., `js1_axis_x`, `js1_axis_y`, `js1_axis_rotz`)
+  - Updated slider regex to capture numbered sliders (e.g., `js1_slider1`, `js1_slider2`)
+  - Added optional `axis_` prefix handling for flexibility in future device templates
+- **Device View Tooltips and Clicks** - Hat, axis, and slider fields now fully functional:
+  - Tooltips appear when hovering over fields with multiple actions
+  - Fields are clickable and open the RemapDialog for editing
+  - All controls (buttons, hats, axes, sliders) now work consistently in Device View
 
 ## [0.7.4] - 2025-12-27
 

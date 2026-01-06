@@ -641,8 +641,10 @@ class QtPdfDeviceWidget(QWidget):
 
             for action_map_name, binding in device_bindings:
                 input_code = binding.input_code.strip()
+                logger.debug(f"Processing binding: {binding.action_name} -> {input_code}")
                 if input_code and input_code.startswith(f"js{js_num}_"):
                     grouped_bindings[input_code].append((action_map_name, binding))
+                    logger.debug(f"  Added to grouped_bindings for {input_code}")
 
             logger.debug(f"Grouped into {len(grouped_bindings)} input codes")
 
@@ -684,17 +686,46 @@ class QtPdfDeviceWidget(QWidget):
     def get_device_bindings(self) -> list:
         """Get all bindings for the current device"""
         if not self.current_device or not self.current_profile:
+            logger.warning("Missing current_device or current_profile")
             return []
 
         bindings = []
-        device_instance = self.current_device.instance
         device_type = self.current_device.device_type
+
+        # Get the correct JS index from device mapper (not the raw device instance)
+        if device_type == 'joystick':
+            if not self.device_mapper:
+                logger.warning("No device mapper available")
+                return []
+
+            device_product_name = self.current_device.product_name or ""
+            logger.debug(f"Looking for JS index for device: '{device_product_name}'")
+
+            js_index = self.device_mapper.get_js_index_for_device(device_product_name)
+            if not js_index:
+                logger.warning(f"No JS index found for device: {device_product_name}")
+                logger.debug(f"  Device instance: {self.current_device.instance}")
+                logger.debug(f"  Available mappings: {self.device_mapper.device_to_joystick}")
+                return []
+
+            js_num = js_index.replace("js", "")
+            js_prefix = f"js{js_num}_"
+            logger.debug(f"Device '{device_product_name}' mapped to JS{js_num}, looking for prefix '{js_prefix}'")
+        else:
+            logger.debug(f"Device is not joystick, type: {device_type}")
+            return []
+
+        # Count total bindings in profile for debugging
+        total_bindings = sum(len(am.actions) for am in self.current_profile.action_maps)
+        logger.debug(f"Profile has {total_bindings} total bindings across {len(self.current_profile.action_maps)} action maps")
 
         for action_map in self.current_profile.action_maps:
             for binding in action_map.actions:
-                if device_type == 'joystick' and binding.input_code.startswith(f'js{device_instance}_'):
+                if binding.input_code.startswith(js_prefix):
                     bindings.append((action_map.name, binding))
+                    logger.debug(f"  Found binding in {action_map.name}: {binding.action_name} -> {binding.input_code}")
 
+        logger.debug(f"Found {len(bindings)} bindings for device '{device_product_name}' (JS{js_num})")
         return bindings
 
     def _truncate_labels(self, labels: list, max_width: int = 30) -> str:
@@ -839,25 +870,32 @@ class QtPdfDeviceWidget(QWidget):
         js_num = js_index.replace("js", "")
 
         if field_mapping:
-            # Has custom mapping
+            # Has custom mapping - check all three mapping types
             button_mapping = field_mapping.get('button_mapping', {})
+            hat_mapping = field_mapping.get('hat_mapping', {})
+            axis_mapping = field_mapping.get('axis_mapping', {})
 
-            # Try to find button number using the full field name first (for dual-device fields with _1/_2 suffix)
-            button_num = button_mapping.get(pdf_field_name)
+            # Try to find in each mapping type (with and without _1/_2 suffix)
+            for mapping, mapping_type in [(button_mapping, 'button'), (hat_mapping, 'hat'), (axis_mapping, 'axis')]:
+                # Try exact match first
+                mapped_value = mapping.get(pdf_field_name)
 
-            if button_num is None:
-                # If not found, try removing _1 or _2 suffix for backward compatibility
-                base_field_name = pdf_field_name
-                if pdf_field_name.endswith('_1') or pdf_field_name.endswith('_2'):
+                if mapped_value is None and (pdf_field_name.endswith('_1') or pdf_field_name.endswith('_2')):
+                    # Try without _1/_2 suffix for backward compatibility
                     base_field_name = pdf_field_name[:-2]
-                button_num = button_mapping.get(base_field_name)
+                    mapped_value = mapping.get(base_field_name)
 
-            if button_num is not None:
-                # Handle both string (display) and integer (mapping) button numbers
-                # Only use it if it's an integer (the actual button number)
-                if isinstance(button_num, int):
-                    return f"js{js_num}_button{button_num}"
-                # Skip string values like "[3]" as they're for display only
+                if mapped_value is not None:
+                    # Handle both integer and string identifiers
+                    if isinstance(mapped_value, int):
+                        # Integer: button number (e.g., 1 -> button1)
+                        return f"js{js_num}_button{mapped_value}"
+                    elif isinstance(mapped_value, str):
+                        # String: direct identifier (e.g., "hat1_up" -> hat1_up)
+                        return f"js{js_num}_{mapped_value}"
+
+            # If not found in any mapping, return None
+            return None
         else:
             # Direct mapping - PDF field should be input code
             return pdf_field_name

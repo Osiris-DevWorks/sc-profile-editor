@@ -14,15 +14,19 @@
     "button_11": 11,
     "button_12": 12,
     "button_13": 13,
-    "button_14": 14,
-    "hat_1_up": "hat_1_up",
-    "hat_1_right": "hat_1_right",
-    "hat_1_down": "hat_1_down",
-    "hat_1_left": "hat_1_left",
-    "axis_x": "axis_x",
-    "axis_y": "axis_y",
-    "axis_z": "axis_z",
-    "axis_rotz": "axis_rotz",
-    "slider_1": "slider_1"
+    "button_14": 14
+  },
+  "hat_mapping": {
+    "hat_1_up": "hat1_up",
+    "hat_1_right": "hat1_right",
+    "hat_1_down": "hat1_down",
+    "hat_1_left": "hat1_left"
+  },
+  "axis_mapping": {
+    "axis_x": "x",
+    "axis_y": "y",
+    "axis_z": "z",
+    "axis_rotz": "rotz",
+    "slider_1": "slider1"
   }
 }

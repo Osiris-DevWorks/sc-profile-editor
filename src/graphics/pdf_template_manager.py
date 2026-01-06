@@ -300,10 +300,14 @@ class PDFTemplateManager:
                                 # Also try without suffix
                                 pdf_field_values[pdf_name] = value
 
-                    # Handle axis inputs (e.g., "js1_x", "js1_y", "js1_rotz")
-                    axis_match = re.match(r'js\d+_(x|y|z|rotx|roty|rotz|slider|throttle|rudder)', input_code, re.IGNORECASE)
+                    # Handle axis inputs (e.g., "js1_x", "js1_y", "js1_rotz", "js1_axis_x", "js1_axis_rotz", "js1_slider1")
+                    # The regex handles optional "axis_" prefix for axes
+                    axis_match = re.match(r'js\d+_(?:axis_)?(x|y|z|rotx|roty|rotz|slider|throttle|rudder)(\d+)?', input_code, re.IGNORECASE)
                     if axis_match:
                         axis_name = axis_match.group(1).lower()
+                        # If there's a number suffix, include it in the axis_name
+                        if axis_match.group(2):
+                            axis_name += axis_match.group(2)
 
                         # Find PDF field name for this axis
                         for pdf_name, mapped_axis in axis_mapping.items():
