@@ -435,6 +435,7 @@ class MainWindow(QMainWindow):
             <ul>
                 <li><strong>GurningBoose</strong></li>
                 <li><strong>Hawkwar</strong></li>
+                <li><strong>iNgeon</strong></li>
                 <li><strong>Nazgul-Five 'Maverick'</strong></li>
                 <li><strong>Tichro 'BreakPoint'</strong></li>
                 <li><strong>UntoldForce</strong></li>
