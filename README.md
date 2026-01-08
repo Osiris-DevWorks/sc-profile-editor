@@ -591,28 +591,6 @@ For development setup, building from source, and contributing:
 
 ---
 
-## Version Information
-
-This guide is for Star Citizen Profile Editor v0.6.1
-
-**Major Features in v0.6.1:**
-- **Device Configuration Tab** - Manage connected devices and device-to-joystick mappings
-- **Device hot-swap detection** - Automatically detect newly connected devices
-- **Automatic input detection** - Detect joystick, keyboard, and mouse inputs with one click
-- **Keyboard modifier support** - Full Ctrl, Alt, Shift support with left/right distinction
-- **Table-based input editing** - Edit inputs directly from Controls Table with Edit button
-- **Interactive PDF-based device templates** (20+ devices supported)
-- **Expanded VKB device support** (Gladiator, Gunfighter, STECS, THQ variants)
-- **Four-tab interface:** Controls Table, Device View, Config, About
-- **Custom label override system** with three-tier priority
-- **Show Detailed view toggle** (3 or 6 columns)
-- **Export to CSV, PDF, Word, and device graphics** (PNG/PDF)
-- **Filter by device, action map, search text**
-- **Automatic label mapping** to device buttons
-- **Version display** in window title and exports
-
----
-
 ## Support the Project
 
 SC Profile Editor is a free, open-source project created to help Star Citizen players manage their control profiles. If you find it useful and would like to support the development, here are ways you can help:
