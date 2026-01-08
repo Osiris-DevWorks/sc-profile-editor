@@ -427,6 +427,12 @@ class MainWindow(QMainWindow):
                 <br/><a href="https://discord.gg/BNzRegKZ7k">Join the Osiris DevWorks Discord</a>
             </p>
 
+            <h2>Other Osiris DevWorks Tools</h2>
+            <p>Check out other tools created by Osiris DevWorks:</p>
+            <ul>
+                <li><a href="https://github.com/Osiris-RK/extended-afk"><strong>Extended AFK</strong></a> - AFK timer tool for Star Citizen</li>
+            </ul>
+
             <h2>Acknowledgements</h2>
             <p>
                 Special thanks to the following individuals for their valuable assistance
