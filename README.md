@@ -54,7 +54,7 @@ Your profile will load into the **Controls Table** tab, showing all your current
 ### Understanding the Four Tabs
 
 - **Controls Table** - View and edit all your control bindings in a searchable, filterable table
-- **Device View** - Visual representations of your controllers with labeled buttons (for 20+ supported devices)
+- **Device View** - Visual representations of your controllers with labeled buttons
 - **Config** - Manage connected devices and configure device-to-joystick mappings
 - **About** - Project information and acknowledgements
 
@@ -64,7 +64,7 @@ Your profile will load into the **Controls Table** tab, showing all your current
 
 ### Loading a Preset Profile to Get Started
 
-Start with a pre-configured profile for your HOTAS setup, then customize it:
+Start with a pre-configured profile for your controller setup, then customize it:
 
 1. Click the **"Load Preset Profile"** button (purple button in the top menu)
 2. Select a preset that matches your hardware (T.16000M, Warthog, VKB Gladiator, etc.)
@@ -72,7 +72,7 @@ Start with a pre-configured profile for your HOTAS setup, then customize it:
 4. Customize the bindings for your preferences
 5. Save your customized profile
 
-**Tip:** After loading a preset, customize the labels (especially for lesser-used actions) to make your graphics more readable!
+**Tip:** After loading a preset, customize the labels for better readability.
 
 ### Configuring Your Devices
 
@@ -86,15 +86,6 @@ If you have multiple joysticks, use the **Config** tab to ensure consistent mapp
 6. (Optional) Click **Auto-Populate** to automatically assign connected joysticks
 
 **Why this matters:** When you unplug and replug joysticks in different order, Star Citizen assigns them different slots. Persistent mappings ensure your profile bindings stay consistent.
-
-### Enabling Default Bindings (Optional)
-
-To automatically populate unmapped actions with Star Citizen's default bindings:
-
-1. Go to the **Config** tab
-2. Check **"Merge default bindings when loading profiles"**
-3. When you load profiles, unmapped actions will be filled with defaults
-4. Your custom bindings always override - no conflicts!
 
 ### Viewing Your Bindings
 
@@ -135,9 +126,9 @@ The **Controls Table** offers two viewing modes:
 3. Type to search (e.g., "button5", "ctrl", "axis_x")
 4. Select your input from the list
 
-### Customizing Labels for Better Graphics
+### Customizing Labels for Better Readability
 
-One of the most powerful features is creating custom, shorter labels for actions to make graphics more readable:
+You can create and display shorter labels for actions to make the graphical view more readable:
 
 1. In the **Controls Table**, find the action you want to rename
 2. **Double-click** the cell in the "Label" or "Action (Override)" column
@@ -163,8 +154,6 @@ The **Device View** tab shows interactive visual representations of your control
 2. Select your device from the dropdown (VKB Gladiator, T.16000M, etc.)
 3. The PDF will display with your labels automatically filled in
 4. Labels automatically update when you edit them in the Control Table!
-
-**Available templates:** 20+ devices including VKB (Gladiator, Gunfighter, STECS), VPC MongoosT-50CM3, and Thrustmaster devices
 
 **To export the diagram as an image:**
 1. Switch to **Device View** tab
@@ -193,14 +182,16 @@ All exports use the **"Show Detailed"** setting - uncheck it for simplified expo
 
 ### Filtering and Searching Bindings
 
-The **Controls Table** has multiple ways to find what you're looking for:
+The **Controls Table** has multiple ways to find and organize what you're looking for:
 
 - **Search Box:** Type any text (action name, device, input label, etc.)
   - Example: "fire" → shows all fire-related actions
 - **Device Filter:** Show only bindings for a specific device
 - **Action Map Filter:** Show only specific categories (Spaceship Movement, Weapons, etc.)
+- **Show Detailed:** Toggle between simplified (3 columns) and complete (6 columns) view
+- **Sorting:** Click any column header to sort by that column (click again to reverse order)
 - **Hide Unmapped Keys:** Hide inputs without bindings
-- **Clear Filters:** Reset all filters with one click
+- **Clear Filters:** Reset all filters and view options with one click
 
 ---
 
