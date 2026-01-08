@@ -366,91 +366,24 @@ class MainWindow(QMainWindow):
         about_browser = QTextBrowser()
         about_browser.setOpenExternalLinks(True)
 
-        about_html = f"""
-        <html>
-        <head>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    padding: 20px;
-                    line-height: 1.6;
-                }}
-                h1 {{
-                    color: #2c3e50;
-                    border-bottom: 3px solid #3498db;
-                    padding-bottom: 10px;
-                }}
-                h2 {{
-                    color: #34495e;
-                    border-bottom: 2px solid #95a5a6;
-                    padding-bottom: 5px;
-                    margin-top: 30px;
-                }}
-                h3 {{
-                    color: #555;
-                    margin-top: 20px;
-                }}
-                p {{
-                    margin: 10px 0;
-                }}
-                ul {{
-                    margin-left: 20px;
-                }}
-                li {{
-                    margin: 5px 0;
-                }}
-                .placeholder {{
-                    color: #888;
-                    font-style: italic;
-                }}
-            </style>
-        </head>
-        <body>
-            <h1>Star Citizen Profile Editor v{self.version}</h1>
+        try:
+            # Load ABOUT.md file
+            about_path = get_resource_path("ABOUT.md")
+            with open(about_path, 'r', encoding='utf-8') as f:
+                about_content = f.read()
 
-            <h2>About This Project</h2>
-            <p>
-                <strong>SC Profile Editor</strong> is a comprehensive tool for Star Citizen players to import, edit, customize, and export their control profiles in human-readable formats. Whether you're managing a complex HOTAS setup, creating reference cards, or sharing configurations with friends, SC Profile Editor makes it easy.
-            </p>
-            <p>
-                SC Profile Editor is developed by <strong>Osiris DevWorks</strong>, a one-man development studio dedicated to making tools that support gamers.
-            </p>
+            # Add version to the first heading
+            about_content = about_content.replace(
+                "# Star Citizen Profile Editor",
+                f"# Star Citizen Profile Editor v{self.version}"
+            )
 
-            <h3>The Osiris DevWorks Promise</h3>
-            <p>
-                All Osiris DevWorks tools will be either <strong>completely free</strong> or have a <strong>free tier</strong>. We believe in creating value for the gaming community without paywalls or mandatory subscriptions.
-            </p>
-
-            <h3>Join the Community</h3>
-            <p>
-                For support, feedback, feature requests, and to connect with other players:
-                <br/><a href="https://discord.gg/BNzRegKZ7k">Join the Osiris DevWorks Discord</a>
-            </p>
-
-            <h2>Other Osiris DevWorks Tools</h2>
-            <p>Check out other tools created by Osiris DevWorks:</p>
-            <ul>
-                <li><a href="https://github.com/Osiris-RK/extended-afk"><strong>Extended AFK</strong></a> - AFK timer tool for Star Citizen</li>
-            </ul>
-
-            <h2>Acknowledgements</h2>
-            <p>
-                Special thanks to the following individuals for their valuable assistance
-                and contributions to this project:
-            </p>
-            <ul>
-                <li><strong>GurningBoose</strong></li>
-                <li><strong>Hawkwar</strong></li>
-                <li><strong>iNgeon</strong></li>
-                <li><strong>Nazgul-Five 'Maverick'</strong></li>
-                <li><strong>Tichro 'BreakPoint'</strong></li>
-                <li><strong>UntoldForce</strong></li>
-            </ul>
-        </body>
-        </html>
-        """
-
-        about_browser.setHtml(about_html)
+            # Convert markdown to HTML
+            about_html = self.markdown_to_html(about_content)
+            about_browser.setHtml(about_html)
+        except Exception as e:
+            logger.error(f"Error loading ABOUT.md: {e}", exc_info=True)
+            about_browser.setHtml("<h1>About</h1><p>Unable to load about information.</p>")
         about_layout.addWidget(about_browser)
 
         self.tab_widget.addTab(about_tab, "About")
