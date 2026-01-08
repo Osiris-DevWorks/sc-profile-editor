@@ -409,8 +409,22 @@ class MainWindow(QMainWindow):
             <h1>Star Citizen Profile Editor v{self.version}</h1>
 
             <h2>About This Project</h2>
-            <p class="placeholder">
-                [This section will contain information about the project and Osiris DevWorks]
+            <p>
+                <strong>SC Profile Editor</strong> is a comprehensive tool for Star Citizen players to import, edit, customize, and export their control profiles in human-readable formats. Whether you're managing a complex HOTAS setup, creating reference cards, or sharing configurations with friends, SC Profile Editor makes it easy.
+            </p>
+            <p>
+                SC Profile Editor is developed by <strong>Osiris DevWorks</strong>, a one-man development studio dedicated to making tools that support gamers.
+            </p>
+
+            <h3>The Osiris DevWorks Promise</h3>
+            <p>
+                All Osiris DevWorks tools will be either <strong>completely free</strong> or have a <strong>free tier</strong>. We believe in creating value for the gaming community without paywalls or mandatory subscriptions.
+            </p>
+
+            <h3>Join the Community</h3>
+            <p>
+                For support, feedback, feature requests, and to connect with other players:
+                <br/><a href="https://discord.gg/BNzRegKZ7k">Join the Osiris DevWorks Discord</a>
             </p>
 
             <h2>Acknowledgements</h2>
