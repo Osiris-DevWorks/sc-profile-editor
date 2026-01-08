@@ -1,7 +1,7 @@
 # SC Profile Editor - Project Context
 
-**Version:** 0.7.1
-**Date:** 2025-12-23
+**Version:** 0.7.5
+**Date:** 2026-01-06
 **For:** AI assistants - Comprehensive project overview and development guidelines
 
 This document provides context for AI assistants working on this project.
@@ -12,10 +12,11 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 
 ## Current Status
 
-**Version:** 0.7.1 (released 2025-12-23)
-**Current Branch:** main (stable)
-**Status:** v0.7.1 released with system tray integration and Issue #15 feedback fixes
-**Previous Release:** 0.7.0 (completed 2025-12-12)
+**Version:** 0.7.5 (released 2026-01-06)
+**Current Branch:** v0.8.0 (development)
+**Status:** v0.7.5 released with Device View label fixes; v0.8.0 development branch started
+**Latest Release:** 0.7.5 (2026-01-06)
+**Previous Release:** 0.7.4 (2025-12-27)
 **Platform:** Windows (PyInstaller executable)
 
 ## Implemented Features
@@ -292,6 +293,19 @@ cmd //c scripts\build\build_all.bat
 13. Test button mapping and form field population in Device View
 
 ### Recent Important Changes
+
+#### v0.7.5 (Released 2026-01-06)
+- **Device View Hat/Axis/Slider Labels**: Fixed hat switch, axis, and slider field labels not displaying in Device View
+- **Field Mapping Restructuring**: Separated button, hat, and axis mappings into distinct sections for Thrustmaster templates
+- **Field Mapping Lookup Enhancement**: Updated `map_pdf_field_to_input_code()` to check all three mapping types
+- **PDF Rendering Regex Improvements**: Enhanced regex patterns to capture numbered axes (axis_x, axis_y) and sliders
+- **Virpil Template Improvements**: Enlarged callout boxes for better readability in device templates
+
+#### v0.7.4 (Released 2025-12-27)
+- **Complete Action Structure for All Profiles**: Master template overlay system using blank.xml as base
+- **All Official Star Citizen Preset Profiles**: Bundled with application for quick-start configurations
+- **Profile Loading System Overhaul**: Replaced merge defaults with runtime overlay architecture
+- **Visual Template Matching**: Enhanced device matching with product ID as primary system
 
 #### v0.7.1 (Released 2025-12-23)
 - **System Tray Integration**: Added minimize-to-tray functionality with user-configurable option in Config tab
