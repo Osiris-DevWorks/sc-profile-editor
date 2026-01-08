@@ -188,6 +188,9 @@ The **Controls Table** has multiple ways to find and organize what you're lookin
   - Example: "fire" → shows all fire-related actions
 - **Device Filter:** Show only bindings for a specific device
 - **Action Map Filter:** Show only specific categories (Spaceship Movement, Weapons, etc.)
+- **Key Filter:** Show only bindings for a specific button, key, or axis
+  - Use the dropdown to manually select a key
+  - **Or use "Detect Key"** button to automatically filter by pressing a button/key (no need to remember names!)
 - **Show Detailed:** Toggle between simplified (3 columns) and complete (6 columns) view
 - **Sorting:** Click any column header to sort by that column (click again to reverse order)
 - **Hide Unmapped Keys:** Hide inputs without bindings
