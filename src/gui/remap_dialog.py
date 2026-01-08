@@ -159,13 +159,22 @@ class ActionAssignmentWidget(QWidget):
         self.activation_mode_combo.addItem("press", "press")
         self.activation_mode_combo.addItem("double_tap", "double_tap")
 
-        # Set current activation mode (default to "press" if not set)
-        current_activation = self.binding.activation_mode or "press"
-        index = self.activation_mode_combo.findData(current_activation)
-        if index >= 0:
-            self.activation_mode_combo.setCurrentIndex(index)
+        # Check if this is an analog axis - they don't support activation modes
+        is_analog = InputValidator.is_analog_axis(self.binding.input_code)
+
+        if is_analog:
+            # Disable activation mode for analog axes
+            self.activation_mode_combo.setEnabled(False)
+            self.activation_mode_combo.addItem("(Analog axis - uses continuous input)", None)
+            self.activation_mode_combo.setCurrentIndex(2)
         else:
-            self.activation_mode_combo.setCurrentIndex(0)  # Default to "press"
+            # Set current activation mode (default to "press" if not set)
+            current_activation = self.binding.activation_mode or "press"
+            index = self.activation_mode_combo.findData(current_activation)
+            if index >= 0:
+                self.activation_mode_combo.setCurrentIndex(index)
+            else:
+                self.activation_mode_combo.setCurrentIndex(0)  # Default to "press"
 
         label_layout.addRow("Activation Mode:", self.activation_mode_combo)
 
@@ -750,8 +759,14 @@ class RemapDialog(QDialog):
             else:
                 binding.custom_label = None
 
-            # Set activation mode (default to "press" if empty)
-            binding.activation_mode = activation_mode if activation_mode else "press"
+            # Set activation mode
+            # Analog axes should NOT have activationMode (they use continuous input)
+            # Only buttons, keys, and hat switches should have activationMode
+            if InputValidator.is_analog_axis(binding.input_code):
+                binding.activation_mode = None
+                logger.debug(f"Analog axis detected: {binding.input_code}, setting activation_mode to None")
+            else:
+                binding.activation_mode = activation_mode if activation_mode else "press"
 
             # Update input code if it has changed
             # For single_action_mode (editing from table), apply the current input code to the binding
