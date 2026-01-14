@@ -282,7 +282,7 @@ class QtPdfDeviceWidget(QWidget):
 
         # Toggle to show all templates (not just connected devices)
         self.show_all_checkbox = QCheckBox("Show all templates")
-        self.show_all_checkbox.setToolTip("When unchecked, only shows templates for connected devices")
+        self.show_all_checkbox.setToolTip("When checked, shows all available templates for each device.\nUseful for applying a physical stick template to a virtual device (e.g., vjoy).")
         self.show_all_checkbox.stateChanged.connect(self.on_show_all_toggled)
         selection_layout.addWidget(self.show_all_checkbox)
 
@@ -406,7 +406,7 @@ class QtPdfDeviceWidget(QWidget):
 
                     # 1. Add ALL matching base stick templates (user can choose)
                     base_stick_name = get_base_stick_name(raw_device_name)
-                    matching_templates = self.find_all_matching_templates(base_stick_name)
+                    matching_templates = self.find_all_matching_templates(base_stick_name, show_all=self.show_all_templates)
 
                     if matching_templates:
                         for template in matching_templates:
@@ -431,7 +431,7 @@ class QtPdfDeviceWidget(QWidget):
                         self.device_combo.addItem(display_text, (device, "VKB SEM"))
                 else:
                     # Regular device (no SEM) - show ALL matching templates
-                    matching_templates = self.find_all_matching_templates(raw_device_name)
+                    matching_templates = self.find_all_matching_templates(raw_device_name, show_all=self.show_all_templates)
 
                     if matching_templates:
                         for template in matching_templates:
@@ -453,16 +453,22 @@ class QtPdfDeviceWidget(QWidget):
             total_count = sum(1 for d in profile.devices if d.device_type == 'joystick')
             self.status_label.setText(f"Found {self.device_combo.count()} device option(s) ({connected_count}/{total_count} connected)")
 
-    def find_all_matching_templates(self, device_name: str) -> list:
+    def find_all_matching_templates(self, device_name: str, show_all: bool = False) -> list:
         """
         Find all templates that match a device name
 
         Args:
             device_name: Device product name
+            show_all: If True, return all available templates regardless of device name match
 
         Returns:
             List of matching PDFDeviceTemplate objects
         """
+        # If show_all is True, return all templates from the registry
+        if show_all:
+            logger.debug(f"Returning all {len(self.pdf_manager.templates)} templates (show_all=True)")
+            return list(self.pdf_manager.templates)
+
         if not device_name:
             return []
 
