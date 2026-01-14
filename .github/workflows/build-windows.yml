@@ -1,0 +1,53 @@
+name: Build Windows Executable
+
+on:
+  push:
+    branches:
+      - claude/fix-device-detection-0mqsc
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Build executable
+      run: python scripts/build/build_exe.py
+
+    - name: Get version
+      id: version
+      shell: bash
+      run: |
+        VERSION=$(cat VERSION.TXT)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Upload executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: SCProfileEditor-v${{ steps.version.outputs.version }}-Windows
+        path: dist/SCProfileEditor.exe
+        retention-days: 30
+
+    - name: Upload build info
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-info
+        path: |
+          VERSION.TXT
+          build/SCProfileEditor/warn-SCProfileEditor.txt
+        retention-days: 7
+        if-no-files-found: ignore
