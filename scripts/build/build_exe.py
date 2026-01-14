@@ -71,11 +71,45 @@ def build_executable():
         f"--add-data=visual-templates{sep}visual-templates",
         f"--add-data=example-profiles{sep}example-profiles",
 
-        # Hidden imports (sometimes PyInstaller misses these)
+        # Hidden imports for PyQt6 modules
         "--hidden-import=PyQt6.QtPdf",
         "--hidden-import=PyQt6.QtPdfWidgets",
         "--hidden-import=pygame",
         "--hidden-import=pynput",
+
+        # Collect all src submodules (fixes ModuleNotFoundError)
+        "--collect-submodules=src",
+
+        # Explicitly include src packages to ensure they're found
+        "--hidden-import=src.parser",
+        "--hidden-import=src.parser.xml_parser",
+        "--hidden-import=src.parser.label_generator",
+        "--hidden-import=src.models",
+        "--hidden-import=src.models.profile_model",
+        "--hidden-import=src.utils",
+        "--hidden-import=src.utils.settings",
+        "--hidden-import=src.utils.version",
+        "--hidden-import=src.utils.device_splitter",
+        "--hidden-import=src.utils.device_joystick_mapper",
+        "--hidden-import=src.utils.label_overrides",
+        "--hidden-import=src.utils.input_detector",
+        "--hidden-import=src.utils.input_validator",
+        "--hidden-import=src.utils.single_instance",
+        "--hidden-import=src.gui",
+        "--hidden-import=src.gui.main_window",
+        "--hidden-import=src.gui.qtpdf_device_widget",
+        "--hidden-import=src.gui.config_tab",
+        "--hidden-import=src.gui.control_editor",
+        "--hidden-import=src.gui.preview_widget",
+        "--hidden-import=src.gui.remap_dialog",
+        "--hidden-import=src.exporters",
+        "--hidden-import=src.exporters.csv_exporter",
+        "--hidden-import=src.exporters.pdf_exporter",
+        "--hidden-import=src.exporters.word_exporter",
+        "--hidden-import=src.exporters.graphic_exporter",
+        "--hidden-import=src.graphics",
+        "--hidden-import=src.graphics.pdf_template_manager",
+        "--hidden-import=src.graphics.template_manager",
 
         # Entry point
         "src/main.py"
