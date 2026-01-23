@@ -18,7 +18,7 @@ For support, feedback, feature requests, and to connect with other players:
 ## Other Osiris DevWorks Tools
 
 Check out other tools created by Osiris DevWorks:
-- [Extended AFK](https://github.com/Osiris-RK/extended-afk) - AFK timer tool for Star Citizen
+- [Extended AFK](https://github.com/Osiris-RK/extended-afk) - AFK tool to prevent idle timeouts by simulating key presses at randomized intervals
 
 ## Acknowledgements
 
