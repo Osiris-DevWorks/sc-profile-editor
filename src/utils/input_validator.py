@@ -299,6 +299,24 @@ class InputValidator:
         return mode in cls.ACTIVATION_MODES
 
     @classmethod
+    def is_analog_axis(cls, input_code: str) -> bool:
+        """
+        Check if an input code represents an analog axis (not a button or key).
+        Analog axes should not have activationMode set - they use continuous input.
+
+        Args:
+            input_code: Input code to check (e.g., "js1_x", "js1_rotz", "js1_slider1")
+
+        Returns:
+            True if the input is an analog axis, False otherwise
+        """
+        if not input_code:
+            return False
+
+        # Check if it matches the axis pattern (js1_x, js1_y, js1_rotz, js1_slider1, etc.)
+        return bool(cls.AXIS_PATTERN.match(input_code.strip()))
+
+    @classmethod
     def get_available_axes(cls) -> List[str]:
         """Get list of available axis names"""
         return ["x", "y", "z", "rotx", "roty", "rotz", "slider1", "slider2"]

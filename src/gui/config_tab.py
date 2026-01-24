@@ -6,7 +6,8 @@ import sys
 import os
 import logging
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLabel, QPushButton,
-                              QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLineEdit, QFileDialog, QCheckBox)
+                              QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLineEdit, QFileDialog, QCheckBox,
+                              QListWidget, QListWidgetItem)
 from PyQt6.QtCore import Qt, pyqtSignal
 
 # Add parent directory to path
@@ -177,7 +178,53 @@ class ConfigTab(QWidget):
         tray_layout.addWidget(self.minimize_to_tray_checkbox)
 
         layout.addWidget(tray_group)
+
+        # === INPUT FILTERING SECTION ===
+        filter_group = QGroupBox("Input Filtering")
+        filter_layout = QVBoxLayout()
+        filter_group.setLayout(filter_layout)
+
+        # Instructions
+        filter_instructions = QLabel(
+            "Filter inputs that constantly trigger (e.g., VKB STECS mode selector).\n"
+            "These inputs will be ignored during input detection."
+        )
+        filter_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
+        filter_instructions.setWordWrap(True)
+        filter_layout.addWidget(filter_instructions)
+        filter_layout.addSpacing(10)
+
+        # Current filters list
+        filter_list_label = QLabel("Current Filters:")
+        filter_layout.addWidget(filter_list_label)
+
+        self.filter_list_widget = QListWidget()
+        self.filter_list_widget.setMaximumHeight(120)
+        filter_layout.addWidget(self.filter_list_widget)
+
+        # Buttons
+        filter_button_layout = QHBoxLayout()
+
+        self.add_filter_btn = QPushButton("Add Input...")
+        self.add_filter_btn.clicked.connect(self.on_add_filter_clicked)
+        filter_button_layout.addWidget(self.add_filter_btn)
+
+        self.remove_filter_btn = QPushButton("Remove Selected")
+        self.remove_filter_btn.clicked.connect(self.on_remove_filter_clicked)
+        filter_button_layout.addWidget(self.remove_filter_btn)
+
+        self.clear_filters_btn = QPushButton("Clear All")
+        self.clear_filters_btn.clicked.connect(self.on_clear_filters_clicked)
+        filter_button_layout.addWidget(self.clear_filters_btn)
+
+        filter_button_layout.addStretch()
+        filter_layout.addLayout(filter_button_layout)
+
+        layout.addWidget(filter_group)
         layout.addStretch()
+
+        # Load current filters into the list
+        self.load_ignored_inputs()
 
     def refresh_devices(self):
         """Refresh the list of connected devices"""
@@ -406,3 +453,140 @@ class ConfigTab(QWidget):
             logger.info(f"Minimize to tray: {status}")
         except Exception as e:
             logger.error(f"Error setting minimize to tray: {e}", exc_info=True)
+
+    def load_ignored_inputs(self):
+        """Load and display current ignored inputs"""
+        try:
+            self.filter_list_widget.clear()
+            ignored_inputs = self.settings.get_ignored_inputs()
+
+            for input_code in ignored_inputs:
+                # Create a more readable description
+                display_text = self._format_input_code(input_code)
+                item = QListWidgetItem(display_text)
+                item.setData(Qt.ItemDataRole.UserRole, input_code)  # Store actual code
+                self.filter_list_widget.addItem(item)
+
+            if ignored_inputs:
+                logger.debug(f"Loaded {len(ignored_inputs)} ignored inputs")
+            else:
+                # Add placeholder text
+                placeholder = QListWidgetItem("(No filters configured)")
+                placeholder.setFlags(placeholder.flags() & ~Qt.ItemFlag.ItemIsSelectable)
+                self.filter_list_widget.addItem(placeholder)
+
+        except Exception as e:
+            logger.error(f"Error loading ignored inputs: {e}", exc_info=True)
+
+    def _format_input_code(self, input_code: str) -> str:
+        """
+        Format input code to human-readable description
+
+        Args:
+            input_code: Code like "js1_button32" or "js2_hat3_up"
+
+        Returns:
+            Formatted description
+        """
+        # Parse the input code
+        parts = input_code.split('_')
+        if len(parts) < 2:
+            return input_code
+
+        js_num = parts[0]  # js1, js2, etc.
+
+        if parts[1].startswith('button'):
+            button_num = parts[1].replace('button', '')
+            return f"{js_num} Button {button_num}"
+        elif parts[1].startswith('hat'):
+            hat_num = parts[1].replace('hat', '')
+            direction = parts[2] if len(parts) > 2 else '?'
+            return f"{js_num} Hat {hat_num} {direction.upper()}"
+        elif len(parts) >= 2:
+            axis_name = parts[1]
+            direction = '+' if len(parts) == 2 else parts[2]
+            return f"{js_num} {axis_name.upper()} ({direction})"
+
+        return input_code
+
+    def on_add_filter_clicked(self):
+        """Handle Add Input button click"""
+        try:
+            from src.gui.input_filter_dialog import InputFilterDialog
+
+            dialog = InputFilterDialog(self)
+            dialog.input_added.connect(self._on_filter_added)
+            dialog.exec()
+
+        except Exception as e:
+            logger.error(f"Error opening input filter dialog: {e}", exc_info=True)
+            QMessageBox.warning(self, "Error", f"Failed to open filter dialog:\n{e}")
+
+    def _on_filter_added(self, input_code: str, input_description: str):
+        """
+        Handle signal when a new filter is added from the dialog
+
+        Args:
+            input_code: Code of the input to filter
+            input_description: Description of the input
+        """
+        try:
+            self.load_ignored_inputs()
+            logger.info(f"Filter added and UI updated: {input_code}")
+        except Exception as e:
+            logger.error(f"Error updating filter list: {e}", exc_info=True)
+
+    def on_remove_filter_clicked(self):
+        """Handle Remove Selected button click"""
+        try:
+            selected_item = self.filter_list_widget.currentItem()
+            if not selected_item:
+                QMessageBox.warning(self, "No Selection", "Please select a filter to remove.")
+                return
+
+            input_code = selected_item.data(Qt.ItemDataRole.UserRole)
+            if not input_code:
+                return
+
+            # Remove from settings
+            self.settings.remove_ignored_input(input_code)
+            logger.info(f"Removed input from filter list: {input_code}")
+
+            # Reload list
+            self.load_ignored_inputs()
+            QMessageBox.information(self, "Removed", f"Filter removed: {self._format_input_code(input_code)}")
+
+        except Exception as e:
+            logger.error(f"Error removing filter: {e}", exc_info=True)
+            QMessageBox.warning(self, "Error", f"Failed to remove filter:\n{e}")
+
+    def on_clear_filters_clicked(self):
+        """Handle Clear All button click"""
+        try:
+            ignored_inputs = self.settings.get_ignored_inputs()
+            if not ignored_inputs:
+                QMessageBox.information(self, "No Filters", "There are no filters to clear.")
+                return
+
+            # Confirmation dialog
+            reply = QMessageBox.question(
+                self,
+                "Clear All Filters",
+                f"Are you sure you want to remove all {len(ignored_inputs)} filter(s)?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+
+            if reply != QMessageBox.StandardButton.Yes:
+                return
+
+            # Clear all filters
+            self.settings.clear_ignored_inputs()
+            logger.info("Cleared all input filters")
+
+            # Reload list
+            self.load_ignored_inputs()
+            QMessageBox.information(self, "Cleared", "All filters have been removed.")
+
+        except Exception as e:
+            logger.error(f"Error clearing filters: {e}", exc_info=True)
+            QMessageBox.warning(self, "Error", f"Failed to clear filters:\n{e}")

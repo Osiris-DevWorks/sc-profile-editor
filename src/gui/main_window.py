@@ -366,70 +366,24 @@ class MainWindow(QMainWindow):
         about_browser = QTextBrowser()
         about_browser.setOpenExternalLinks(True)
 
-        about_html = f"""
-        <html>
-        <head>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    padding: 20px;
-                    line-height: 1.6;
-                }}
-                h1 {{
-                    color: #2c3e50;
-                    border-bottom: 3px solid #3498db;
-                    padding-bottom: 10px;
-                }}
-                h2 {{
-                    color: #34495e;
-                    border-bottom: 2px solid #95a5a6;
-                    padding-bottom: 5px;
-                    margin-top: 30px;
-                }}
-                h3 {{
-                    color: #555;
-                    margin-top: 20px;
-                }}
-                p {{
-                    margin: 10px 0;
-                }}
-                ul {{
-                    margin-left: 20px;
-                }}
-                li {{
-                    margin: 5px 0;
-                }}
-                .placeholder {{
-                    color: #888;
-                    font-style: italic;
-                }}
-            </style>
-        </head>
-        <body>
-            <h1>Star Citizen Profile Editor v{self.version}</h1>
+        try:
+            # Load ABOUT.md file
+            about_path = get_resource_path("ABOUT.md")
+            with open(about_path, 'r', encoding='utf-8') as f:
+                about_content = f.read()
 
-            <h2>About This Project</h2>
-            <p class="placeholder">
-                [This section will contain information about the project and Osiris DevWorks]
-            </p>
+            # Add version to the first heading
+            about_content = about_content.replace(
+                "# Star Citizen Profile Editor",
+                f"# Star Citizen Profile Editor v{self.version}"
+            )
 
-            <h2>Acknowledgements</h2>
-            <p>
-                Special thanks to the following individuals for their valuable assistance
-                and contributions to this project:
-            </p>
-            <ul>
-                <li><strong>GurningBoose</strong></li>
-                <li><strong>Hawkwar</strong></li>
-                <li><strong>Nazgul-Five 'Maverick'</strong></li>
-                <li><strong>Tichro 'BreakPoint'</strong></li>
-                <li><strong>UntoldForce</strong></li>
-            </ul>
-        </body>
-        </html>
-        """
-
-        about_browser.setHtml(about_html)
+            # Convert markdown to HTML
+            about_html = self.markdown_to_html(about_content)
+            about_browser.setHtml(about_html)
+        except Exception as e:
+            logger.error(f"Error loading ABOUT.md: {e}", exc_info=True)
+            about_browser.setHtml("<h1>About</h1><p>Unable to load about information.</p>")
         about_layout.addWidget(about_browser)
 
         self.tab_widget.addTab(about_tab, "About")
@@ -2383,8 +2337,8 @@ class MainWindow(QMainWindow):
         html += f"h4 {{ color: {link_color}; margin-top: 15px; font-size: 18px; font-weight: bold; }}"
         html += f"p {{ font-size: 16px; margin: 10px 0; color: {text_color}; }}"
         html += f"li {{ font-size: 16px; margin: 5px 0; color: {text_color}; }}"
-        html += f"a {{ color: {link_color}; text-decoration: none; }}"
-        html += f"a:hover {{ text-decoration: underline; }}"
+        html += f"a {{ color: {link_color}; text-decoration: underline; font-weight: 500; }}"
+        html += f"a:hover {{ text-decoration: underline; opacity: 0.8; cursor: pointer; }}"
         html += f"code {{ background-color: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 15px; color: {text_color}; }}"
         html += f"pre {{ background-color: rgba(0,0,0,0.05); padding: 10px; border-radius: 5px; overflow-x: auto; font-size: 15px; color: {text_color}; }}"
         html += f"ul {{ margin-left: 20px; font-size: 16px; }}"

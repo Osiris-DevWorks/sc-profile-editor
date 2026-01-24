@@ -28,6 +28,15 @@ def main():
     logger = logging.getLogger(__name__)
     logger.info("Starting Star Citizen Profile Editor")
 
+    # Initialize action registry (loads UNBIND_ALL.xml with 1,085 actions)
+    try:
+        from src.registry.action_registry import get_action_registry
+        registry = get_action_registry()
+        logger.info(f"Action Registry loaded: {registry.get_action_count()} actions across {registry.get_actionmap_count()} actionmaps")
+    except Exception as e:
+        logger.error(f"Failed to initialize action registry: {e}", exc_info=True)
+        logger.warning("Continuing without action registry - profile loading may be incomplete")
+
     app = QApplication(sys.argv)
     app.setApplicationName("Star Citizen Profile Editor")
     app.setOrganizationName("SC Tools")

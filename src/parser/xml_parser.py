@@ -12,6 +12,7 @@ import logging
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from models.profile_model import ControlProfile, Device, ActionMap, ActionBinding
+from registry.action_registry import get_action_registry
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,10 @@ class ProfileParser:
         self.tree = None
         self.root = None
 
-        # Get base path for bundled resources
+        # Get registry for master template (contains 1,085 actions)
+        self.registry = get_action_registry()
+
+        # Get base path for bundled resources (kept for backwards compatibility)
         if getattr(sys, 'frozen', False):
             # Running as PyInstaller executable
             base_path = sys._MEIPASS
@@ -33,9 +37,6 @@ class ProfileParser:
             # Running as script
             base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             base_path = os.path.dirname(base_path)  # Go up to project root
-
-        # Path to blank.xml master template
-        self.blank_template_path = os.path.join(base_path, 'example-profiles', 'blank.xml')
 
         # Path to bundled default bindings (kept for backwards compatibility)
         if use_bundled_defaults:
@@ -46,7 +47,7 @@ class ProfileParser:
     def parse(self) -> ControlProfile:
         """
         Parse the XML file and return ControlProfile object with complete action structure.
-        Uses blank.xml as master template with source profile overlay.
+        Uses ActionRegistry master template (UNBIND_ALL.xml) with source profile overlay.
         """
         try:
             self.tree = ET.parse(self.xml_path)
@@ -56,18 +57,13 @@ class ProfileParser:
         except FileNotFoundError:
             raise FileNotFoundError(f"XML file not found: {self.xml_path}")
 
-        # Check if blank.xml exists
-        if not os.path.exists(self.blank_template_path):
-            logger.warning(f"blank.xml not found at {self.blank_template_path}, falling back to source-only parsing")
-            return self._parse_source_only()
-
-        # Parse blank.xml as master template
+        # Get master template from action registry
         try:
-            template_tree = ET.parse(self.blank_template_path)
+            template_tree = self.registry.get_master_template_tree()
             template_root = template_tree.getroot()
-            logger.info(f"Loaded master template from: {self.blank_template_path}")
+            logger.info(f"Loaded master template from ActionRegistry: {self.registry.get_action_count()} actions")
         except Exception as e:
-            logger.error(f"Failed to parse blank.xml: {e}, falling back to source-only parsing")
+            logger.error(f"Failed to get master template from registry: {e}, falling back to source-only parsing")
             return self._parse_source_only()
 
         # Overlay source customizations onto template

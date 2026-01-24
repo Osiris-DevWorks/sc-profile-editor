@@ -1,7 +1,7 @@
 # Star Citizen Profile Editor - Development Guide
 
-**Version:** 0.6.1
-**Date:** 2025-12-04
+**Version:** 0.7.5
+**Date:** 2026-01-06
 **For:** Developers - Setup, architecture, and development workflow
 
 A desktop application for editing and converting Star Citizen control profile XML files into human-readable formats (PDF, Word, CSV) with annotated device graphics.
@@ -23,12 +23,14 @@ A desktop application for editing and converting Star Citizen control profile XM
 ## Project Structure
 
 ```
-sc-profile-viewer/
+sc-profile-editor/
 ├── src/                        # Source code
 │   ├── main.py                # Application entry point
 │   ├── gui/                   # GUI components (PyQt6)
 │   │   ├── main_window.py    # Main application window
-│   │   └── webengine_pdf_widget.py # Interactive PDF device viewer
+│   │   ├── qtpdf_device_widget.py # Interactive PDF device viewer (QtPdf-based)
+│   │   ├── remap_dialog.py   # Dialog for editing button assignments with input detection
+│   │   └── config_tab.py      # Config tab for device management
 │   ├── parser/                # XML parsing and label generation
 │   │   ├── xml_parser.py     # SC profile XML parser
 │   │   └── label_generator.py # Human-readable label generator
@@ -44,10 +46,14 @@ sc-profile-viewer/
 │   └── utils/                 # Utilities
 │       ├── settings.py       # Application settings persistence
 │       ├── label_overrides.py # Custom label override manager
-│       └── version.py        # Version management utilities
+│       ├── input_detector.py # Input detection for joystick, keyboard, mouse
+│       └── device_mapper.py   # Device-to-joystick mapping management
 ├── scripts/                    # Build and utility scripts
-│   └── build/                 # Build scripts
-│       └── build_exe.py      # Standard build
+│   ├── build/                 # Build scripts
+│   │   ├── build_exe.py      # Standard build
+│   │   ├── build_all.bat      # Build executable and installer
+│   │   └── discord_notify.py  # Discord release notifications
+│   └── prototypes/            # Research and prototype code
 ├── visual-templates/          # Device graphics templates
 ├── example-profiles/          # Sample SC profile XML files
 ├── assets/                    # Application assets (icons, images)
