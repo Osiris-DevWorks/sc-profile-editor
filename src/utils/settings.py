@@ -180,3 +180,82 @@ class AppSettings:
         self.settings.setValue("minimize_to_tray_enabled", enabled)
         self.settings.sync()
         logger.info(f"Saved minimize to tray enabled: {enabled}")
+
+    def get_ignored_inputs(self) -> list:
+        """
+        Get the list of input codes that should be filtered/ignored during detection
+
+        Returns:
+            List of input code strings (e.g., ["js1_button32", "js2_hat3_up"])
+        """
+        ignored = self.settings.value("ignored_inputs", [], type=list)
+        logger.debug(f"Retrieved ignored inputs: {ignored}")
+        return ignored
+
+    def set_ignored_inputs(self, inputs: list):
+        """
+        Save the list of input codes to ignore
+
+        Args:
+            inputs: List of input code strings to filter
+        """
+        self.settings.setValue("ignored_inputs", inputs)
+        self.settings.sync()
+        logger.info(f"Saved ignored inputs: {inputs}")
+
+    def add_ignored_input(self, input_code: str) -> bool:
+        """
+        Add a single input code to the ignore list
+
+        Args:
+            input_code: Input code to ignore (e.g., "js1_button32")
+
+        Returns:
+            True if added, False if already in list
+        """
+        ignored = self.get_ignored_inputs()
+        if input_code not in ignored:
+            ignored.append(input_code)
+            self.set_ignored_inputs(ignored)
+            logger.info(f"Added input to ignore list: {input_code}")
+            return True
+        logger.debug(f"Input already in ignore list: {input_code}")
+        return False
+
+    def remove_ignored_input(self, input_code: str) -> bool:
+        """
+        Remove a single input code from the ignore list
+
+        Args:
+            input_code: Input code to remove
+
+        Returns:
+            True if removed, False if not in list
+        """
+        ignored = self.get_ignored_inputs()
+        if input_code in ignored:
+            ignored.remove(input_code)
+            self.set_ignored_inputs(ignored)
+            logger.info(f"Removed input from ignore list: {input_code}")
+            return True
+        logger.debug(f"Input not in ignore list: {input_code}")
+        return False
+
+    def is_input_ignored(self, input_code: str) -> bool:
+        """
+        Check if an input code is in the ignore list
+
+        Args:
+            input_code: Input code to check
+
+        Returns:
+            True if input should be ignored, False otherwise
+        """
+        ignored = self.get_ignored_inputs()
+        return input_code in ignored
+
+    def clear_ignored_inputs(self):
+        """Clear all ignored inputs from the list"""
+        self.settings.remove("ignored_inputs")
+        self.settings.sync()
+        logger.info("Cleared all ignored inputs")

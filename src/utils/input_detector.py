@@ -40,6 +40,13 @@ class InputDetectorThread(QThread):
         self.modifier_press_time: Dict[str, float] = {}  # Track when each modifier was pressed
         self.other_key_pressed = False  # Flag: was a non-modifier key pressed after a modifier?
 
+        # Load ignored inputs from settings for filtering
+        from src.utils.settings import AppSettings
+        settings = AppSettings()
+        self.ignored_inputs = set(settings.get_ignored_inputs())
+        if self.ignored_inputs:
+            logger.info(f"Loaded {len(self.ignored_inputs)} ignored inputs for filtering")
+
     def run(self):
         """Run the input detection loop"""
         try:
@@ -211,6 +218,10 @@ class InputDetectorThread(QThread):
                             js_num = event.joy + 1  # Convert to 1-indexed
                             button_num = event.button + 1  # pygame uses 0-indexed buttons
                             input_code = f"js{js_num}_button{button_num}"
+                            # Filter ignored inputs
+                            if input_code in self.ignored_inputs:
+                                logger.debug(f"Ignoring filtered button input: {input_code}")
+                                continue
                             result_dict["code"] = input_code
                             result_dict["description"] = f"Joystick {js_num} Button {button_num}"
                             detected_event.set()
@@ -235,6 +246,10 @@ class InputDetectorThread(QThread):
                                 continue  # No motion
 
                             input_code = f"js{js_num}_hat{hat_num}_{direction}"
+                            # Filter ignored inputs
+                            if input_code in self.ignored_inputs:
+                                logger.debug(f"Ignoring filtered hat input: {input_code}")
+                                continue
                             result_dict["code"] = input_code
                             result_dict["description"] = f"Joystick {js_num} Hat {hat_num} {direction.upper()}"
                             detected_event.set()
@@ -269,10 +284,14 @@ class InputDetectorThread(QThread):
                                     previous_axis_state[state_key] = value
                                     direction = "+" if value > 0 else "-"
                                     input_code = f"js{js_num}_{axis_name}"
-                                    result_dict["code"] = input_code
-                                    result_dict["description"] = f"Joystick {js_num} {axis_name.upper()} ({direction})"
-                                    detected_event.set()
-                                    return
+                                    # Filter ignored inputs
+                                    if input_code in self.ignored_inputs:
+                                        logger.debug(f"Ignoring filtered axis input: {input_code}")
+                                    else:
+                                        result_dict["code"] = input_code
+                                        result_dict["description"] = f"Joystick {js_num} {axis_name.upper()} ({direction})"
+                                        detected_event.set()
+                                        return
                             else:
                                 # Reset state when axis returns below threshold
                                 state_key = (js_num, axis_name)
