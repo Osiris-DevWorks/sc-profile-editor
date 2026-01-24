@@ -17,9 +17,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-## [0.8.0] - In Development
+## [0.8.0] - 2026-01-23
 
-Development branch for v0.8.0 release. Features and improvements will be added here as development progresses.
+### Added
+- **Complete Action Registry System** - All 1,085 Star Citizen bindable actions now available:
+  - Replaces incomplete blank.xml (643 actions) with complete UNBIND_ALL.xml (1,085 actions)
+  - Adds 442 new actions including FPS weapon actions, MFD controls, and vehicle commands
+  - Singleton pattern for centralized action management and validation
+  - Dynamic action discovery and profile validation
+- **Input Filtering System** - Native solution for constantly-triggering inputs:
+  - Filter inputs from VKB STECS mode selector and other problematic devices
+  - Easy-to-use Config tab UI for managing ignored inputs
+  - Persistent filter storage across sessions
+  - Applied at 3 detection points (buttons, hats, axes) during input detection
+
+### Fixed
+- **Issue #15 - Missing Actions** - All 1,085 Star Citizen actions now accessible:
+  - `v_reload_secondary` - Secondary weapon reload
+  - `v_ammo_repool` - Ammo repool action
+  - Plus 440+ other FPS weapon actions, MFD controls, and vehicle commands
+- **Issue #22 - VKB STECS Mode Selector Blocking** - Native input filtering solves blocking:
+  - STECS mode selector no longer blocks input detection
+  - User-friendly filter management eliminates need for third-party tools (HidHide, vJoy, GremlinEx)
+- **Analog Axis Constant Rotation** - Fixed pitch/yaw/roll constantly rotating in-game:
+  - Removed incorrect `activationMode="press"` from analog inputs
+  - Proper handling of continuous axes and sliders
+  - All joystick axes (x, y, z, rotz, rotx, roty, sliders) work correctly
+
+### Changed
+- **Profile Parser** - Now uses Action Registry instead of blank.xml for template:
+  - Gets master template from registry at runtime
+  - Complete action coverage for all profile types (new, preset, imported)
 
 ## [0.7.5] - 2026-01-06
 
