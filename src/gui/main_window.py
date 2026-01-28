@@ -732,31 +732,12 @@ class MainWindow(QMainWindow):
             self.load_profile_from_path(blank_profile_path)
 
             # Add currently connected joystick devices to the new profile
-            if self.current_profile:
-                try:
-                    from src.utils.input_detector import InputDetector
-                    connected_devices = InputDetector.get_available_devices()
+            self._add_missing_joystick_devices()
 
-                    # Add joystick devices to the profile
-                    for device in connected_devices:
-                        if device.get('type') == 'joystick':
-                            # Create a Device object for the joystick
-                            from src.models.profile_model import Device
-                            joystick_device = Device(
-                                device_type='joystick',
-                                instance=device.get('instance', 1),
-                                product_name=device.get('name', f"Joystick {device.get('instance', 1)}")
-                            )
-
-                            # Add to profile's devices list if not already present
-                            if not any(d.device_type == 'joystick' and d.instance == joystick_device.instance
-                                      for d in self.current_profile.devices):
-                                self.current_profile.devices.append(joystick_device)
-                                logger.info(f"Added joystick device to new profile: {joystick_device.product_name} (js{joystick_device.instance})")
-
-                except Exception as e:
-                    logger.warning(f"Could not add joystick devices to new profile: {e}")
-                    # Continue anyway - this is not critical
+            # Refresh Device View widget with updated devices
+            if self.pdf_device_widget:
+                self.pdf_device_widget.load_profile(self.current_profile)
+                logger.debug("Refreshed Device View with newly added joystick devices")
 
             # Set a default filename for save
             from datetime import datetime
@@ -857,6 +838,14 @@ class MainWindow(QMainWindow):
 
                     # Load the preset profile
                     self.load_profile_from_path(preset_path)
+
+                    # Ensure currently connected joystick devices are in the profile
+                    self._add_missing_joystick_devices()
+
+                    # Refresh Device View widget with updated devices
+                    if self.pdf_device_widget:
+                        self.pdf_device_widget.load_profile(self.current_profile)
+                        logger.debug("Refreshed Device View with connected joystick devices")
 
                     # Mark as modified since it's a starting point for customization
                     self.current_profile.mark_modified()
@@ -2025,6 +2014,52 @@ class MainWindow(QMainWindow):
         # Refresh device view if active
         if self.pdf_device_widget and self.pdf_device_widget.current_device:
             self.pdf_device_widget.load_device_pdf()
+
+    def _add_missing_joystick_devices(self):
+        """
+        Ensure currently connected joystick devices are in the profile.
+        Adds any connected joysticks that aren't already in the profile's device list.
+        Fixes Issue #17: Device detection for new/preset profiles.
+        """
+        if not self.current_profile:
+            return
+
+        try:
+            from src.utils.input_detector import InputDetector
+            from src.models.profile_model import Device
+
+            connected_devices = InputDetector.get_available_devices()
+            devices_added = False
+
+            # Add joystick devices to the profile if not already present
+            for device in connected_devices:
+                if device.get('type') == 'joystick':
+                    instance = device.get('instance', 1)
+                    product_name = device.get('name', f"Joystick {instance}")
+
+                    # Check if this joystick is already in the profile
+                    already_in_profile = any(
+                        d.device_type == 'joystick' and d.instance == instance
+                        for d in self.current_profile.devices
+                    )
+
+                    if not already_in_profile:
+                        # Add this joystick to the profile
+                        joystick_device = Device(
+                            device_type='joystick',
+                            instance=instance,
+                            product_name=product_name
+                        )
+                        self.current_profile.devices.append(joystick_device)
+                        devices_added = True
+                        logger.info(f"Added joystick device to profile: {product_name} (js{instance})")
+
+            if devices_added:
+                logger.info(f"Profile now has {len(self.current_profile.devices)} devices after adding connected joysticks")
+
+        except Exception as e:
+            logger.warning(f"Could not add joystick devices to profile: {e}", exc_info=True)
+            # Continue anyway - this is not critical
 
     def _check_and_warn_disconnected_devices(self, profile):
         """Check if profile has disconnected devices and show warning if needed"""
