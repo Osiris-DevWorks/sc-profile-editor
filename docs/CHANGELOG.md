@@ -17,6 +17,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.8.1] - 2026-01-28
+
+### Fixed
+- **Issue #25 - Duplicate Actions in XML** - Fixed exponential duplication of action elements:
+  - Root cause: Duplicate action elements with same name in actionmap weren't being removed during save
+  - Solution: Added first-pass deduplication in update_bindings() before processing
+  - Duplicates no longer accumulate with each save/reload cycle
+  - Fixes corrupt XML files that users reported with progressively worsening duplicates
+- **Issue #17 - Plugged-In Devices Not Detected** - Joystick devices now show immediately when loading profiles:
+  - Root cause: Device View populated before joystick devices added to profile
+  - Solution: Added `_add_missing_joystick_devices()` helper to auto-detect connected devices
+  - New profiles now show all connected devices on creation
+  - Preset profiles now show all connected devices on load
+  - Device View refreshed after device detection to show current hardware
+  - Users no longer need to restart or make a binding to see devices
+- **Issue #22 - VKB STECS Input Blocking** - Already fixed in v0.8.0:
+  - Input Filtering System provides native solution (no third-party tools needed)
+  - Users can now filter the STECS mode selector and other constantly-triggering inputs
+
+### Note
+- Issue #24 (General Feedback) - Tracking feedback for future improvements
+- Issue #26 (Dynamic Device Mapping) - Feature request for future enhancement (currently limited to 3 devices)
+
 ## [0.8.0] - 2026-01-23
 
 ### Added

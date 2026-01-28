@@ -163,6 +163,20 @@ class XMLExporter:
 
             # Find ALL actions with this name in the actionmap (may have duplicates from overlay)
             action_elems = actionmap_elem.findall('action')
+
+            # FIRST PASS: Remove duplicate action elements (keep only first occurrence of each action name)
+            action_names_seen = set()
+            for action_elem in list(action_elems):
+                action_name = action_elem.get('name', '')
+                if action_name in action_names_seen:
+                    # This is a duplicate action element - remove it
+                    logger.warning(f"Found and removing duplicate action element: {map_name}.{action_name}")
+                    actionmap_elem.remove(action_elem)
+                else:
+                    action_names_seen.add(action_name)
+
+            # SECOND PASS: Update bindings in the remaining (unique) action elements
+            action_elems = actionmap_elem.findall('action')
             for action_elem in action_elems:
                 action_name = action_elem.get('name', '')
                 key = (map_name, action_name)
