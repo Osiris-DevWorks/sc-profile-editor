@@ -1493,20 +1493,44 @@ class MainWindow(QMainWindow):
 
         # Mark profile as modified
         if self.current_profile:
-            # Check if any bindings are not in the profile and add them
+            # First pass: remove any duplicate bindings (by object identity) from each action map
+            # This can happen if a binding is somehow added multiple times
+            for action_map in self.current_profile.action_maps:
+                seen_bindings = {}  # Map from binding id to binding object
+                bindings_to_keep = []
+
+                for binding in action_map.actions:
+                    binding_id = id(binding)
+                    if binding_id not in seen_bindings:
+                        seen_bindings[binding_id] = binding
+                        bindings_to_keep.append(binding)
+                    else:
+                        logger.warning(f"on_bindings_changed_from_table: Removing duplicate binding {binding.action_name} from {action_map.name}")
+
+                # If we removed any duplicates, update the action map
+                if len(bindings_to_keep) < len(action_map.actions):
+                    logger.warning(f"on_bindings_changed_from_table: Found and removed {len(action_map.actions) - len(bindings_to_keep)} duplicates in {action_map.name}")
+                    action_map.actions = bindings_to_keep
+
+            # Second pass: check if any bindings are not in the profile and add them
+            # (This handles multi-binding scenarios)
             for binding in bindings:
                 binding_found = False
+                binding_location = None
+
                 for action_map in self.current_profile.action_maps:
-                    for existing_binding in action_map.actions:
+                    for i, existing_binding in enumerate(action_map.actions):
                         if existing_binding is binding:
                             binding_found = True
+                            binding_location = (action_map.name, i)
+                            logger.debug(f"on_bindings_changed_from_table: Found binding at {action_map.name}[{i}]")
                             break
                     if binding_found:
                         break
 
                 # If binding is not in profile, add it to the appropriate action map
                 if not binding_found:
-                    logger.info(f"on_bindings_changed_from_table: Binding {binding.action_name} not in profile, finding correct actionmap...")
+                    logger.info(f"on_bindings_changed_from_table: Binding {binding.action_name} not found in profile, attempting to add...")
                     # Find the correct action map for this action
                     added = False
                     for action_map in self.current_profile.action_maps:
