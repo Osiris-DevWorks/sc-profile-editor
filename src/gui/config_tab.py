@@ -7,7 +7,7 @@ import os
 import logging
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLabel, QPushButton,
                               QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLineEdit, QFileDialog, QCheckBox,
-                              QListWidget, QListWidgetItem)
+                              QListWidget, QListWidgetItem, QSizePolicy)
 from PyQt6.QtCore import Qt, pyqtSignal
 
 # Add parent directory to path
@@ -83,11 +83,17 @@ class ConfigTab(QWidget):
         for i in range(1, 4):
             js_label = f"js{i}"
             h_layout = QHBoxLayout()
-            h_layout.addWidget(QLabel(f"{js_label}:"))
-            h_layout.setContentsMargins(20, 5, 20, 5)
+            h_layout.setContentsMargins(20, 8, 20, 8)
+            h_layout.setSpacing(15)  # Better spacing between elements
+
+            label = QLabel(f"{js_label}:")
+            label.setMinimumWidth(40)  # Ensure label has minimum width
+            h_layout.addWidget(label)
 
             combo = QComboBox()
             combo.addItem("-- None --", None)
+            combo.setMinimumWidth(200)  # Ensure combo box is wide enough
+            combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             self.mapping_combos[js_label] = combo
 
             h_layout.addWidget(combo)
@@ -98,15 +104,19 @@ class ConfigTab(QWidget):
 
         # Auto-populate and Save buttons
         button_layout = QHBoxLayout()
+        button_layout.setContentsMargins(20, 10, 20, 10)
+        button_layout.setSpacing(10)
 
         auto_populate_btn = QPushButton("Auto-Populate from Connected Devices")
         auto_populate_btn.setToolTip("Automatically map connected joysticks to js1, js2, js3 based on detection order")
+        auto_populate_btn.setMinimumHeight(35)
         auto_populate_btn.clicked.connect(self.on_auto_populate_clicked)
         button_layout.addWidget(auto_populate_btn)
 
         button_layout.addStretch()
 
         save_btn = QPushButton("Save Configuration")
+        save_btn.setMinimumHeight(35)
         save_btn.clicked.connect(self.on_save_config_clicked)
         button_layout.addWidget(save_btn)
 
