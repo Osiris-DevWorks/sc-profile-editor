@@ -734,6 +734,9 @@ class MainWindow(QMainWindow):
             # Add currently connected joystick devices to the new profile
             self._add_missing_joystick_devices()
 
+            # Refresh UI to show the newly added devices
+            self.display_profile()
+
             # Refresh Device View widget with updated devices
             if self.pdf_device_widget:
                 self.pdf_device_widget.load_profile(self.current_profile)
@@ -841,6 +844,9 @@ class MainWindow(QMainWindow):
 
                     # Ensure currently connected joystick devices are in the profile
                     self._add_missing_joystick_devices()
+
+                    # Refresh UI to show the newly added devices
+                    self.display_profile()
 
                     # Refresh Device View widget with updated devices
                     if self.pdf_device_widget:
@@ -2047,6 +2053,7 @@ class MainWindow(QMainWindow):
         Fixes Issue #17: Device detection for new/preset profiles.
         """
         if not self.current_profile:
+            logger.warning("_add_missing_joystick_devices: No current profile")
             return
 
         try:
@@ -2054,57 +2061,72 @@ class MainWindow(QMainWindow):
             from src.models.profile_model import Device
 
             connected_devices = InputDetector.get_available_devices()
+            logger.info(f"_add_missing_joystick_devices: Found {len(connected_devices)} total connected devices")
+            for i, dev in enumerate(connected_devices):
+                logger.debug(f"  Device {i}: type={dev.get('type')}, instance={dev.get('instance')}, name={dev.get('name')}")
+
             devices_added = False
 
             # Load device mapping from settings (user's configured device-to-js mappings)
             device_mapping = self.settings.get_device_config() if self.settings else {}
-            logger.debug(f"_add_missing_joystick_devices: Loaded device mapping: {device_mapping}")
+            logger.info(f"_add_missing_joystick_devices: Loaded device mapping: {device_mapping}")
+
+            # Log current profile devices
+            logger.debug(f"_add_missing_joystick_devices: Profile currently has {len(self.current_profile.devices)} devices:")
+            for i, d in enumerate(self.current_profile.devices):
+                logger.debug(f"  Device {i}: type={d.device_type}, instance={d.instance}, name={d.product_name}")
 
             # Add joystick devices to the profile if not already present
-            for device in connected_devices:
-                if device.get('type') == 'joystick':
-                    device_name = device.get('name', f"Joystick {device.get('instance', 1)}")
+            joystick_devices = [d for d in connected_devices if d.get('type') == 'joystick']
+            logger.info(f"_add_missing_joystick_devices: Found {len(joystick_devices)} joystick device(s) to process")
 
-                    # Determine the instance number based on device mapping
-                    # First, check if this device has a mapped instance (js1, js2, etc.)
-                    mapped_instance = None
-                    for js_label, mapped_device_name in device_mapping.items():
-                        if mapped_device_name == device_name:
-                            # Extract instance number from label like "js1" -> 1
-                            try:
-                                mapped_instance = int(js_label.replace('js', ''))
-                                logger.debug(f"_add_missing_joystick_devices: Device '{device_name}' is mapped to {js_label}")
-                                break
-                            except ValueError:
-                                pass
+            for device in joystick_devices:
+                device_name = device.get('name', f"Joystick {device.get('instance', 1)}")
+                logger.debug(f"_add_missing_joystick_devices: Processing joystick: {device_name}")
 
-                    # Use mapped instance if found, otherwise use device's instance
-                    instance = mapped_instance if mapped_instance else device.get('instance', 1)
+                # Determine the instance number based on device mapping
+                # First, check if this device has a mapped instance (js1, js2, etc.)
+                mapped_instance = None
+                for js_label, mapped_device_name in device_mapping.items():
+                    if mapped_device_name == device_name:
+                        # Extract instance number from label like "js1" -> 1
+                        try:
+                            mapped_instance = int(js_label.replace('js', ''))
+                            logger.debug(f"_add_missing_joystick_devices: Device '{device_name}' is mapped to {js_label} (instance {mapped_instance})")
+                            break
+                        except ValueError:
+                            logger.warning(f"_add_missing_joystick_devices: Could not parse instance from {js_label}")
 
-                    # Check if this joystick is already in the profile
-                    already_in_profile = any(
-                        d.device_type == 'joystick' and d.instance == instance
-                        for d in self.current_profile.devices
+                # Use mapped instance if found, otherwise use device's instance
+                instance = mapped_instance if mapped_instance else device.get('instance', 1)
+                logger.debug(f"_add_missing_joystick_devices: Using instance {instance} for {device_name}")
+
+                # Check if this joystick is already in the profile
+                already_in_profile = any(
+                    d.device_type == 'joystick' and d.instance == instance
+                    for d in self.current_profile.devices
+                )
+
+                if already_in_profile:
+                    logger.debug(f"_add_missing_joystick_devices: Device {device_name} (js{instance}) already in profile")
+                else:
+                    # Add this joystick to the profile
+                    joystick_device = Device(
+                        device_type='joystick',
+                        instance=instance,
+                        product_name=device_name
                     )
-
-                    if not already_in_profile:
-                        # Add this joystick to the profile
-                        joystick_device = Device(
-                            device_type='joystick',
-                            instance=instance,
-                            product_name=device_name
-                        )
-                        self.current_profile.devices.append(joystick_device)
-                        devices_added = True
-                        logger.info(f"Added joystick device to profile: {device_name} (js{instance})")
+                    self.current_profile.devices.append(joystick_device)
+                    devices_added = True
+                    logger.info(f"_add_missing_joystick_devices: Added joystick device: {device_name} (js{instance})")
 
             if devices_added:
-                logger.info(f"Profile now has {len(self.current_profile.devices)} devices after adding connected joysticks")
+                logger.info(f"_add_missing_joystick_devices: Profile now has {len(self.current_profile.devices)} devices after adding connected joysticks")
             else:
-                logger.debug(f"_add_missing_joystick_devices: No new joystick devices needed to be added")
+                logger.info(f"_add_missing_joystick_devices: No new joystick devices were added")
 
         except Exception as e:
-            logger.warning(f"Could not add joystick devices to profile: {e}", exc_info=True)
+            logger.error(f"_add_missing_joystick_devices: Could not add joystick devices to profile: {e}", exc_info=True)
             # Continue anyway - this is not critical
 
     def _check_and_warn_disconnected_devices(self, profile):
