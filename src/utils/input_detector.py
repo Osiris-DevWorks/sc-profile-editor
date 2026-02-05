@@ -180,6 +180,15 @@ class InputDetectorThread(QThread):
             pygame.init()
             pygame.joystick.init()
 
+            # Create a hidden display window for proper event handling
+            # Some systems require an active display for joystick events to be pumped
+            try:
+                # Try to create a minimal hidden surface
+                pygame.display.set_mode((1, 1), flags=pygame.HIDDEN)
+                logger.debug("Created hidden pygame display for joystick event handling")
+            except Exception as e:
+                logger.warning(f"Could not create hidden display: {e}, continuing without it")
+
             # Get list of joysticks
             joystick_count = pygame.joystick.get_count()
 
@@ -215,17 +224,31 @@ class InputDetectorThread(QThread):
                     # Process pygame events for button presses
                     for event in pygame.event.get():
                         if event.type == pygame.JOYBUTTONDOWN:
-                            js_num = event.joy + 1  # Convert to 1-indexed
-                            button_num = event.button + 1  # pygame uses 0-indexed buttons
-                            input_code = f"js{js_num}_button{button_num}"
-                            # Filter ignored inputs
-                            if input_code in self.ignored_inputs:
-                                logger.debug(f"Ignoring filtered button input: {input_code}")
+                            # Debug: log raw event attributes
+                            logger.debug(f"JOYBUTTONDOWN event: joy={getattr(event, 'joy', 'MISSING')}, button={getattr(event, 'button', 'MISSING')}")
+
+                            # Safely get joystick and button numbers with validation
+                            try:
+                                js_num = event.joy + 1  # Convert to 1-indexed
+                                button_num = event.button + 1  # pygame uses 0-indexed buttons
+
+                                # Validate button_num is reasonable (should be 1-32 typically)
+                                if button_num < 1 or button_num > 100:
+                                    logger.warning(f"Suspicious button number detected: {button_num - 1} (raw) -> {button_num} (1-indexed) for js{js_num}")
+
+                                input_code = f"js{js_num}_button{button_num}"
+                                # Filter ignored inputs
+                                if input_code in self.ignored_inputs:
+                                    logger.debug(f"Ignoring filtered button input: {input_code}")
+                                    continue
+                                result_dict["code"] = input_code
+                                result_dict["description"] = f"Joystick {js_num} Button {button_num}"
+                                logger.info(f"Button detected: {input_code} - {result_dict['description']}")
+                                detected_event.set()
+                                return
+                            except AttributeError as e:
+                                logger.error(f"Error accessing event.button or event.joy: {e}", exc_info=True)
                                 continue
-                            result_dict["code"] = input_code
-                            result_dict["description"] = f"Joystick {js_num} Button {button_num}"
-                            detected_event.set()
-                            return
 
                         elif event.type == pygame.JOYHATMOTION:
                             # Hat/POV switch
