@@ -379,9 +379,24 @@ class ConfigTab(QWidget):
     def on_refresh_devices_clicked(self):
         """Handle Refresh Devices button click"""
         self.refresh_devices()
-        # Auto-remap devices based on current detection
-        self._auto_populate_internal()
-        logger.info("Auto-remapped devices based on current detection")
+
+        # If user has saved a config, restore it after refresh
+        # Otherwise, auto-detect the mapping based on current devices
+        if self.device_mapping and any(self.device_mapping.values()):
+            # User has saved a custom mapping, restore it
+            logger.info("Restoring saved device mapping after refresh")
+            for js_label, combo in self.mapping_combos.items():
+                device_name = self.device_mapping.get(js_label)
+                if device_name:
+                    for i in range(combo.count()):
+                        if combo.itemData(i) == device_name:
+                            combo.setCurrentIndex(i)
+                            break
+        else:
+            # No saved config, auto-detect mapping from current devices
+            logger.info("Auto-detecting device mapping based on current detection")
+            self._auto_populate_internal()
+
         QMessageBox.information(self, "Devices Refreshed", f"Found {len(self.current_devices)} device(s)")
 
     def _auto_populate_internal(self):
