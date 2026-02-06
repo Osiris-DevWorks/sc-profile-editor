@@ -7,7 +7,7 @@ import os
 import logging
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLabel, QPushButton,
                               QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLineEdit, QFileDialog, QCheckBox,
-                              QListWidget, QListWidgetItem)
+                              QListWidget, QListWidgetItem, QAbstractItemView)
 from PyQt6.QtCore import Qt, pyqtSignal
 
 # Add parent directory to path
@@ -50,7 +50,10 @@ class ConfigTab(QWidget):
         self.devices_table.setColumnWidth(0, 120)
         self.devices_table.setColumnWidth(1, 300)
         self.devices_table.setColumnWidth(2, 100)
-        self.devices_table.setMaximumHeight(200)  # Increased from 150 to show all devices
+        self.devices_table.setMaximumHeight(250)  # Allow space for multiple rows
+        self.devices_table.setMinimumHeight(100)  # Ensure minimum height
+        self.devices_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.devices_table.setAlternatingRowColors(True)  # Better visibility
         devices_layout.addWidget(self.devices_table)
 
         # Refresh button
