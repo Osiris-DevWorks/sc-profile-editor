@@ -303,7 +303,6 @@ class ConfigTab(QWidget):
 
             for combo in self.mapping_combos.values():
                 combo.blockSignals(True)
-                current_selection = combo.currentData()
                 combo.clear()
                 combo.addItem("-- None --", None)
 
@@ -314,12 +313,8 @@ class ConfigTab(QWidget):
                         product_name = device.get('name', f"Joystick {instance}")
                         combo.addItem(product_name, product_name)
 
-                # Restore previous selection if still available
-                if current_selection and current_selection in connected_device_names:
-                    for i in range(combo.count()):
-                        if combo.itemData(i) == current_selection:
-                            combo.setCurrentIndex(i)
-                            break
+                # Reset to "-- None --" - let on_refresh_devices_clicked or load_device_config handle restoration
+                combo.setCurrentIndex(0)
 
                 combo.blockSignals(False)
 
