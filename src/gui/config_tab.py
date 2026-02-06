@@ -36,11 +36,15 @@ class ConfigTab(QWidget):
     def setup_ui(self):
         """Set up the configuration tab UI"""
         layout = QVBoxLayout()
+        layout.setSpacing(5)  # Reduce spacing between sections
+        layout.setContentsMargins(5, 5, 5, 5)  # Reduce margins
         self.setLayout(layout)
 
         # === CONNECTED DEVICES SECTION ===
         devices_group = QGroupBox("Connected Devices")
         devices_layout = QVBoxLayout()
+        devices_layout.setSpacing(3)  # Reduce internal spacing
+        devices_layout.setContentsMargins(8, 5, 8, 8)  # Reduce margins
         devices_group.setLayout(devices_layout)
 
         # Devices table
@@ -59,6 +63,7 @@ class ConfigTab(QWidget):
         refresh_btn = QPushButton("Refresh Devices")
         refresh_btn.clicked.connect(self.on_refresh_devices_clicked)
         refresh_layout = QHBoxLayout()
+        refresh_layout.setContentsMargins(0, 3, 0, 0)
         refresh_layout.addStretch()
         refresh_layout.addWidget(refresh_btn)
         devices_layout.addLayout(refresh_layout)
@@ -68,6 +73,8 @@ class ConfigTab(QWidget):
         # === DEVICE MAPPING SECTION ===
         mapping_group = QGroupBox("Joystick Number Assignment")
         mapping_layout = QVBoxLayout()
+        mapping_layout.setSpacing(2)  # Minimal spacing between elements
+        mapping_layout.setContentsMargins(8, 5, 8, 8)  # Reduce margins
         mapping_group.setLayout(mapping_layout)
 
         # Instructions
@@ -75,55 +82,56 @@ class ConfigTab(QWidget):
             "Assign physical joystick devices to js1, js2, js3 slots.\n"
             "This ensures your profile works consistently regardless of connection order."
         )
-        instructions.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
+        instructions.setStyleSheet("QLabel { color: palette(text); font-size: 9px; font-style: italic; }")
         instructions.setWordWrap(True)
         mapping_layout.addWidget(instructions)
-        mapping_layout.addSpacing(10)
+        mapping_layout.addSpacing(5)  # Minimal spacing
 
         # Create mapping dropdowns for js1, js2, js3
         self.mapping_combos = {}
         for i in range(1, 4):
             js_label = f"js{i}"
             h_layout = QHBoxLayout()
-            h_layout.setContentsMargins(20, 8, 20, 8)
-            h_layout.setSpacing(15)  # Better spacing between elements
+            h_layout.setContentsMargins(10, 2, 10, 2)  # Reduced margins
+            h_layout.setSpacing(10)  # Reduced spacing
 
             label = QLabel(f"{js_label}:")
-            label.setMinimumWidth(40)  # Ensure label has minimum width
+            label.setMinimumWidth(40)
             h_layout.addWidget(label)
 
             combo = QComboBox()
             combo.addItem("-- None --", None)
-            combo.setMinimumWidth(200)  # Ensure combo box is wide enough
+            combo.setMinimumWidth(200)
             self.mapping_combos[js_label] = combo
 
             h_layout.addWidget(combo)
             h_layout.addStretch()
             mapping_layout.addLayout(h_layout)
 
-        mapping_layout.addSpacing(15)
+        mapping_layout.addSpacing(5)  # Minimal spacing before button
 
         # Save button (auto-populate happens automatically on tab load)
         button_layout = QHBoxLayout()
-        button_layout.setContentsMargins(20, 10, 20, 5)  # Reduced bottom margin
+        button_layout.setContentsMargins(10, 2, 10, 2)  # Reduced margins
         button_layout.setSpacing(10)
 
         button_layout.addStretch()
 
         save_btn = QPushButton("Save Configuration")
-        save_btn.setMinimumHeight(35)
+        save_btn.setMinimumHeight(30)  # Reduced from 35
         save_btn.setMinimumWidth(150)
         save_btn.clicked.connect(self.on_save_config_clicked)
         button_layout.addWidget(save_btn)
 
         mapping_layout.addLayout(button_layout)
-        mapping_layout.addSpacing(10)  # Add spacing after button to separate from border
 
         layout.addWidget(mapping_group)
 
         # === STAR CITIZEN PROFILES DIRECTORY SECTION ===
         sc_dir_group = QGroupBox("Star Citizen Profiles Directory")
         sc_dir_layout = QVBoxLayout()
+        sc_dir_layout.setSpacing(3)
+        sc_dir_layout.setContentsMargins(8, 5, 8, 8)
         sc_dir_group.setLayout(sc_dir_layout)
 
         # Instructions
@@ -131,13 +139,15 @@ class ConfigTab(QWidget):
             "Specify the location of your Star Citizen control profiles.\n"
             "This allows the app to easily import profiles from your SC installation."
         )
-        sc_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
+        sc_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 9px; font-style: italic; }")
         sc_instructions.setWordWrap(True)
         sc_dir_layout.addWidget(sc_instructions)
-        sc_dir_layout.addSpacing(10)
+        sc_dir_layout.addSpacing(3)
 
         # Directory path input
         path_input_layout = QHBoxLayout()
+        path_input_layout.setContentsMargins(0, 0, 0, 0)
+        path_input_layout.setSpacing(5)
         path_input_layout.addWidget(QLabel("Directory:"))
         self.sc_profiles_path_input = QLineEdit()
         self.sc_profiles_path_input.setPlaceholderText("C:\\Program Files\\Roberts Space Industries\\StarCitizen\\LIVE\\USER\\Client\\0\\Controls\\Mappings")
@@ -151,12 +161,13 @@ class ConfigTab(QWidget):
         path_input_layout.addWidget(browse_btn)
 
         sc_dir_layout.addLayout(path_input_layout)
-        sc_dir_layout.addSpacing(10)
+        sc_dir_layout.addSpacing(3)
 
         # Save button
         sc_save_btn = QPushButton("Save SC Directory")
         sc_save_btn.clicked.connect(self.on_save_sc_directory_clicked)
         sc_save_layout = QHBoxLayout()
+        sc_save_layout.setContentsMargins(0, 0, 0, 0)
         sc_save_layout.addStretch()
         sc_save_layout.addWidget(sc_save_btn)
         sc_dir_layout.addLayout(sc_save_layout)
@@ -166,6 +177,8 @@ class ConfigTab(QWidget):
         # === SYSTEM TRAY SECTION ===
         tray_group = QGroupBox("System Tray")
         tray_layout = QVBoxLayout()
+        tray_layout.setSpacing(3)
+        tray_layout.setContentsMargins(8, 5, 8, 8)
         tray_group.setLayout(tray_layout)
 
         # Instructions
@@ -173,10 +186,10 @@ class ConfigTab(QWidget):
             "Control minimize-to-tray behavior.\n"
             "When enabled, minimizing the window will hide it to the system tray instead of the taskbar."
         )
-        tray_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
+        tray_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 9px; font-style: italic; }")
         tray_instructions.setWordWrap(True)
         tray_layout.addWidget(tray_instructions)
-        tray_layout.addSpacing(10)
+        tray_layout.addSpacing(3)
 
         # Minimize to tray checkbox
         self.minimize_to_tray_checkbox = QCheckBox("Minimize to system tray when window is minimized")
@@ -189,6 +202,8 @@ class ConfigTab(QWidget):
         # === INPUT FILTERING SECTION ===
         filter_group = QGroupBox("Input Filtering")
         filter_layout = QVBoxLayout()
+        filter_layout.setSpacing(3)
+        filter_layout.setContentsMargins(8, 5, 8, 8)
         filter_group.setLayout(filter_layout)
 
         # Instructions
@@ -196,21 +211,23 @@ class ConfigTab(QWidget):
             "Filter inputs that constantly trigger (e.g., VKB STECS mode selector).\n"
             "These inputs will be ignored during input detection."
         )
-        filter_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
+        filter_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 9px; font-style: italic; }")
         filter_instructions.setWordWrap(True)
         filter_layout.addWidget(filter_instructions)
-        filter_layout.addSpacing(10)
+        filter_layout.addSpacing(3)
 
         # Current filters list
         filter_list_label = QLabel("Current Filters:")
         filter_layout.addWidget(filter_list_label)
 
         self.filter_list_widget = QListWidget()
-        self.filter_list_widget.setMaximumHeight(120)
+        self.filter_list_widget.setMaximumHeight(80)  # Reduced from 120
         filter_layout.addWidget(self.filter_list_widget)
 
         # Buttons
         filter_button_layout = QHBoxLayout()
+        filter_button_layout.setContentsMargins(0, 0, 0, 0)
+        filter_button_layout.setSpacing(5)
 
         self.add_filter_btn = QPushButton("Add Input...")
         self.add_filter_btn.clicked.connect(self.on_add_filter_clicked)
@@ -228,7 +245,6 @@ class ConfigTab(QWidget):
         filter_layout.addLayout(filter_button_layout)
 
         layout.addWidget(filter_group)
-        layout.addStretch()
 
         # Load current filters into the list
         self.load_ignored_inputs()
