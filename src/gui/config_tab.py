@@ -127,6 +127,53 @@ class ConfigTab(QWidget):
 
         layout.addWidget(mapping_group)
 
+        # === INPUT FILTERING SECTION ===
+        filter_group = QGroupBox("Input Filtering")
+        filter_layout = QVBoxLayout()
+        filter_layout.setSpacing(3)
+        filter_layout.setContentsMargins(8, 5, 8, 8)
+        filter_group.setLayout(filter_layout)
+
+        # Instructions
+        filter_instructions = QLabel(
+            "Filter inputs that constantly trigger (e.g., VKB STECS mode selector).\n"
+            "These inputs will be ignored during input detection."
+        )
+        filter_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 9px; font-style: italic; }")
+        filter_instructions.setWordWrap(True)
+        filter_layout.addWidget(filter_instructions)
+        filter_layout.addSpacing(3)
+
+        # Current filters list
+        filter_list_label = QLabel("Current Filters:")
+        filter_layout.addWidget(filter_list_label)
+
+        self.filter_list_widget = QListWidget()
+        self.filter_list_widget.setMaximumHeight(80)  # Reduced from 120
+        filter_layout.addWidget(self.filter_list_widget)
+
+        # Buttons
+        filter_button_layout = QHBoxLayout()
+        filter_button_layout.setContentsMargins(0, 0, 0, 0)
+        filter_button_layout.setSpacing(5)
+
+        self.add_filter_btn = QPushButton("Add Input...")
+        self.add_filter_btn.clicked.connect(self.on_add_filter_clicked)
+        filter_button_layout.addWidget(self.add_filter_btn)
+
+        self.remove_filter_btn = QPushButton("Remove Selected")
+        self.remove_filter_btn.clicked.connect(self.on_remove_filter_clicked)
+        filter_button_layout.addWidget(self.remove_filter_btn)
+
+        self.clear_filters_btn = QPushButton("Clear All")
+        self.clear_filters_btn.clicked.connect(self.on_clear_filters_clicked)
+        filter_button_layout.addWidget(self.clear_filters_btn)
+
+        filter_button_layout.addStretch()
+        filter_layout.addLayout(filter_button_layout)
+
+        layout.addWidget(filter_group)
+
         # === STAR CITIZEN PROFILES DIRECTORY SECTION ===
         sc_dir_group = QGroupBox("Star Citizen Profiles Directory")
         sc_dir_layout = QVBoxLayout()
@@ -198,53 +245,6 @@ class ConfigTab(QWidget):
         tray_layout.addWidget(self.minimize_to_tray_checkbox)
 
         layout.addWidget(tray_group)
-
-        # === INPUT FILTERING SECTION ===
-        filter_group = QGroupBox("Input Filtering")
-        filter_layout = QVBoxLayout()
-        filter_layout.setSpacing(3)
-        filter_layout.setContentsMargins(8, 5, 8, 8)
-        filter_group.setLayout(filter_layout)
-
-        # Instructions
-        filter_instructions = QLabel(
-            "Filter inputs that constantly trigger (e.g., VKB STECS mode selector).\n"
-            "These inputs will be ignored during input detection."
-        )
-        filter_instructions.setStyleSheet("QLabel { color: palette(text); font-size: 9px; font-style: italic; }")
-        filter_instructions.setWordWrap(True)
-        filter_layout.addWidget(filter_instructions)
-        filter_layout.addSpacing(3)
-
-        # Current filters list
-        filter_list_label = QLabel("Current Filters:")
-        filter_layout.addWidget(filter_list_label)
-
-        self.filter_list_widget = QListWidget()
-        self.filter_list_widget.setMaximumHeight(80)  # Reduced from 120
-        filter_layout.addWidget(self.filter_list_widget)
-
-        # Buttons
-        filter_button_layout = QHBoxLayout()
-        filter_button_layout.setContentsMargins(0, 0, 0, 0)
-        filter_button_layout.setSpacing(5)
-
-        self.add_filter_btn = QPushButton("Add Input...")
-        self.add_filter_btn.clicked.connect(self.on_add_filter_clicked)
-        filter_button_layout.addWidget(self.add_filter_btn)
-
-        self.remove_filter_btn = QPushButton("Remove Selected")
-        self.remove_filter_btn.clicked.connect(self.on_remove_filter_clicked)
-        filter_button_layout.addWidget(self.remove_filter_btn)
-
-        self.clear_filters_btn = QPushButton("Clear All")
-        self.clear_filters_btn.clicked.connect(self.on_clear_filters_clicked)
-        filter_button_layout.addWidget(self.clear_filters_btn)
-
-        filter_button_layout.addStretch()
-        filter_layout.addLayout(filter_button_layout)
-
-        layout.addWidget(filter_group)
 
         # Load current filters into the list
         self.load_ignored_inputs()
