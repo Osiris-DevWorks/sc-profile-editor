@@ -340,6 +340,16 @@ class ConfigTab(QWidget):
             logger.info("Auto-detecting device mapping based on current detection")
             self._auto_populate_internal()
 
+            # Capture the auto-populated mapping so Refresh will preserve it
+            auto_detected_mapping = {}
+            for js_label, combo in self.mapping_combos.items():
+                device_name = combo.currentData()
+                if device_name:
+                    auto_detected_mapping[js_label] = device_name
+
+            self.device_mapping = auto_detected_mapping
+            logger.info(f"Auto-detected device mapping: {auto_detected_mapping}")
+
         except Exception as e:
             logger.error(f"Error loading device config: {e}", exc_info=True)
 
