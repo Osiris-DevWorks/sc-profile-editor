@@ -7,7 +7,7 @@ import os
 import logging
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLabel, QPushButton,
                               QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLineEdit, QFileDialog, QCheckBox,
-                              QListWidget, QListWidgetItem, QSizePolicy)
+                              QListWidget, QListWidgetItem)
 from PyQt6.QtCore import Qt, pyqtSignal
 
 # Add parent directory to path
@@ -93,7 +93,6 @@ class ConfigTab(QWidget):
             combo = QComboBox()
             combo.addItem("-- None --", None)
             combo.setMinimumWidth(200)  # Ensure combo box is wide enough
-            combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             self.mapping_combos[js_label] = combo
 
             h_layout.addWidget(combo)
