@@ -312,8 +312,7 @@ class ConfigTab(QWidget):
                     if device.get('type') == 'joystick':
                         instance = device.get('instance', 0)
                         product_name = device.get('name', f"Joystick {instance}")
-                        display_text = f"js{instance}: {product_name}"
-                        combo.addItem(display_text, product_name)
+                        combo.addItem(product_name, product_name)
 
                 # Restore previous selection if still available
                 if current_selection and current_selection in connected_device_names:
