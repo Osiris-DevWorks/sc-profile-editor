@@ -50,10 +50,9 @@ class ConfigTab(QWidget):
         self.devices_table.setColumnWidth(0, 120)
         self.devices_table.setColumnWidth(1, 300)
         self.devices_table.setColumnWidth(2, 100)
-        self.devices_table.setMaximumHeight(250)  # Allow space for multiple rows
-        self.devices_table.setMinimumHeight(100)  # Ensure minimum height
         self.devices_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.devices_table.setAlternatingRowColors(True)  # Better visibility
+        self.devices_table.setMaximumHeight(16777215)  # Remove height limit, will auto-size
         devices_layout.addWidget(self.devices_table)
 
         # Refresh button
@@ -67,14 +66,14 @@ class ConfigTab(QWidget):
         layout.addWidget(devices_group)
 
         # === DEVICE MAPPING SECTION ===
-        mapping_group = QGroupBox("Device-to-Joystick Mapping")
+        mapping_group = QGroupBox("Joystick Number Assignment")
         mapping_layout = QVBoxLayout()
         mapping_group.setLayout(mapping_layout)
 
         # Instructions
         instructions = QLabel(
-            "Map physical devices to joystick slots (js1, js2, js3, etc.).\n"
-            "This helps keep your profile working when devices are connected in different order."
+            "Assign physical joystick devices to js1, js2, js3 slots.\n"
+            "This ensures your profile works consistently regardless of connection order."
         )
         instructions.setStyleSheet("QLabel { color: palette(text); font-size: 10px; font-style: italic; }")
         instructions.setWordWrap(True)
@@ -102,23 +101,18 @@ class ConfigTab(QWidget):
             h_layout.addStretch()
             mapping_layout.addLayout(h_layout)
 
-        mapping_layout.addSpacing(10)
+        mapping_layout.addSpacing(15)
 
-        # Auto-populate and Save buttons
+        # Save button (auto-populate happens automatically on tab load)
         button_layout = QHBoxLayout()
-        button_layout.setContentsMargins(20, 10, 20, 10)
+        button_layout.setContentsMargins(20, 15, 20, 20)
         button_layout.setSpacing(10)
-
-        auto_populate_btn = QPushButton("Auto-Populate from Connected Devices")
-        auto_populate_btn.setToolTip("Automatically map connected joysticks to js1, js2, js3 based on detection order")
-        auto_populate_btn.setMinimumHeight(35)
-        auto_populate_btn.clicked.connect(self.on_auto_populate_clicked)
-        button_layout.addWidget(auto_populate_btn)
 
         button_layout.addStretch()
 
         save_btn = QPushButton("Save Configuration")
         save_btn.setMinimumHeight(35)
+        save_btn.setMinimumWidth(150)
         save_btn.clicked.connect(self.on_save_config_clicked)
         button_layout.addWidget(save_btn)
 
@@ -272,6 +266,14 @@ class ConfigTab(QWidget):
                 inst_item.setFlags(inst_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 self.devices_table.setItem(row, 2, inst_item)
 
+            # Dynamically resize table to fit content
+            self.devices_table.resizeRowsToContents()
+            # Calculate total height needed
+            height = self.devices_table.horizontalHeader().height()
+            for i in range(self.devices_table.rowCount()):
+                height += self.devices_table.rowHeight(i)
+            self.devices_table.setMaximumHeight(height)
+
             # Update mapping dropdowns with current devices
             # Also clean up device_mapping to remove disconnected devices
             connected_device_names = set()
@@ -321,21 +323,27 @@ class ConfigTab(QWidget):
             QMessageBox.warning(self, "Device Refresh Error", f"Failed to refresh devices:\n{e}")
 
     def load_device_config(self):
-        """Load device configuration from settings"""
+        """Load device configuration from settings, auto-populate if empty"""
         try:
             self.device_mapping = self.settings.get_device_config()
             logger.debug(f"Loaded device mapping: {self.device_mapping}")
 
-            # Apply mapping to dropdowns
-            for js_label, combo in self.mapping_combos.items():
-                device_name = self.device_mapping.get(js_label)
-                if device_name:
-                    for i in range(combo.count()):
-                        if combo.itemData(i) == device_name:
-                            combo.setCurrentIndex(i)
-                            break
-
             self.refresh_devices()
+
+            # Auto-populate if no saved configuration exists
+            if not self.device_mapping or not any(self.device_mapping.values()):
+                logger.info("No saved device mapping found, auto-populating from connected devices")
+                self._auto_populate_internal()
+            else:
+                # Apply saved mapping to dropdowns
+                for js_label, combo in self.mapping_combos.items():
+                    device_name = self.device_mapping.get(js_label)
+                    if device_name:
+                        for i in range(combo.count()):
+                            if combo.itemData(i) == device_name:
+                                combo.setCurrentIndex(i)
+                                break
+                logger.info(f"Applied saved device mapping: {self.device_mapping}")
 
         except Exception as e:
             logger.error(f"Error loading device config: {e}", exc_info=True)
@@ -364,14 +372,14 @@ class ConfigTab(QWidget):
         self.refresh_devices()
         QMessageBox.information(self, "Devices Refreshed", f"Found {len(self.current_devices)} device(s)")
 
-    def on_auto_populate_clicked(self):
-        """Auto-populate device mappings from connected joysticks"""
+    def _auto_populate_internal(self):
+        """Auto-populate device mappings from connected joysticks (internal, silent)"""
         try:
             # Get list of connected joystick devices
             joysticks = [d for d in self.current_devices if d.get('type') == 'joystick']
 
             if not joysticks:
-                QMessageBox.warning(self, "No Joysticks", "No joystick devices are currently connected.")
+                logger.debug("No joystick devices connected for auto-population")
                 return
 
             # Sort by instance to ensure consistent ordering
@@ -397,17 +405,10 @@ class ConfigTab(QWidget):
                             logger.info(f"Mapped {js_label} to {device_name}")
                             break
 
-            # Show summary message
-            summary = f"Auto-populated {len(joysticks)} joystick device mapping(s):\n\n"
-            for idx, device in enumerate(joysticks[:3], 1):
-                summary += f"js{idx}: {device.get('name', f'Joystick {idx}')}\n"
-
-            QMessageBox.information(self, "Auto-Population Complete", summary)
-            logger.info(f"Auto-populated device mappings: {summary}")
+            logger.info(f"Auto-populated device mappings for {len(joysticks)} joystick(s)")
 
         except Exception as e:
             logger.error(f"Error auto-populating device mappings: {e}", exc_info=True)
-            QMessageBox.warning(self, "Auto-Population Error", f"Failed to auto-populate device mappings:\n{e}")
 
     def on_save_config_clicked(self):
         """Handle Save Configuration button click"""
