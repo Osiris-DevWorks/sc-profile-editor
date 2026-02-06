@@ -389,6 +389,9 @@ class ConfigTab(QWidget):
     def on_refresh_devices_clicked(self):
         """Handle Refresh Devices button click"""
         self.refresh_devices()
+        # Auto-remap devices based on current detection
+        self._auto_populate_internal()
+        logger.info("Auto-remapped devices based on current detection")
         QMessageBox.information(self, "Devices Refreshed", f"Found {len(self.current_devices)} device(s)")
 
     def _auto_populate_internal(self):
