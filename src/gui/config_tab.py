@@ -342,27 +342,17 @@ class ConfigTab(QWidget):
             QMessageBox.warning(self, "Device Refresh Error", f"Failed to refresh devices:\n{e}")
 
     def load_device_config(self):
-        """Load device configuration from settings, auto-populate if empty"""
+        """Load device configuration from settings, auto-detect on startup"""
         try:
             self.device_mapping = self.settings.get_device_config()
             logger.debug(f"Loaded device mapping: {self.device_mapping}")
 
             self.refresh_devices()
 
-            # Auto-populate if no saved configuration exists
-            if not self.device_mapping or not any(self.device_mapping.values()):
-                logger.info("No saved device mapping found, auto-populating from connected devices")
-                self._auto_populate_internal()
-            else:
-                # Apply saved mapping to dropdowns
-                for js_label, combo in self.mapping_combos.items():
-                    device_name = self.device_mapping.get(js_label)
-                    if device_name:
-                        for i in range(combo.count()):
-                            if combo.itemData(i) == device_name:
-                                combo.setCurrentIndex(i)
-                                break
-                logger.info(f"Applied saved device mapping: {self.device_mapping}")
+            # Always auto-populate based on current device detection
+            # This ensures the initial state reflects the actual connected devices
+            logger.info("Auto-detecting device mapping based on current detection")
+            self._auto_populate_internal()
 
         except Exception as e:
             logger.error(f"Error loading device config: {e}", exc_info=True)
