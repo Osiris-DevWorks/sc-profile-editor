@@ -408,6 +408,29 @@ class ConfigTab(QWidget):
                             combo.setCurrentIndex(i)
                             logger.info(f"Restored {js_label} to {device_name}")
                             break
+
+            # Auto-assign newly connected devices to empty slots
+            assigned_devices = set(self.device_mapping.values())
+            unassigned_devices = connected_device_names - assigned_devices
+
+            if unassigned_devices:
+                logger.info(f"Found unassigned devices: {unassigned_devices}")
+                # Find empty js slots and assign unassigned devices
+                for js_label in ["js1", "js2", "js3"]:
+                    if not self.device_mapping.get(js_label) and unassigned_devices:
+                        device_name = unassigned_devices.pop()
+                        self.device_mapping[js_label] = device_name
+
+                        # Set the combo to this device
+                        combo = self.mapping_combos[js_label]
+                        for i in range(combo.count()):
+                            if combo.itemData(i) == device_name:
+                                combo.setCurrentIndex(i)
+                                logger.info(f"Auto-assigned {js_label} to newly detected {device_name}")
+                                break
+
+                # Save the updated mapping
+                self.settings.set_device_config(self.device_mapping)
         else:
             # No saved config, auto-detect mapping from current devices
             logger.info("Auto-detecting device mapping based on current detection")
