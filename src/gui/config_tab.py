@@ -318,17 +318,8 @@ class ConfigTab(QWidget):
 
                 combo.blockSignals(False)
 
-            # Clean up device_mapping: remove devices that are no longer connected
-            updated_mapping = {}
-            for js_label, device_name in self.device_mapping.items():
-                if device_name in connected_device_names:
-                    updated_mapping[js_label] = device_name
-
-            if updated_mapping != self.device_mapping:
-                logger.info(f"Cleaned up device mapping: removed {len(self.device_mapping) - len(updated_mapping)} disconnected device(s)")
-                self.device_mapping = updated_mapping
-                # Save the cleaned up mapping
-                self.settings.set_device_config(updated_mapping)
+            # Note: Device cleanup is handled in on_refresh_devices_clicked() to avoid
+            # modifying the mapping during a simple device list update
 
             logger.info(f"Devices refreshed: {len(self.current_devices)} devices found")
 
@@ -375,17 +366,37 @@ class ConfigTab(QWidget):
         """Handle Refresh Devices button click"""
         self.refresh_devices()
 
-        # If user has saved a config, restore it after refresh
-        # Otherwise, auto-detect the mapping based on current devices
+        # Get list of currently connected device names
+        connected_device_names = set()
+        for device in self.current_devices:
+            if device.get('type') == 'joystick':
+                connected_device_names.add(device.get('name', f"Joystick {device.get('instance', 0)}"))
+
+        # If user has saved a config, preserve it but clean up disconnected devices
         if self.device_mapping and any(self.device_mapping.values()):
-            # User has saved a custom mapping, restore it
-            logger.info("Restoring saved device mapping after refresh")
+            # User has saved a custom mapping, preserve it
+            logger.info("Preserving saved device mapping after refresh")
+
+            # First, clean up mapping to remove disconnected devices
+            updated_mapping = {}
+            for js_label, device_name in self.device_mapping.items():
+                if device_name in connected_device_names:
+                    updated_mapping[js_label] = device_name
+                else:
+                    logger.info(f"Removing disconnected device {device_name} from {js_label}")
+
+            if updated_mapping != self.device_mapping:
+                self.device_mapping = updated_mapping
+                self.settings.set_device_config(updated_mapping)
+
+            # Now restore the (cleaned up) mapping to combos
             for js_label, combo in self.mapping_combos.items():
                 device_name = self.device_mapping.get(js_label)
                 if device_name:
                     for i in range(combo.count()):
                         if combo.itemData(i) == device_name:
                             combo.setCurrentIndex(i)
+                            logger.info(f"Restored {js_label} to {device_name}")
                             break
         else:
             # No saved config, auto-detect mapping from current devices
