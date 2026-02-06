@@ -105,7 +105,7 @@ class ConfigTab(QWidget):
 
         # Save button (auto-populate happens automatically on tab load)
         button_layout = QHBoxLayout()
-        button_layout.setContentsMargins(20, 15, 20, 20)
+        button_layout.setContentsMargins(20, 10, 20, 5)  # Reduced bottom margin
         button_layout.setSpacing(10)
 
         button_layout.addStretch()
@@ -117,6 +117,7 @@ class ConfigTab(QWidget):
         button_layout.addWidget(save_btn)
 
         mapping_layout.addLayout(button_layout)
+        mapping_layout.addSpacing(10)  # Add spacing after button to separate from border
 
         layout.addWidget(mapping_group)
 
@@ -268,11 +269,14 @@ class ConfigTab(QWidget):
 
             # Dynamically resize table to fit content
             self.devices_table.resizeRowsToContents()
-            # Calculate total height needed
-            height = self.devices_table.horizontalHeader().height()
-            for i in range(self.devices_table.rowCount()):
-                height += self.devices_table.rowHeight(i)
-            self.devices_table.setMaximumHeight(height)
+            # Calculate total height needed with padding
+            header_height = self.devices_table.horizontalHeader().height()
+            rows_height = sum(self.devices_table.rowHeight(i) for i in range(self.devices_table.rowCount()))
+            total_height = header_height + rows_height + 10  # Add 10px padding
+
+            # Set both min and fixed height to ensure it displays correctly
+            self.devices_table.setMinimumHeight(total_height)
+            self.devices_table.setMaximumHeight(total_height)
 
             # Update mapping dropdowns with current devices
             # Also clean up device_mapping to remove disconnected devices
