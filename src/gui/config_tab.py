@@ -50,7 +50,7 @@ class ConfigTab(QWidget):
         self.devices_table.setColumnWidth(0, 120)
         self.devices_table.setColumnWidth(1, 300)
         self.devices_table.setColumnWidth(2, 100)
-        self.devices_table.setMaximumHeight(150)
+        self.devices_table.setMaximumHeight(200)  # Increased from 150 to show all devices
         devices_layout.addWidget(self.devices_table)
 
         # Refresh button
@@ -239,17 +239,23 @@ class ConfigTab(QWidget):
         """Refresh the list of connected devices"""
         try:
             self.current_devices = InputDetector.get_available_devices()
-            logger.debug(f"Found {len(self.current_devices)} devices")
+            logger.info(f"Found {len(self.current_devices)} devices:")
+            for d in self.current_devices:
+                logger.info(f"  - {d.get('type')}: {d.get('name')} (instance {d.get('instance')})")
 
             # Emit signal so other widgets (like Device View) can update
             self.devices_changed.emit(self.current_devices)
 
             # Update devices table
+            logger.info(f"Setting devices table row count to {len(self.current_devices)}")
             self.devices_table.setRowCount(len(self.current_devices))
+
             for row, device in enumerate(self.current_devices):
                 device_type = device.get('type', 'unknown').capitalize()
                 product_name = device.get('name', 'Unknown Device')
                 instance = str(device.get('instance', '?'))
+
+                logger.info(f"Adding device to table row {row}: {device_type} - {product_name} (instance {instance})")
 
                 type_item = QTableWidgetItem(device_type)
                 type_item.setFlags(type_item.flags() & ~Qt.ItemFlag.ItemIsEditable)

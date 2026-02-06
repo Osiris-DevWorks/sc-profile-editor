@@ -1,0 +1,21 @@
+● Perfect! That's a much cleaner approach. Let me update Test 1 for your setup:                                                                                                                                                                     
+                                                            
+  Test 1: Device Detection with T16000 Only 🎮                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+  Setup:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  - Disconnect the Throttle (only T16000 connected)                                                                                                                                                                                                   - Start the application fresh                                                                                                                                                                                                                                                                                                                                                                                                                                                                           Steps:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  1. Click "Create New Profile"                                                                                                                                                                                                                       2. Go to the Controls tab                                                                                                                                                                                                                         
+  3. Look at the Profile Summary on the right side                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+  What to Look For:                                                                                                                                                                                                                                 
+                                                                            
+  You should see:
+  Profile Name: new_profile_YYYYMMDD
+  Devices: 3                          ← Should be 3 (Keyboard, Mouse, T16000)
+    - Keyboard 1: Keyboard
+    - Mouse 1: Mouse
+    - Joystick 1: T.16000M            ← Your stick by name
+
+  Report Back:
+
+  1. ✅ Does it show "Devices: 3" or something else?
+  2. ✅ Does your T16000 appear with its real name?
+  3. ✅ Any error messages?
+
+  Please run this and let me know what you see! 👍
