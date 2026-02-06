@@ -50,7 +50,7 @@ class ConfigTab(QWidget):
         # Devices table
         self.devices_table = QTableWidget()
         self.devices_table.setColumnCount(3)
-        self.devices_table.setHorizontalHeaderLabels(["Device Type", "Product Name", "Instance"])
+        self.devices_table.setHorizontalHeaderLabels(["Device Type", "Device Name", "Instance"])
         self.devices_table.setColumnWidth(0, 120)
         self.devices_table.setColumnWidth(1, 300)
         self.devices_table.setColumnWidth(2, 100)
