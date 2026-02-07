@@ -180,14 +180,17 @@ class InputDetectorThread(QThread):
             pygame.init()
             pygame.joystick.init()
 
-            # Create a hidden display window for proper event handling
-            # Some systems require an active display for joystick events to be pumped
+            # Create a display window for proper event handling
+            # Windows requires an active display context for joystick events
             try:
-                # Try to create a minimal hidden surface
-                pygame.display.set_mode((1, 1), flags=pygame.HIDDEN)
-                logger.debug("Created hidden pygame display for joystick event handling")
+                # Create a small visible window (hidden windows don't work reliably on Windows)
+                pygame.display.set_mode((100, 100))
+                pygame.display.set_caption("Input Detection")
+                logger.info("Created pygame display window for joystick event handling")
             except Exception as e:
-                logger.warning(f"Could not create hidden display: {e}, continuing without it")
+                logger.error(f"Could not create pygame display: {e}", exc_info=True)
+                # Continue anyway, but events might not be detected
+                logger.warning("Continuing without pygame display - joystick events may not be detected")
 
             # Get list of joysticks
             joystick_count = pygame.joystick.get_count()
