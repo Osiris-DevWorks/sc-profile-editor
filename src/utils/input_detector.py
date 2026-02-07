@@ -175,6 +175,7 @@ class InputDetectorThread(QThread):
         """Detect joystick input in a separate thread using pygame"""
         try:
             import pygame
+            import os
 
             # Initialize pygame and joystick module
             pygame.init()
@@ -183,10 +184,9 @@ class InputDetectorThread(QThread):
             # Create a display window for proper event handling
             # Windows requires an active display context for joystick events
             try:
-                # Create a small visible window (hidden windows don't work reliably on Windows)
-                pygame.display.set_mode((100, 100))
-                pygame.display.set_caption("Input Detection")
-                logger.info("Created pygame display window for joystick event handling")
+                # Create a minimal 1x1 window (essentially invisible but provides display context)
+                pygame.display.set_mode((1, 1))
+                logger.info("Created minimal pygame display window for joystick event handling")
             except Exception as e:
                 logger.error(f"Could not create pygame display: {e}", exc_info=True)
                 # Continue anyway, but events might not be detected
