@@ -221,6 +221,9 @@ class InputDetectorThread(QThread):
 
             while self.running and (time.time() - start_time) * 1000 < self.timeout_ms:
                 try:
+                    # Pump events on Windows - required for joystick events to be detected
+                    pygame.event.pump()
+
                     # Process pygame events for button presses
                     for event in pygame.event.get():
                         if event.type == pygame.JOYBUTTONDOWN:
