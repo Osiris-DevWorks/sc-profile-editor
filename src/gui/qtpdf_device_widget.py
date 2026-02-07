@@ -392,9 +392,18 @@ class QtPdfDeviceWidget(QWidget):
         # Add devices that have PDF templates
         from utils.device_splitter import is_vkb_with_sem, get_base_stick_name
 
-        # Use connected devices from Config tab instead of profile devices
-        # This ensures Device View shows what's actually connected
-        joystick_devices = [d for d in self.connected_devices if d.get('type') == 'joystick']
+        # Determine which devices to show based on show_all_templates flag
+        if self.show_all_templates:
+            # Show all available templates, not just connected devices
+            logger.debug("Show all templates enabled - displaying all available templates")
+            devices_to_show = self.pdf_manager.list_all_templates()
+            # Convert template names to device-like dicts for consistent processing
+            joystick_devices = [{'name': t.name, 'instance': 0, 'type': 'joystick'}
+                               for t in devices_to_show if t.device_type == 'joystick']
+        else:
+            # Use connected devices from Config tab
+            # This ensures Device View shows what's actually connected
+            joystick_devices = [d for d in self.connected_devices if d.get('type') == 'joystick']
 
         for device_dict in joystick_devices:
             # Extract device info from connected_devices dict
@@ -627,10 +636,11 @@ class QtPdfDeviceWidget(QWidget):
                 return field_values
 
             # Get joystick index for this device
-            js_index = self.device_mapper.get_js_index_for_device(self.current_device.product_name or "")
+            # current_device is now a device name string (from connected_devices)
+            js_index = self.device_mapper.get_js_index_for_device(self.current_device or "")
 
             if js_index is None:
-                logger.warning(f"No JS index found for device: {self.current_device.product_name}")
+                logger.warning(f"No JS index found for device: {self.current_device}")
                 return field_values
 
             # Extract JS number
@@ -869,7 +879,8 @@ class QtPdfDeviceWidget(QWidget):
             return None
 
         # Get JS index for this device
-        js_index = self.device_mapper.get_js_index_for_device(self.current_device.product_name or "")
+        # current_device is now a device name string (from connected_devices)
+        js_index = self.device_mapper.get_js_index_for_device(self.current_device or "")
         if not js_index:
             return None
 
