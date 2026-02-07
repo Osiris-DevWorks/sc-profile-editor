@@ -184,9 +184,28 @@ class InputDetectorThread(QThread):
             # Create a display window for proper event handling
             # Windows requires an active display context for joystick events
             try:
-                # Create a minimal 1x1 window (essentially invisible but provides display context)
+                import os
+                import sys
+
+                # Create a minimal window positioned off-screen
                 pygame.display.set_mode((1, 1))
-                logger.info("Created minimal pygame display window for joystick event handling")
+
+                # Try to move window off-screen on Windows
+                if sys.platform == 'win32':
+                    try:
+                        import ctypes
+                        hwnd = pygame.display.get_surface()
+                        if hwnd:
+                            # Get the window handle and move it off-screen
+                            win32_hwnd = ctypes.windll.user32.FindWindowW(None, "pygame window")
+                            if win32_hwnd:
+                                # Move window to coordinates (-10000, -10000) - far off-screen
+                                ctypes.windll.user32.SetWindowPos(win32_hwnd, 0, -10000, -10000, 1, 1, 0x0001)
+                                logger.debug("Moved pygame window off-screen")
+                    except Exception as e:
+                        logger.debug(f"Could not move window off-screen: {e}")
+
+                logger.info("Created pygame display window for joystick event handling")
             except Exception as e:
                 logger.error(f"Could not create pygame display: {e}", exc_info=True)
                 # Continue anyway, but events might not be detected
