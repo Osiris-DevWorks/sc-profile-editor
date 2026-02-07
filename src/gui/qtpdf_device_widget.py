@@ -392,66 +392,68 @@ class QtPdfDeviceWidget(QWidget):
         # Add devices that have PDF templates
         from utils.device_splitter import is_vkb_with_sem, get_base_stick_name
 
-        for device in profile.devices:
-            if device.device_type == 'joystick':
-                # Always show devices from profile, but check if connected for visual feedback
-                is_connected = self._is_device_connected(device)
-                connection_status = "" if is_connected else " [DISCONNECTED]"
+        # Use connected devices from Config tab instead of profile devices
+        # This ensures Device View shows what's actually connected
+        joystick_devices = [d for d in self.connected_devices if d.get('type') == 'joystick']
 
-                raw_device_name = device.product_name if device.product_name else f"Joystick {device.instance}"
+        for device_dict in joystick_devices:
+            # Extract device info from connected_devices dict
+            device_name = device_dict.get('name', f"Joystick {device_dict.get('instance', 0)}")
+            device_instance = device_dict.get('instance', 0)
 
-                # Check if this is a VKB device with SEM module
-                if is_vkb_with_sem(raw_device_name):
-                    # Split into two entries: base stick and SEM module
+            # Connected devices from Config tab are always connected
+            connection_status = ""
+            raw_device_name = device_name
 
-                    # 1. Add ALL matching base stick templates (user can choose)
-                    base_stick_name = get_base_stick_name(raw_device_name)
-                    matching_templates = self.find_all_matching_templates(base_stick_name)
+            # Check if this is a VKB device with SEM module
+            if is_vkb_with_sem(raw_device_name):
+                # Split into two entries: base stick and SEM module
 
-                    if matching_templates:
-                        for template in matching_templates:
-                            # Store tuple: (device, template.name) for searching
-                            # Use template name as search key since it's unique
-                            display_text = template.name + connection_status
-                            self.device_combo.addItem(display_text, (device, template.name))
-                    else:
-                        friendly_base_name = get_friendly_device_name(base_stick_name)
-                        display_text = f"{friendly_base_name} (No template){connection_status}"
-                        self.device_combo.addItem(display_text, (device, base_stick_name))
+                # 1. Add ALL matching base stick templates (user can choose)
+                base_stick_name = get_base_stick_name(raw_device_name)
+                matching_templates = self.find_all_matching_templates(base_stick_name)
 
-                    # 2. Add SEM module entry
-                    sem_template = self.pdf_manager.find_template("VKB SEM")
-
-                    if sem_template:
-                        # Store tuple: (device, "VKB SEM")
-                        display_text = "VKB SEM" + connection_status
-                        self.device_combo.addItem(display_text, (device, "VKB SEM"))
-                    else:
-                        display_text = f"VKB SEM (No template){connection_status}"
-                        self.device_combo.addItem(display_text, (device, "VKB SEM"))
+                if matching_templates:
+                    for template in matching_templates:
+                        # Store tuple: (device_name, device_instance, template.name)
+                        display_text = template.name + connection_status
+                        self.device_combo.addItem(display_text, (device_name, device_instance, template.name))
                 else:
-                    # Regular device (no SEM) - show ALL matching templates
-                    matching_templates = self.find_all_matching_templates(raw_device_name)
+                    friendly_base_name = get_friendly_device_name(base_stick_name)
+                    display_text = f"{friendly_base_name} (No template){connection_status}"
+                    self.device_combo.addItem(display_text, (device_name, device_instance, base_stick_name))
 
-                    if matching_templates:
-                        for template in matching_templates:
-                            # Store tuple: (device, template.name)
-                            display_text = template.name + connection_status
-                            self.device_combo.addItem(display_text, (device, template.name))
-                    else:
-                        device_name = get_friendly_device_name(raw_device_name)
-                        display_text = f"{device_name} (No template){connection_status}"
-                        self.device_combo.addItem(display_text, device)
+                # 2. Add SEM module entry
+                sem_template = self.pdf_manager.find_template("VKB SEM")
+
+                if sem_template:
+                    # Store tuple: (device_name, device_instance, "VKB SEM")
+                    display_text = "VKB SEM" + connection_status
+                    self.device_combo.addItem(display_text, (device_name, device_instance, "VKB SEM"))
+                else:
+                    display_text = f"VKB SEM (No template){connection_status}"
+                    self.device_combo.addItem(display_text, (device_name, device_instance, "VKB SEM"))
+            else:
+                # Regular device (no SEM) - show ALL matching templates
+                matching_templates = self.find_all_matching_templates(raw_device_name)
+
+                if matching_templates:
+                    for template in matching_templates:
+                        # Store tuple: (device_name, device_instance, template.name)
+                        display_text = template.name + connection_status
+                        self.device_combo.addItem(display_text, (device_name, device_instance, template.name))
+                else:
+                    friendly_device_name = get_friendly_device_name(raw_device_name)
+                    display_text = f"{friendly_device_name} (No template){connection_status}"
+                    self.device_combo.addItem(display_text, (device_name, device_instance, raw_device_name))
 
         if self.device_combo.count() == 0:
-            self.status_label.setText("No devices found in profile")
+            self.status_label.setText("No connected devices found")
             self.device_combo.addItem("No devices available", None)
         else:
-            # Count connected vs total
-            connected_count = sum(1 for d in profile.devices
-                                if d.device_type == 'joystick' and self._is_device_connected(d))
-            total_count = sum(1 for d in profile.devices if d.device_type == 'joystick')
-            self.status_label.setText(f"Found {self.device_combo.count()} device option(s) ({connected_count}/{total_count} connected)")
+            # All connected devices are by definition connected
+            connected_count = len(joystick_devices)
+            self.status_label.setText(f"Found {connected_count} connected device(s)")
 
     def find_all_matching_templates(self, device_name: str) -> list:
         """
@@ -526,10 +528,17 @@ class QtPdfDeviceWidget(QWidget):
             self.export_available_changed.emit(False)
             return
 
-        # Handle both old format (device) and new format (device, template_name)
+        # Handle tuple format (device_name, device_instance, template_name)
         if isinstance(item_data, tuple):
-            self.current_device = item_data[0]
-            self.current_template_search_name = item_data[1]
+            if len(item_data) == 3:
+                # New format: (device_name, device_instance, template_name)
+                self.current_device = item_data[0]  # device_name
+                self.current_device_instance = item_data[1]  # device_instance
+                self.current_template_search_name = item_data[2]  # template_name
+            elif len(item_data) == 2:
+                # Old format: (device, template_name) - for backwards compatibility
+                self.current_device = item_data[0]
+                self.current_template_search_name = item_data[1]
         else:
             self.current_device = item_data
             self.current_template_search_name = None
@@ -551,12 +560,9 @@ class QtPdfDeviceWidget(QWidget):
                 # Fallback: try as device name pattern
                 template = self.pdf_manager.find_template(self.current_template_search_name)
         else:
-            # No specific template selected, use device name and product_id for matching
-            # Product ID is the primary matching method (via find_template)
-            template = self.pdf_manager.find_template(
-                self.current_device.product_name or "",
-                product_id=self.current_device.product_id
-            )
+            # No specific template selected, use device name for matching
+            # current_device is now a device name string (from connected_devices)
+            template = self.pdf_manager.find_template(self.current_device)
 
         if not template:
             self.scene.clear()
