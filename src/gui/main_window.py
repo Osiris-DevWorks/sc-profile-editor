@@ -926,11 +926,16 @@ class MainWindow(QMainWindow):
         # Block signals to prevent itemChanged from triggering during population
         self.controls_table.blockSignals(True)
 
-        # Get all bindings and store for filtering
+        # Get all bindings and store for filtering, deduplicated by action name
+        # (Same action can appear in multiple actionmaps, we only want to show it once)
         self.all_bindings = []
+        seen_actions = set()
         for action_map in self.current_profile.action_maps:
             for binding in action_map.actions:
-                self.all_bindings.append((action_map.name, binding))
+                # Only add each unique action once
+                if binding.action_name not in seen_actions:
+                    self.all_bindings.append((action_map.name, binding))
+                    seen_actions.add(binding.action_name)
 
         # Populate filter dropdowns
         self.populate_filter_dropdowns()
