@@ -396,10 +396,10 @@ class QtPdfDeviceWidget(QWidget):
         if self.show_all_templates:
             # Show all available templates, not just connected devices
             logger.debug("Show all templates enabled - displaying all available templates")
-            devices_to_show = self.pdf_manager.list_all_templates()
+            all_templates = self.pdf_manager.get_all_templates()
             # Convert template names to device-like dicts for consistent processing
             joystick_devices = [{'name': t.name, 'instance': 0, 'type': 'joystick'}
-                               for t in devices_to_show if t.device_type == 'joystick']
+                               for t in all_templates]
         else:
             # Use connected devices from Config tab
             # This ensures Device View shows what's actually connected
