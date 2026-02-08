@@ -17,6 +17,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.8.2] - 2026-02-07
+
+### Fixed
+- **XML Export - Missing Actionmaps** - Fixed critical issue where bindings for actionmaps not in source XML were skipped:
+  - Root cause: Exporter tried to find actionmap in XML, failed, then skipped binding entirely
+  - Solution: Create missing actionmaps in XML during export if they don't exist
+  - Bindings now properly saved for all actionmaps, including those added by template system
+  - Fixes issue where user-bound actions were being lost during save/reload
+
+- **XML Export - Unbound Actions** - Fixed removal of unbind actions, preventing game interface binding:
+  - Root cause: Exporter removed all actions without bindings from XML
+  - Solution: Keep ALL actions (bound and unbound) in XML, only remove true duplicates
+  - Users can now bind actions through Star Citizen's native interface if desired
+  - Profile XML now includes complete action structure for maximum compatibility
+
+- **Device View - PDF Click Detection** - Fixed clicking on PDF buttons not opening remap dialog:
+  - Root cause: Device mapper created before joystick devices added to profile, couldn't find devices
+  - Solution: Refresh device mapper after auto-detecting joystick devices
+  - Ensure joystick devices added to profile on every load (not just new/preset profiles)
+  - PDF field click regions now properly populated with correct device mappings
+  - Fixed device name string vs Device object type error handling
+
+- **Device View - Device Mapper Updates** - Device mapper now updates when profile devices change:
+  - Added `refresh_device_mapper()` method to Device View widget
+  - Called after `_add_missing_joystick_devices()` to ensure mapper has current devices
+  - Fixes issue where Device View couldn't find devices because mapper was stale
+
+- **Profile Summary - Inflated Action Counts** - Fixed double/triple counting of actions from overlay system:
+  - Root cause: Counted all ActionBinding objects (including duplicates from overlay)
+  - Solution: Count unique action names instead of duplicate objects
+  - "Total Actions Available" now shows ~1085 (not inflated 5299)
+  - "Bound Actions" now shows accurate count (deduplicated)
+
+### Changed
+- **Device Detection** - Joystick devices now added to all profiles on load:
+  - Previously only added during "Create New" or "Load Preset"
+  - Now added in `display_profile()` to ensure all profiles have current devices
+  - Improves reliability across all profile loading paths
+
 ## [0.8.1] - 2026-01-28
 
 ### Fixed
