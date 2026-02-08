@@ -170,14 +170,18 @@ class InteractivePDFGraphicsView(QGraphicsView):
         if event.button() == Qt.MouseButton.LeftButton:
             # Map view coordinates to scene coordinates
             scene_pos = self.mapToScene(event.pos())
+            logger.debug(f"mousePressEvent: Click at view {event.pos()}, scene {scene_pos}, field_regions: {len(self.field_regions)}")
 
             # Check if click is within any field region
             for input_code, rect in self.field_regions.items():
                 if rect.contains(scene_pos):
                     # Field clicked - emit signal
                     current_value = self.field_values.get(input_code, "")
+                    logger.info(f"mousePressEvent: Field clicked! {input_code} at {scene_pos}")
                     self.field_clicked.emit(input_code, current_value)
                     return
+
+            logger.debug(f"mousePressEvent: Click did not hit any field region. Fields: {list(self.field_regions.keys())}")
 
         # Default handling for non-field clicks
         super().mousePressEvent(event)
@@ -385,6 +389,7 @@ class QtPdfDeviceWidget(QWidget):
         try:
             self.device_mapper = DeviceJoystickMapper(profile,
                 os.path.join(self.templates_dir, "template_registry.json"))
+            logger.debug(f"load_profile: Created device mapper with mappings: {self.device_mapper.device_to_js}")
         except Exception as e:
             logger.error(f"Error creating device mapper: {e}", exc_info=True)
             self.device_mapper = None
@@ -554,16 +559,38 @@ class QtPdfDeviceWidget(QWidget):
 
         self.load_device_pdf()
 
+    def refresh_device_mapper(self):
+        """Refresh device mapper after profile devices have been updated
+        This is called after auto-detecting and adding joystick devices"""
+        if not self.current_profile or not self.device_mapper:
+            logger.warning("Cannot refresh device mapper: no profile or mapper")
+            return
+
+        try:
+            # Recreate the mapper with updated devices
+            self.device_mapper = DeviceJoystickMapper(self.current_profile,
+                os.path.join(self.templates_dir, "template_registry.json"))
+            logger.info(f"refresh_device_mapper: New mappings: {self.device_mapper.device_to_js}")
+            # Reload current device if one is selected
+            if self.current_device:
+                self.load_device_pdf()
+        except Exception as e:
+            logger.error(f"Error refreshing device mapper: {e}", exc_info=True)
+
     def load_device_pdf(self):
         """Load and display device PDF with populated form fields"""
         if not self.current_device:
+            logger.debug("load_device_pdf: No current_device set")
             return
+
+        logger.debug(f"load_device_pdf: Loading PDF for device '{self.current_device}'")
 
         # Find PDF template for this device
         # Use the template search name if set (for split devices or user selection)
         if self.current_template_search_name:
             # Search name might be a template name (e.g., "VKB Gladiator SCG OTA (Left)")
             # Try to find by template name first
+            logger.debug(f"load_device_pdf: Using template search name: {self.current_template_search_name}")
             template = self.find_template_by_name(self.current_template_search_name)
             if not template:
                 # Fallback: try as device name pattern
@@ -571,6 +598,7 @@ class QtPdfDeviceWidget(QWidget):
         else:
             # No specific template selected, use device name for matching
             # current_device is now a device name string (from connected_devices)
+            logger.debug(f"load_device_pdf: Finding template for device name: {self.current_device}")
             template = self.pdf_manager.find_template(self.current_device)
 
         if not template:
@@ -706,7 +734,19 @@ class QtPdfDeviceWidget(QWidget):
             return []
 
         bindings = []
-        device_type = self.current_device.device_type
+
+        # current_device can be either a string (device name) or a Device object
+        # Handle both cases for compatibility
+        if isinstance(self.current_device, str):
+            # Device name string - match it to a Device object in the profile
+            device_product_name = self.current_device
+            device_type = 'joystick'  # For now, assume string devices are joysticks
+            logger.debug(f"current_device is string: {device_product_name}")
+        else:
+            # Device object
+            device_type = self.current_device.device_type
+            device_product_name = self.current_device.product_name or ""
+            logger.debug(f"current_device is Device object: {device_product_name}")
 
         # Get the correct JS index from device mapper (not the raw device instance)
         if device_type == 'joystick':
@@ -714,14 +754,14 @@ class QtPdfDeviceWidget(QWidget):
                 logger.warning("No device mapper available")
                 return []
 
-            device_product_name = self.current_device.product_name or ""
             logger.debug(f"Looking for JS index for device: '{device_product_name}'")
 
             js_index = self.device_mapper.get_js_index_for_device(device_product_name)
             if not js_index:
                 logger.warning(f"No JS index found for device: {device_product_name}")
-                logger.debug(f"  Device instance: {self.current_device.instance}")
-                logger.debug(f"  Available mappings: {self.device_mapper.device_to_joystick}")
+                if hasattr(self.current_device, 'instance'):
+                    logger.debug(f"  Device instance: {self.current_device.instance}")
+                logger.debug(f"  Available mappings: {self.device_mapper.device_to_js}")
                 return []
 
             js_num = js_index.replace("js", "")
@@ -843,7 +883,10 @@ class QtPdfDeviceWidget(QWidget):
             # DPI scale factor
             zoom = dpi / 72.0
 
+            widget_count = 0
+            mapped_count = 0
             for widget in page.widgets():
+                widget_count += 1
                 field_name = widget.field_name
                 rect = widget.rect
 
@@ -859,14 +902,19 @@ class QtPdfDeviceWidget(QWidget):
                 input_code = self.map_pdf_field_to_input_code(field_name, field_mapping)
 
                 if input_code:
+                    mapped_count += 1
                     field_regions[input_code] = scaled_rect
                     # Store current value for this field
                     current_value = self.current_field_values.get(input_code, "")
                     field_values[input_code] = current_value
                     # Store reverse mapping
                     self.field_to_input_code[field_name] = input_code
+                    logger.debug(f"get_field_regions_from_pdf: Mapped '{field_name}' -> '{input_code}'")
+                else:
+                    logger.debug(f"get_field_regions_from_pdf: Could not map field '{field_name}'")
 
             doc.close()
+            logger.info(f"get_field_regions_from_pdf: Found {widget_count} widgets, mapped {mapped_count} input codes")
 
         except Exception as e:
             logger.error(f"Error getting field regions: {e}", exc_info=True)
@@ -876,13 +924,20 @@ class QtPdfDeviceWidget(QWidget):
     def map_pdf_field_to_input_code(self, pdf_field_name: str, field_mapping: dict) -> str:
         """Map PDF field name to Star Citizen input code"""
         if not self.device_mapper:
+            logger.warning(f"map_pdf_field_to_input_code: No device_mapper available")
             return None
 
         # Get JS index for this device
         # current_device is now a device name string (from connected_devices)
-        js_index = self.device_mapper.get_js_index_for_device(self.current_device or "")
+        device_name = self.current_device or ""
+        logger.debug(f"map_pdf_field_to_input_code: Looking up JS index for device '{device_name}'")
+        js_index = self.device_mapper.get_js_index_for_device(device_name)
         if not js_index:
+            logger.warning(f"map_pdf_field_to_input_code: Could not find JS index for device '{device_name}'")
+            logger.debug(f"map_pdf_field_to_input_code: Available mappings: {self.device_mapper.device_to_js}")
             return None
+
+        logger.debug(f"map_pdf_field_to_input_code: Device '{device_name}' mapped to {js_index}")
 
         js_num = js_index.replace("js", "")
 

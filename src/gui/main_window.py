@@ -737,10 +737,11 @@ class MainWindow(QMainWindow):
             # Refresh UI to show the newly added devices
             self.display_profile()
 
-            # Refresh Device View widget with updated devices
+            # Refresh Device View widget with updated devices AND refresh its device mapper
             if self.pdf_device_widget:
                 self.pdf_device_widget.load_profile(self.current_profile)
-                logger.debug("Refreshed Device View with newly added joystick devices")
+                self.pdf_device_widget.refresh_device_mapper()
+                logger.debug("Refreshed Device View with newly added joystick devices and updated device mapper")
 
             # Set a default filename for save
             from datetime import datetime
@@ -848,10 +849,11 @@ class MainWindow(QMainWindow):
                     # Refresh UI to show the newly added devices
                     self.display_profile()
 
-                    # Refresh Device View widget with updated devices
+                    # Refresh Device View widget with updated devices AND refresh its device mapper
                     if self.pdf_device_widget:
                         self.pdf_device_widget.load_profile(self.current_profile)
-                        logger.debug("Refreshed Device View with connected joystick devices")
+                        self.pdf_device_widget.refresh_device_mapper()
+                        logger.debug("Refreshed Device View with connected joystick devices and updated device mapper")
 
                     # Mark as modified since it's a starting point for customization
                     self.current_profile.mark_modified()
@@ -896,7 +898,19 @@ class MainWindow(QMainWindow):
             summary_parts.append(f"  - {device.device_type.capitalize()} {device.instance}: {device_name}")
 
         summary_parts.append(f"\nAction Categories: {len(profile.action_maps)}")
-        summary_parts.append(f"Total Bindings: {len(profile.get_all_bindings())}")
+        # Count unique actions (deduplicated by action name across all actionmaps)
+        # This avoids counting duplicates from the overlay system
+        all_action_names = set()
+        bound_action_names = set()
+        for am in profile.action_maps:
+            for b in am.actions:
+                all_action_names.add(b.action_name)
+                if b.input_code and not b.input_code.rstrip().endswith('_'):
+                    bound_action_names.add(b.action_name)
+        total_actions = len(all_action_names)
+        bound_actions = len(bound_action_names)
+        summary_parts.append(f"Total Actions Available: {total_actions}")
+        summary_parts.append(f"Bound Actions: {bound_actions}")
 
         if profile.categories:
             summary_parts.append(f"\nCategories: {', '.join(profile.categories[:5])}")
@@ -911,9 +925,15 @@ class MainWindow(QMainWindow):
         # Apply filters to show the rows (important when loading a new profile)
         self.apply_filters()
 
-        # Load profile into Device View widget
+        # Ensure joystick devices are in the profile before loading into Device View
+        # This is important for profiles loaded from disk that don't have joystick devices
+        self._add_missing_joystick_devices()
+
+        # Load profile into Device View widget with updated device mapper
         if self.pdf_device_widget:
             self.pdf_device_widget.load_profile(profile)
+            self.pdf_device_widget.refresh_device_mapper()
+            logger.debug("Loaded profile into Device View with updated device mapper")
 
     def populate_controls_table(self):
         """Populate the controls table with bindings"""
@@ -1961,8 +1981,15 @@ class MainWindow(QMainWindow):
 
             # Profile info
             info = doc.add_paragraph()
+            # Count unique bound actions (deduplicated by action name)
+            bound_action_names = set()
+            for am in self.current_profile.action_maps:
+                for b in am.actions:
+                    if b.input_code and not b.input_code.rstrip().endswith('_'):
+                        bound_action_names.add(b.action_name)
+            bound_actions = len(bound_action_names)
             info.add_run(f"Devices: {len(self.current_profile.devices)} | ")
-            info.add_run(f"Total Bindings: {len(self.current_profile.get_all_bindings())}")
+            info.add_run(f"Bound Actions: {bound_actions}")
             info.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
             doc.add_paragraph()  # Spacer

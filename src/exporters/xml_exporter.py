@@ -252,8 +252,12 @@ class XMLExporter:
                     break
 
             if not actionmap_elem:
-                logger.warning(f"EXPORT DEBUG: Could not find actionmap {map_name} in XML, skipping binding {action_name}")
-                continue
+                # Actionmap doesn't exist in XML - create it
+                # This happens when bindings are for actionmaps in the template but not in the source file
+                logger.info(f"EXPORT DEBUG: Actionmap {map_name} not found in XML, creating it")
+                actionmap_elem = ET.SubElement(self.root, 'actionmap')
+                actionmap_elem.set('name', map_name)
+                logger.info(f"EXPORT DEBUG: Created new actionmap {map_name} in XML")
 
             # Create new action element
             action_elem = ET.SubElement(actionmap_elem, 'action')
@@ -274,11 +278,11 @@ class XMLExporter:
                 if binding.activation_mode:
                     rebind_elem.set('activationMode', binding.activation_mode)
 
-        # Remove empty/unmapped actions and duplicates from XML
+        # Remove duplicate actions from XML, but KEEP all actions (bound and unbound)
+        # This allows users to bind actions through the game interface if they wish
         for actionmap_elem in self.root.findall('.//actionmap'):
             map_name = actionmap_elem.get('name', '')
             # Track which action names we've seen in this actionmap
-            # Store as action_name -> list of (elem, has_binding, binding_input_code)
             seen_actions = {}
             actions_to_remove = []
 
@@ -298,30 +302,26 @@ class XMLExporter:
                             binding_input = inp
                             break
 
-                if not has_binding:
-                    # Mark empty actions for removal
-                    actions_to_remove.append(action_elem)
-                elif action_name in seen_actions:
-                    # Duplicate action found - keep the one with actual mapped binding, remove unmapped
+                # Handle duplicates - keep the one with binding if available, otherwise keep first
+                if action_name in seen_actions:
+                    # Duplicate action found
                     prev_elem, prev_has_binding, prev_binding = seen_actions[action_name]
 
                     if has_binding and not prev_has_binding:
                         # Current has binding, previous doesn't - remove previous, keep current
                         actions_to_remove.append(prev_elem)
                         seen_actions[action_name] = (action_elem, has_binding, binding_input)
-                        logger.debug(f"Removing duplicate unmapped action: {map_name}.{action_name}, keeping mapped version")
-                    elif has_binding and prev_has_binding:
-                        # Both have bindings - keep first, remove second
-                        actions_to_remove.append(action_elem)
-                        logger.debug(f"Removing duplicate action: {map_name}.{action_name}")
+                        logger.debug(f"Removing duplicate action: {map_name}.{action_name}, keeping bound version")
                     else:
-                        # Previous has binding or both are unmapped - keep previous
+                        # Previous has binding or both are same - keep previous, remove current
                         actions_to_remove.append(action_elem)
-                        logger.debug(f"Removing duplicate action: {map_name}.{action_name}")
+                        logger.debug(f"Removing duplicate action: {map_name}.{action_name}, keeping first occurrence")
                 else:
+                    # First occurrence of this action - keep it regardless of binding status
+                    # This ensures all actions are available to the game even if unbound
                     seen_actions[action_name] = (action_elem, has_binding, binding_input)
 
-            # Remove marked actions
+            # Remove marked actions (only duplicates, not unbound actions)
             for action_elem in actions_to_remove:
                 actionmap_elem.remove(action_elem)
 
