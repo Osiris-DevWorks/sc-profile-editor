@@ -1,7 +1,7 @@
 # SC Profile Editor - Project Context
 
-**Version:** 0.7.5
-**Date:** 2026-01-06
+**Version:** 0.8.2
+**Date:** 2026-02-07
 **For:** AI assistants - Comprehensive project overview and development guidelines
 
 This document provides context for AI assistants working on this project.
@@ -12,11 +12,11 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 
 ## Current Status
 
-**Version:** 0.7.5 (released 2026-01-06)
-**Current Branch:** v0.8.0 (development)
-**Status:** v0.7.5 released with Device View label fixes; v0.8.0 development branch started
-**Latest Release:** 0.7.5 (2026-01-06)
-**Previous Release:** 0.7.4 (2025-12-27)
+**Version:** 0.8.2 (released 2026-02-07)
+**Current Branch:** main (stable)
+**Status:** v0.8.2 released with critical XML export, device detection, and PDF click fixes
+**Latest Release:** 0.8.2 (2026-02-07)
+**Previous Release:** 0.8.1 (2026-01-28)
 **Platform:** Windows (PyInstaller executable)
 
 ## Implemented Features
@@ -293,6 +293,16 @@ cmd //c scripts\build\build_all.bat
 13. Test button mapping and form field population in Device View
 
 ### Recent Important Changes
+
+#### v0.8.2 (Released 2026-02-07)
+- **XML Export Critical Fixes**: Bindings no longer lost when saving profiles with missing actionmaps; ALL actions now written to XML
+- **Device Detection**: Joystick devices now properly detected for all profiles; device mapper refreshes automatically
+- **Device View PDF Clicking**: PDF button clicking now works reliably with proper device mappings
+- **Action Counting**: Fixed inflated counts from overlay system duplication; accurate unique action counts
+
+#### v0.8.1 (Released 2026-01-28)
+- **Duplicate Actions Fix**: Action elements no longer accumulate exponentially on save/reload
+- **Device Detection**: Joystick devices auto-detected on profile load
 
 #### v0.7.5 (Released 2026-01-06)
 - **Device View Hat/Axis/Slider Labels**: Fixed hat switch, axis, and slider field labels not displaying in Device View

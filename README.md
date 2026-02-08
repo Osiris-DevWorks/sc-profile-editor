@@ -2,7 +2,7 @@
 
 A desktop application for editing and exporting Star Citizen control profiles in human-readable formats. Create visual diagrams of your controller layouts and export your bindings to PDF, Word, CSV, and annotated device graphics.
 
-![Version](https://img.shields.io/badge/version-0.7.5-blue)
+![Version](https://img.shields.io/badge/version-0.8.2-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 
 ## Download & Installation
