@@ -268,6 +268,8 @@ class QtPdfDeviceWidget(QWidget):
         # Track connected devices for filtering
         self.connected_devices = []  # List of connected device dicts from InputDetector
         self.show_all_templates = False  # Toggle to show all templates or just connected
+        self.show_disconnected_devices = False  # Toggle to show devices from profile even if offline
+        self.show_omni_only = False  # Toggle to show only OTA templates for EVO R/L devices
 
         self.setup_ui()
 
@@ -289,6 +291,21 @@ class QtPdfDeviceWidget(QWidget):
         self.show_all_checkbox.setToolTip("When unchecked, only shows templates for connected devices")
         self.show_all_checkbox.stateChanged.connect(self.on_show_all_toggled)
         selection_layout.addWidget(self.show_all_checkbox)
+
+        # Toggle to show disconnected devices from profile
+        self.show_disconnected_checkbox = QCheckBox("Show disconnected devices")
+        self.show_disconnected_checkbox.setToolTip(
+            "Show templates for devices in the profile even if not physically connected"
+        )
+        self.show_disconnected_checkbox.stateChanged.connect(self.on_show_disconnected_toggled)
+        selection_layout.addWidget(self.show_disconnected_checkbox)
+
+        # Omni toggle for EVO R/L devices
+        self.omni_checkbox = QCheckBox("Omni")
+        self.omni_checkbox.setToolTip("Show only Omni Throttle Adapter (OTA) template variants")
+        self.omni_checkbox.stateChanged.connect(self.on_omni_toggled)
+        self.omni_checkbox.setVisible(False)  # Hidden until EVO R/L detected
+        selection_layout.addWidget(self.omni_checkbox)
 
         layout.addLayout(selection_layout)
 
@@ -351,6 +368,79 @@ class QtPdfDeviceWidget(QWidget):
         if self.current_profile:
             self.load_profile(self.current_profile)
 
+    def on_show_disconnected_toggled(self, state):
+        """Handle toggle for showing disconnected profile devices"""
+        self.show_disconnected_devices = (state != 0)
+        logger.debug(f"Show disconnected devices toggled: {self.show_disconnected_devices}")
+
+        # Reload device list with new filter
+        if self.current_profile:
+            self.load_profile(self.current_profile)
+
+    def on_omni_toggled(self, state):
+        """Show only OTA (Omni Throttle Adapter) templates when checked"""
+        self.show_omni_only = (state != 0)
+        logger.debug(f"Omni toggle: {self.show_omni_only}")
+        if self.current_profile:
+            self.load_profile(self.current_profile)
+
+    def _should_show_omni_toggle(self, joystick_devices: list) -> bool:
+        """Return True if any non-OTA VKBsim Gladiator EVO R/L device is in the list"""
+        from utils.device_splitter import get_base_stick_name
+        for d in joystick_devices:
+            base = get_base_stick_name(d.get('name', '')).upper()
+            if 'VKB' in base and 'EVO' in base and 'OTA' not in base:
+                if 'EVO R' in base or 'EVO L' in base:
+                    return True
+        return False
+
+    def _should_filter_template_for_omni(self, template_name: str, currently_selected_template: str) -> bool:
+        """
+        Check if a template should be hidden when Omni is toggled.
+        Only hide non-OTA templates of the SAME device and SAME side as the currently selected one.
+
+        Args:
+            template_name: Name of template to check (e.g., "VKB Gladiator SCG (Left)")
+            currently_selected_template: Currently selected template name
+
+        Returns:
+            True if template should be hidden, False if it should be shown
+        """
+        # Extract side (Left/Right) from template names
+        current_side = None
+        check_side = None
+        if '(Left)' in currently_selected_template:
+            current_side = '(Left)'
+        elif '(Right)' in currently_selected_template:
+            current_side = '(Right)'
+
+        if '(Left)' in template_name:
+            check_side = '(Left)'
+        elif '(Right)' in template_name:
+            check_side = '(Right)'
+
+        # Different sides? Don't filter
+        if current_side != check_side:
+            return False
+
+        # Extract base device name (remove OTA and side markers)
+        def get_base_device(name: str) -> str:
+            # Remove " OTA", " (Left)", " (Right)" to get base name
+            import re
+            base = re.sub(r'\s+OTA\s*', ' ', name)
+            base = re.sub(r'\s*\([^)]*\)\s*$', '', base)
+            return base.strip().upper()
+
+        current_base = get_base_device(currently_selected_template)
+        check_base = get_base_device(template_name)
+
+        # Different base devices? Don't filter
+        if current_base != check_base:
+            return False
+
+        # Same base and side - hide non-OTA when omni is toggled
+        return 'OTA' not in template_name.upper()
+
     def _is_device_connected(self, device: Device) -> bool:
         """Check if a device is actually connected (for visual indicator purposes)"""
         if not self.connected_devices:
@@ -397,7 +487,7 @@ class QtPdfDeviceWidget(QWidget):
         # Add devices that have PDF templates
         from utils.device_splitter import is_vkb_with_sem, get_base_stick_name
 
-        # Determine which devices to show based on show_all_templates flag
+        # Determine which devices to show based on show_all_templates and show_disconnected_devices flags
         if self.show_all_templates:
             # Show all available templates, not just connected devices
             logger.debug("Show all templates enabled - displaying all available templates")
@@ -405,10 +495,30 @@ class QtPdfDeviceWidget(QWidget):
             # Convert template names to device-like dicts for consistent processing
             joystick_devices = [{'name': t.name, 'instance': 0, 'type': 'joystick'}
                                for t in all_templates]
+        elif self.show_disconnected_devices:
+            # Use devices from the XML profile — works without hardware connected
+            logger.debug("Show disconnected devices enabled - displaying devices from profile")
+            joystick_devices = [
+                {'name': d.product_name or f"Joystick {d.instance}",
+                 'instance': d.instance,
+                 'type': 'joystick',
+                 'product_id': d.product_id}
+                for d in profile.devices
+                if d.device_type == 'joystick' and d.product_name
+            ]
         else:
             # Use connected devices from Config tab
             # This ensures Device View shows what's actually connected
             joystick_devices = [d for d in self.connected_devices if d.get('type') == 'joystick']
+
+        # Show Omni toggle only for non-OTA EVO R/L devices
+        has_evo = self._should_show_omni_toggle(joystick_devices)
+        self.omni_checkbox.setVisible(has_evo)
+        if not has_evo:
+            self.omni_checkbox.blockSignals(True)
+            self.omni_checkbox.setChecked(False)
+            self.omni_checkbox.blockSignals(False)
+            self.show_omni_only = False
 
         for device_dict in joystick_devices:
             # Extract device info from connected_devices dict
@@ -419,80 +529,199 @@ class QtPdfDeviceWidget(QWidget):
             connection_status = ""
             raw_device_name = device_name
 
+            # Extract product_id if available
+            product_id = device_dict.get('product_id', None)
+
             # Check if this is a VKB device with SEM module
             if is_vkb_with_sem(raw_device_name):
                 # Split into two entries: base stick and SEM module
 
                 # 1. Add ALL matching base stick templates (user can choose)
                 base_stick_name = get_base_stick_name(raw_device_name)
-                matching_templates = self.find_all_matching_templates(base_stick_name)
+                matching_templates = self.find_all_matching_templates(base_stick_name, product_id)
+
+                # Determine the side (Left/Right) from the device name
+                device_upper = raw_device_name.upper()
+                is_left = 'LEFT' in device_upper or ' L' in device_upper
+                is_right = 'RIGHT' in device_upper or ' R' in device_upper
+
+                if self.show_omni_only and matching_templates:
+                    # Filter to show OTA variants of the same side, with fallback to non-OTA if no OTA exists
+                    logger.debug(f"Omni filter: device='{raw_device_name}', is_left={is_left}, is_right={is_right}")
+                    logger.debug(f"  Templates before: {[t.name for t in matching_templates]}")
+
+                    ota_filtered = []
+                    non_ota_same_side = []
+                    other_side = []
+
+                    for t in matching_templates:
+                        template_upper = t.name.upper()
+                        template_is_left = '(LEFT)' in template_upper
+                        template_is_right = '(RIGHT)' in template_upper
+                        is_ota = 'OTA' in template_upper
+
+                        # Categorize templates
+                        if (is_left and template_is_left) or (is_right and template_is_right):
+                            # Same side as device
+                            if is_ota:
+                                ota_filtered.append(t)
+                            else:
+                                non_ota_same_side.append(t)
+                        else:
+                            # Different side or no side
+                            other_side.append(t)
+
+                    # Use OTA variants if available, otherwise fall back to non-OTA for same side
+                    if ota_filtered:
+                        filtered = ota_filtered + other_side
+                        logger.debug(f"  Using OTA variants for same side")
+                    else:
+                        filtered = non_ota_same_side + other_side
+                        logger.debug(f"  No OTA variants found, falling back to non-OTA for same side")
+
+                    logger.debug(f"  Templates after: {[t.name for t in filtered]}")
+                    matching_templates = filtered
 
                 if matching_templates:
                     for template in matching_templates:
                         # Store tuple: (device_name, device_instance, template.name)
                         display_text = template.name + connection_status
                         self.device_combo.addItem(display_text, (device_name, device_instance, template.name))
-                else:
-                    friendly_base_name = get_friendly_device_name(base_stick_name)
-                    display_text = f"{friendly_base_name} (No template){connection_status}"
-                    self.device_combo.addItem(display_text, (device_name, device_instance, base_stick_name))
 
-                # 2. Add SEM module entry
-                sem_template = self.pdf_manager.find_template("VKB SEM")
+                # 2. Add SEM module entry - find correct variant based on device type
+                # For NXT+SEM, find the standalone variant; for Gladiator+SEM, find the regular one
+                sem_templates = self.find_all_matching_templates(raw_device_name, product_id) if is_vkb_with_sem(raw_device_name) else []
+                # Filter to only SEM templates
+                sem_templates = [t for t in sem_templates if 'SEM' in t.name.upper() and t.id.startswith('vkb_sem')]
 
-                if sem_template:
-                    # Store tuple: (device_name, device_instance, "VKB SEM")
-                    display_text = "VKB SEM" + connection_status
-                    self.device_combo.addItem(display_text, (device_name, device_instance, "VKB SEM"))
-                else:
-                    display_text = f"VKB SEM (No template){connection_status}"
-                    self.device_combo.addItem(display_text, (device_name, device_instance, "VKB SEM"))
+                if sem_templates:
+                    for sem_template in sem_templates:
+                        # Store tuple: (device_name, device_instance, template.name)
+                        display_text = sem_template.name + connection_status
+                        self.device_combo.addItem(display_text, (device_name, device_instance, sem_template.name))
             else:
                 # Regular device (no SEM) - show ALL matching templates
-                matching_templates = self.find_all_matching_templates(raw_device_name)
+                matching_templates = self.find_all_matching_templates(raw_device_name, product_id)
+
+                # Determine the side (Left/Right) from the device name
+                device_upper = raw_device_name.upper()
+                is_left = 'LEFT' in device_upper or ' L' in device_upper
+                is_right = 'RIGHT' in device_upper or ' R' in device_upper
+
+                if self.show_omni_only and matching_templates:
+                    # Filter to show OTA variants of the same side, with fallback to non-OTA if no OTA exists
+                    logger.debug(f"Omni filter: device='{raw_device_name}', is_left={is_left}, is_right={is_right}")
+                    logger.debug(f"  Templates before: {[t.name for t in matching_templates]}")
+
+                    ota_filtered = []
+                    non_ota_same_side = []
+                    other_side = []
+
+                    for t in matching_templates:
+                        template_upper = t.name.upper()
+                        template_is_left = '(LEFT)' in template_upper
+                        template_is_right = '(RIGHT)' in template_upper
+                        is_ota = 'OTA' in template_upper
+
+                        # Categorize templates
+                        if (is_left and template_is_left) or (is_right and template_is_right):
+                            # Same side as device
+                            if is_ota:
+                                ota_filtered.append(t)
+                            else:
+                                non_ota_same_side.append(t)
+                        else:
+                            # Different side or no side
+                            other_side.append(t)
+
+                    # Use OTA variants if available, otherwise fall back to non-OTA for same side
+                    if ota_filtered:
+                        filtered = ota_filtered + other_side
+                        logger.debug(f"  Using OTA variants for same side")
+                    else:
+                        filtered = non_ota_same_side + other_side
+                        logger.debug(f"  No OTA variants found, falling back to non-OTA for same side")
+
+                    logger.debug(f"  Templates after: {[t.name for t in filtered]}")
+                    matching_templates = filtered
 
                 if matching_templates:
                     for template in matching_templates:
                         # Store tuple: (device_name, device_instance, template.name)
                         display_text = template.name + connection_status
                         self.device_combo.addItem(display_text, (device_name, device_instance, template.name))
-                else:
-                    friendly_device_name = get_friendly_device_name(raw_device_name)
-                    display_text = f"{friendly_device_name} (No template){connection_status}"
-                    self.device_combo.addItem(display_text, (device_name, device_instance, raw_device_name))
 
         if self.device_combo.count() == 0:
-            self.status_label.setText("No connected devices found")
+            self.status_label.setText("No devices found")
             self.device_combo.addItem("No devices available", None)
         else:
-            # All connected devices are by definition connected
-            connected_count = len(joystick_devices)
-            self.status_label.setText(f"Found {connected_count} connected device(s)")
+            count = len(joystick_devices)
+            if self.show_disconnected_devices:
+                self.status_label.setText(f"Showing {count} device(s) from profile (offline)")
+            else:
+                self.status_label.setText(f"Found {count} connected device(s)")
 
-    def find_all_matching_templates(self, device_name: str) -> list:
+    def find_all_matching_templates(self, device_name: str, product_id: str = None) -> list:
         """
-        Find all templates that match a device name
+        Find all templates that match a device name or product ID
 
         Args:
             device_name: Device product name
+            product_id: Optional product ID for primary matching
 
         Returns:
             List of matching PDFDeviceTemplate objects
         """
-        if not device_name:
+        if not device_name and not product_id:
             return []
 
         matching_templates = []
-        device_name_lower = device_name.lower().strip()
 
-        # Get all templates from the registry
-        for template in self.pdf_manager.templates:
-            # Check each device match pattern
-            for pattern in template.device_match_patterns:
-                pattern_lower = pattern.lower().strip()
-                if pattern_lower in device_name_lower or device_name_lower in pattern_lower:
-                    matching_templates.append(template)
-                    break  # Don't add the same template multiple times
+        # If product_id is provided, prioritize matching on it
+        if product_id:
+            product_id = product_id.strip().strip('{}') if product_id else None
+            if product_id:
+                for template in self.pdf_manager.templates:
+                    if template.product_ids:
+                        for pid in template.product_ids:
+                            if pid.strip().strip('{}') == product_id:
+                                matching_templates.append(template)
+                                break
+
+        # If we found matches via product_id, return them
+        if matching_templates:
+            return matching_templates
+
+        # Fallback to name matching
+        if device_name:
+            device_name_lower = device_name.lower().strip()
+
+            # Determine device side for filtering
+            device_upper = device_name.upper()
+            is_left = 'LEFT' in device_upper or ' L' in device_upper
+            is_right = 'RIGHT' in device_upper or ' R' in device_upper
+
+            for template in self.pdf_manager.templates:
+                # Check each device match pattern
+                for pattern in template.device_match_patterns:
+                    pattern_lower = pattern.lower().strip()
+
+                    # Match pattern to device name
+                    if pattern_lower in device_name_lower or device_name_lower in pattern_lower:
+                        # If device has a clear side, filter templates by side
+                        if is_left or is_right:
+                            template_upper = template.name.upper()
+                            template_is_left = '(LEFT)' in template_upper
+                            template_is_right = '(RIGHT)' in template_upper
+
+                            # Only add if template matches device side
+                            if (is_left and template_is_left) or (is_right and template_is_right):
+                                matching_templates.append(template)
+                                break
+                        else:
+                            # No clear side in device name, add template anyway
+                            matching_templates.append(template)
+                            break  # Don't add the same template multiple times
 
         return matching_templates
 
@@ -654,6 +883,7 @@ class QtPdfDeviceWidget(QWidget):
             self.status_label.setText(f"Error rendering PDF: {str(e)}")
             self.export_available_changed.emit(False)
 
+
     def get_field_values_for_device(self) -> dict:
         """Get PDF form field values for the current device"""
         field_values = {}
@@ -675,6 +905,15 @@ class QtPdfDeviceWidget(QWidget):
             js_num = js_index.replace("js", "")
             logger.debug(f"Processing device with JS number: {js_num}")
 
+
+            # Determine button range filter for SEM modules
+            sem_button_range = None
+            if self.current_template and 'SEM' in self.current_template.name and self.current_device and 'SEM' in self.current_device.upper():
+                # Displaying a SEM template - only include buttons in the SEM range
+                from utils.device_splitter import _get_sem_button_range
+                sem_button_range = _get_sem_button_range(self.current_device)
+                logger.debug(f"Filtering to SEM button range: {sem_button_range}")
+
             # Get all bindings for this device
             device_bindings = self.get_device_bindings()
             logger.debug(f"Found {len(device_bindings)} device bindings")
@@ -687,6 +926,16 @@ class QtPdfDeviceWidget(QWidget):
                 input_code = binding.input_code.strip()
                 logger.debug(f"Processing binding: {binding.action_name} -> {input_code}")
                 if input_code and input_code.startswith(f"js{js_num}_"):
+                    # Filter by button range if displaying SEM
+                    if sem_button_range:
+                        import re
+                        button_match = re.search(r'button(\d+)', input_code)
+                        if button_match:
+                            button_num = int(button_match.group(1))
+                            if not (sem_button_range[0] <= button_num <= sem_button_range[1]):
+                                logger.debug(f"  Skipping {input_code} - outside SEM range {sem_button_range}")
+                                continue
+
                     grouped_bindings[input_code].append((action_map_name, binding))
                     logger.debug(f"  Added to grouped_bindings for {input_code}")
 
@@ -960,7 +1209,7 @@ class QtPdfDeviceWidget(QWidget):
                 if mapped_value is not None:
                     # Handle both integer and string identifiers
                     if isinstance(mapped_value, int):
-                        # Integer: button number (e.g., 1 -> button1)
+                        # Integer: button number (e.g., 20 for standalone, 52 for Gladiator)
                         return f"js{js_num}_button{mapped_value}"
                     elif isinstance(mapped_value, str):
                         # String: direct identifier (e.g., "hat1_up" -> hat1_up)

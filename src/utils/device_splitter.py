@@ -150,13 +150,36 @@ def get_base_stick_name(device_name: str) -> str:
     return base_name.strip()
 
 
+def _get_sem_button_range(device_name: str) -> tuple:
+    """
+    Determine the button range for SEM module based on device type
+
+    For Gladiator-based devices (EVO, SCG, etc.): SEM uses buttons 41-78
+    For NXT-based or standalone SEM: SEM uses buttons 9-40
+
+    Args:
+        device_name: Full device name from SC profile
+
+    Returns:
+        Tuple of (start_button, end_button) for SEM range
+    """
+    device_upper = device_name.upper() if device_name else ""
+
+    # If device contains "Gladiator" (EVO, SCG, MCGU, etc.), use 41-78 range
+    if 'GLADIATOR' in device_upper or 'GUNFIGHTER' in device_upper:
+        return (41, 78)
+
+    # For NXT or standalone SEM, use 9-40 range
+    return (9, 40)
+
+
 def split_device_by_button(device_name: str, button_number: int) -> str:
     """
     Split a composite device into its component parts based on button number
 
     For VKB devices with SEM:
-    - Buttons 1-40: Base stick (e.g., "VKBsim Gladiator EVO R")
-    - Buttons 41-64: SEM module ("VKB SEM")
+    - Always maps to "VKB SEM" for display/filtering
+    - The actual button range varies by device type
 
     Args:
         device_name: Full device name from SC profile
@@ -168,11 +191,10 @@ def split_device_by_button(device_name: str, button_number: int) -> str:
     if not is_vkb_with_sem(device_name):
         return device_name
 
-    # VKB SEM uses buttons 41-64
-    if button_number >= 41:
-        return "VKB SEM"
-    else:
-        return get_base_stick_name(device_name)
+    # For composite VKB+SEM devices, always show as "VKB SEM" in device filter/display
+    # This prevents base stick names like "VKBsim NXT" from appearing in the filter
+    # All buttons (base and SEM) are grouped under the VKB SEM device for filtering
+    return "VKB SEM"
 
 
 def extract_button_number(input_code: str) -> Optional[int]:

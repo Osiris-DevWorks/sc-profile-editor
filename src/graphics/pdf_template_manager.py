@@ -31,6 +31,7 @@ class PDFDeviceTemplate:
     notes: Optional[str] = None
     deprecated: bool = False
     product_ids: Optional[List[str]] = None  # Product IDs for primary matching
+    field_mapping_path: Optional[str] = None  # Custom field mapping path from registry
 
 
 class PDFTemplateManager:
@@ -75,6 +76,11 @@ class PDFTemplateManager:
                     logger.warning(f"PDF not found for template {template_data['id']}: {pdf_path}")
                     continue
 
+                # Resolve field mapping path if specified (only if it's a string path, not inline)
+                field_mapping_path = None
+                if 'field_mapping' in template_data and isinstance(template_data['field_mapping'], str):
+                    field_mapping_path = os.path.join(self.templates_dir, template_data['field_mapping'])
+
                 template = PDFDeviceTemplate(
                     id=template_data['id'],
                     name=template_data['name'],
@@ -88,7 +94,8 @@ class PDFTemplateManager:
                     default_joystick_index=template_data.get('default_joystick_index'),
                     notes=template_data.get('notes'),
                     deprecated=template_data.get('deprecated', False),
-                    product_ids=template_data.get('product_ids')
+                    product_ids=template_data.get('product_ids'),
+                    field_mapping_path=field_mapping_path
                 )
                 self.templates.append(template)
 
@@ -202,7 +209,12 @@ class PDFTemplateManager:
         Returns:
             Mapping dictionary or None if no mapping exists
         """
-        mapping_path = os.path.join(os.path.dirname(template.pdf_path), "field_mapping.json")
+        # Use explicit field_mapping_path from template if specified
+        if template.field_mapping_path:
+            mapping_path = template.field_mapping_path
+        else:
+            # Fallback: look in same directory as PDF
+            mapping_path = os.path.join(os.path.dirname(template.pdf_path), "field_mapping.json")
 
         if not os.path.exists(mapping_path):
             return None

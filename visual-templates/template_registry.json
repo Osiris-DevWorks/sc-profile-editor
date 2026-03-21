@@ -107,19 +107,45 @@
       ]
     },
     {
+      "id": "vkb_sem_standalone",
+      "name": "VKB SEM (Standalone)",
+      "pdf": "vkb_sem/VKB-SEM-v1.0.pdf",
+      "device_match_patterns": [
+        "VKBsim NXT SEM",
+        "VKBSim NXT SEM",
+        "NXT SEM"
+      ],
+      "type": "module",
+      "manufacturer": "VKB",
+      "product_ids": [
+        "2204231D-0000-0000-0000-504944564944"
+      ],
+      "button_range": [
+        9,
+        32
+      ],
+      "field_mapping": "vkb_sem_standalone/field_mapping.json",
+      "notes": "Space Extension Module - standalone or with NXT base. Buttons 9-32."
+    },
+    {
       "id": "vkb_sem",
       "name": "VKB SEM",
       "pdf": "vkb_sem/VKB-SEM-v1.0.pdf",
       "device_match_patterns": [
         "VKB SEM",
-        "SEM"
+        "VKBsim Gladiator SEM",
+        "Gladiator SEM"
       ],
       "type": "module",
       "manufacturer": "VKB",
+      "product_ids": [
+        "2204231D-0000-0000-0000-504944564944"
+      ],
       "button_range": [
         41,
         78
       ],
+      "field_mapping": "vkb_sem/field_mapping.json",
       "notes": "Space Extension Module - attaches to Gladiator sticks. Buttons 41-78."
     },
     {
