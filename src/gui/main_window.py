@@ -890,6 +890,8 @@ class MainWindow(QMainWindow):
         # Build summary text
         summary_parts = []
         summary_parts.append(f"Profile Name: {profile.profile_name}")
+        if profile.source_xml_path:
+            summary_parts.append(f"File Name: {profile.source_xml_path}")
         summary_parts.append(f"Devices: {len(profile.devices)}")
 
         # List devices
