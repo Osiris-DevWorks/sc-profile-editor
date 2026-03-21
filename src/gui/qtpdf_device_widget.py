@@ -1251,28 +1251,33 @@ class QtPdfDeviceWidget(QWidget):
 
         # Mark profile as modified
         if self.current_profile:
-            # Check if any bindings are not in the profile and add them
+            # Process each binding: update existing or add new
             for binding in bindings:
                 binding_found = False
+
+                # Search for existing binding by action_name + input_code combination
                 for action_map in self.current_profile.action_maps:
-                    for existing_binding in action_map.actions:
-                        if existing_binding is binding:
+                    for i, existing_binding in enumerate(action_map.actions):
+                        if (existing_binding.action_name == binding.action_name and
+                            existing_binding.input_code == binding.input_code):
+                            # Found exact match - this binding already exists, no need to add
                             binding_found = True
+                            logger.debug(f"on_bindings_changed: Binding {binding.action_name} -> {binding.input_code} already in profile")
                             break
                     if binding_found:
                         break
 
                 # If binding is not in profile, add it to the appropriate action map
                 if not binding_found:
-                    logger.info(f"on_bindings_changed: Binding {binding.action_name} not in profile, finding correct actionmap...")
+                    logger.info(f"on_bindings_changed: Adding new binding {binding.action_name} -> {binding.input_code}")
                     # Find the correct action map for this action
                     added = False
                     for action_map in self.current_profile.action_maps:
                         for existing_binding in action_map.actions:
                             if existing_binding.action_name == binding.action_name:
-                                # Add the new binding to this action map
+                                # Add the new binding to this action map (don't duplicate)
                                 action_map.actions.append(binding)
-                                logger.info(f"on_bindings_changed: Added binding {binding.action_name} to {action_map.name}")
+                                logger.info(f"on_bindings_changed: Added binding {binding.action_name} -> {binding.input_code} to {action_map.name}")
                                 added = True
                                 break
                         if added:
