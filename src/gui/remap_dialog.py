@@ -458,11 +458,23 @@ class RemapDialog(QDialog):
 
         layout.addWidget(info_label)
 
-        # Dialog buttons
+        # Dialog buttons with Clear All button
+        button_layout = QHBoxLayout()
+
+        clear_all_btn = QPushButton("Clear All")
+        clear_all_btn.setStyleSheet("color: #d32f2f;")
+        clear_all_btn.clicked.connect(self.clear_all_bindings)
+        clear_all_btn.setToolTip("Remove all mappings for this button")
+        button_layout.addWidget(clear_all_btn)
+
+        button_layout.addStretch()
+
         button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         button_box.accepted.connect(self.accept_changes)
         button_box.rejected.connect(self.reject)
-        layout.addWidget(button_box)
+        button_layout.addWidget(button_box)
+
+        layout.addLayout(button_layout)
 
     def populate_from_bindings(self):
         """Populate dialog from all bindings for this input code"""
@@ -508,6 +520,40 @@ class RemapDialog(QDialog):
         # Show "no actions" label if empty
         if not self.action_widgets:
             self.no_actions_label.show()
+
+    def clear_all_bindings(self):
+        """Clear all bindings for this button"""
+        if not self.action_widgets:
+            QMessageBox.information(self, "No Mappings", "No mappings to clear for this button.")
+            return
+
+        # Confirm action
+        reply = QMessageBox.warning(
+            self,
+            "Clear All Mappings",
+            f"Remove all {len(self.action_widgets)} mapping(s) from this button?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
+        )
+
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        # Delete all action widgets
+        for binding in list(self.bindings_for_input):
+            self.deleted_bindings.append(binding)
+
+        # Clear all widgets
+        for widget in self.action_widgets:
+            self.actions_container_layout.removeWidget(widget)
+            widget.deleteLater()
+
+        self.action_widgets.clear()
+        self.bindings_for_input.clear()
+
+        # Show "no actions" label
+        self.no_actions_label.show()
+
+        logger.info(f"Cleared all {len(self.deleted_bindings)} mapping(s) for {self.input_code}")
 
     def on_action_map_changed(self, index: int):
         """Handle action map category selection"""
