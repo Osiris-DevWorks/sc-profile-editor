@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **File Path Display** - Profile info box now displays the source file path for loaded profiles, improving profile identification
 
 ### Fixed
+- **Issue #17 - Hot-Swap Device Detection** - Fixed regression where connecting new devices after app launch would fail:
+  - Add automatic device refresh when Config tab is shown
+  - Devices are now re-detected without requiring manual "Refresh Devices" click
+  - Supports connecting new input devices (e.g., Logitech gamepad) after app launch
+  - Device View updates automatically when devices change
+  - Resolves "Plugged-In Device Not Detected" error on new device connection
 - **Duplicate Binding Appending** - Fixed issue where repeated saves would append duplicate bindings on existing actions
 - **VKB SEM Button Mapping** - Resolved button collisions in VKB Space Sim Module standalone mode:
   - Reorganized FLAPS button layout (buttons 17-21)
