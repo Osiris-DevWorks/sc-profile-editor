@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-03-24
+
 ### Added
 - **Remap Dialog Clear All Button** - New dedicated "Clear All" button for quickly unmapping all inputs in a single action
 - **File Path Display** - Profile info box now displays the source file path for loaded profiles, improving profile identification
