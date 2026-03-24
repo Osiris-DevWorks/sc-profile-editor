@@ -12,10 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-
-### Changed
+- **Remap Dialog Clear All Button** - New dedicated "Clear All" button for quickly unmapping all inputs in a single action
+- **File Path Display** - Profile info box now displays the source file path for loaded profiles, improving profile identification
 
 ### Fixed
+- **Duplicate Binding Appending** - Fixed issue where repeated saves would append duplicate bindings on existing actions
+- **VKB SEM Button Mapping** - Resolved button collisions in VKB Space Sim Module standalone mode:
+  - Reorganized FLAPS button layout (buttons 17-21)
+  - Fixed C1 placement (button 17) and SW1 positioning (buttons 25-27)
+  - Corrected MODE button mapping and swaps in standalone field mapping
+- **VKB Profile Loading** - Fixed field mapping not loading correctly for VKB SEM standalone variant
 
 ## [0.8.2] - 2026-02-07
 

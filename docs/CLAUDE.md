@@ -1,7 +1,7 @@
 # SC Profile Editor - Project Context
 
 **Version:** 0.8.2
-**Date:** 2026-02-07
+**Date:** 2026-03-21 (latest: vkb-sem-fixes branch in development)
 **For:** AI assistants - Comprehensive project overview and development guidelines
 
 This document provides context for AI assistants working on this project.
@@ -12,12 +12,13 @@ SC Profile Editor is a desktop application for Star Citizen players to edit, cus
 
 ## Current Status
 
-**Version:** 0.8.2 (released 2026-02-07)
-**Current Branch:** main (stable)
-**Status:** v0.8.2 released with critical XML export, device detection, and PDF click fixes
+**Version:** 0.8.2 (released 2026-02-07, stable on main)
+**Current Branch:** vkb-sem-fixes (in development with VKB profile enhancements)
+**Status:** Active development on VKB profile support and UI improvements
 **Latest Release:** 0.8.2 (2026-02-07)
 **Previous Release:** 0.8.1 (2026-01-28)
 **Platform:** Windows (PyInstaller executable)
+**Next Expected Release:** 0.9.0 (pending feature completion and testing)
 
 ## Implemented Features
 
@@ -293,6 +294,11 @@ cmd //c scripts\build\build_all.bat
 13. Test button mapping and form field population in Device View
 
 ### Recent Important Changes
+
+#### Current Development (vkb-sem-fixes branch - Next Release)
+- **UI Enhancements**: Added Clear All button to remap dialog; file path display in profile info box
+- **VKB SEM Mapping Fixes**: Resolved button collisions and field mapping issues in VKB Space Sim Module standalone mode
+- **Duplicate Binding Fix**: Fixed issue where repeated saves would append duplicate bindings
 
 #### v0.8.2 (Released 2026-02-07)
 - **XML Export Critical Fixes**: Bindings no longer lost when saving profiles with missing actionmaps; ALL actions now written to XML
