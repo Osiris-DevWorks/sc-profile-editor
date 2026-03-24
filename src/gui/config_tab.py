@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLabe
                               QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLineEdit, QFileDialog, QCheckBox,
                               QListWidget, QListWidgetItem, QAbstractItemView)
 from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QShowEvent
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -32,6 +33,17 @@ class ConfigTab(QWidget):
         self.device_mapping = {}  # js1 -> device name mapping
         self.setup_ui()
         self.load_device_config()
+
+    def showEvent(self, event: QShowEvent):
+        """
+        Automatically refresh connected devices when the Config tab is shown.
+        This fixes Issue #17 by detecting newly connected devices when the user
+        switches to the Config tab, without requiring a manual refresh click.
+        """
+        super().showEvent(event)
+        if event.isAccepted():
+            logger.debug("Config tab shown - auto-refreshing device list")
+            self.refresh_devices()
 
     def setup_ui(self):
         """Set up the configuration tab UI"""
