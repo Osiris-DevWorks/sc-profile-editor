@@ -60,3 +60,7 @@ label_overrides_custom.json
 app_output.log
 /screenshots
 *.sla
+
+# Personal reference files (not part of releases)
+UNMAPPED_CONTROLS.md
+example-profiles/layout_osiris-vkb-*.xml
