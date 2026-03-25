@@ -36,6 +36,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Affects: PDFTemplateManager and Device View template matching
   - Resolves "VKBSim NXT SEM is not detected" popup on profile load
 
+- **Binding Duplication in Profile Overlay** - Fixed critical bug causing bindings to multiply during profile loading:
+  - Root cause: Master template (UNBIND_ALL.xml) has multiple unmapped rebind entries per action (e.g., 5 for v_eject: kb1_, mouse1_, gp1_, js1_, js2_)
+  - Bug: Overlay logic applied source binding once per template rebind, duplicating user bindings 5x
+  - Solution: Track processed actions in overlay, apply source binding only once per action
+  - Impact: Profiles now load with correct binding counts (e.g., 4,764 vs 5,320 bindings)
+  - Fixes: Bindings no longer multiply on load/save cycles, Device View shows correct count
+
 ## [0.8.2] - 2026-02-07
 
 ### Fixed

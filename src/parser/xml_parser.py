@@ -522,7 +522,7 @@ class ProfileParser:
         Overlay source bindings onto template action maps.
 
         For each action in template:
-        - If source has mapped binding → use source binding
+        - If source has mapped binding → use source binding (once)
         - If source has only unmapped → keep template unmapped (js1_ )
         - If source has no binding → keep template unmapped
 
@@ -538,6 +538,7 @@ class ProfileParser:
 
         for template_map in template_maps:
             overlaid_actions = []
+            processed_actions = set()  # Track which actions we've already handled
 
             for template_binding in template_map.actions:
                 action_name = template_binding.action_name
@@ -545,7 +546,7 @@ class ProfileParser:
                 processed_source_keys.add(key)
 
                 # Check if source has bindings for this action
-                if key in source_bindings:
+                if key in source_bindings and key not in processed_actions:
                     source_bindings_for_action = source_bindings[key]
 
                     # Filter out unmapped bindings from source
@@ -553,12 +554,13 @@ class ProfileParser:
                                      if not b.input_code.rstrip().endswith('_')]
 
                     if mapped_bindings:
-                        # Use source's mapped bindings
+                        # Use source's mapped bindings (only once per action, not once per template binding)
                         overlaid_actions.extend(mapped_bindings)
+                        processed_actions.add(key)
                     else:
                         # Source only has unmapped, keep template's binding
                         overlaid_actions.append(template_binding)
-                else:
+                elif key not in processed_actions:
                     # No source binding, keep template's binding
                     overlaid_actions.append(template_binding)
 
