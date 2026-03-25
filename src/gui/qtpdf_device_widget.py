@@ -594,11 +594,22 @@ class QtPdfDeviceWidget(QWidget):
                 # Filter to only SEM templates
                 sem_templates = [t for t in sem_templates if 'SEM' in t.name.upper() and t.id.startswith('vkb_sem')]
 
+                # Deduplicate: only add SEM templates if not already in combo
+                added_template_names = set()
+                for i in range(self.device_combo.count()):
+                    item_data = self.device_combo.itemData(i)
+                    if item_data and len(item_data) == 3:
+                        added_template_names.add(item_data[2])
+
                 if sem_templates:
                     for sem_template in sem_templates:
+                        # Skip if this template already added
+                        if sem_template.name in added_template_names:
+                            continue
                         # Store tuple: (device_name, device_instance, template.name)
                         display_text = sem_template.name + connection_status
                         self.device_combo.addItem(display_text, (device_name, device_instance, sem_template.name))
+                        added_template_names.add(sem_template.name)
             else:
                 # Regular device (no SEM) - show ALL matching templates
                 matching_templates = self.find_all_matching_templates(raw_device_name, product_id)
