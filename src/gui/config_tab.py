@@ -31,6 +31,7 @@ class ConfigTab(QWidget):
         self.settings = AppSettings()
         self.current_devices = []
         self.device_mapping = {}  # js1 -> device name mapping
+        self._current_profile = None  # Current loaded profile (for add device feature)
         self.setup_ui()
         self.load_device_config()
 
@@ -134,6 +135,12 @@ class ConfigTab(QWidget):
         save_btn.setMinimumWidth(150)
         save_btn.clicked.connect(self.on_save_config_clicked)
         button_layout.addWidget(save_btn)
+
+        add_device_btn = QPushButton("+ Add Device to Profile")
+        add_device_btn.setMinimumHeight(30)
+        add_device_btn.setMinimumWidth(200)
+        add_device_btn.clicked.connect(self._on_add_device_clicked)
+        button_layout.addWidget(add_device_btn)
 
         mapping_layout.addLayout(button_layout)
 
@@ -339,6 +346,15 @@ class ConfigTab(QWidget):
             logger.error(f"Error refreshing devices: {e}", exc_info=True)
             QMessageBox.warning(self, "Device Refresh Error", f"Failed to refresh devices:\n{e}")
 
+    def set_current_profile(self, profile):
+        """
+        Set the current loaded profile (used for add device feature)
+
+        Args:
+            profile: ControlProfile object or None
+        """
+        self._current_profile = profile
+
     def load_device_config(self):
         """Load device configuration from settings, auto-detect on startup"""
         try:
@@ -491,6 +507,136 @@ class ConfigTab(QWidget):
     def on_save_config_clicked(self):
         """Handle Save Configuration button click"""
         self.save_device_config()
+
+    def _on_add_device_clicked(self):
+        """Handle Add Device to Profile button click"""
+        try:
+            # Check that a profile is loaded
+            if not hasattr(self, '_current_profile') or self._current_profile is None:
+                QMessageBox.information(
+                    self,
+                    "No Profile Loaded",
+                    "Please load a profile before adding devices."
+                )
+                return
+
+            # Import here to avoid circular imports
+            from src.gui.add_device_dialog import AddDeviceDialog
+            from src.graphics.pdf_template_manager import PDFTemplateManager
+            from src.main import get_resource_path
+
+            # Get the PDF manager from main window or create one
+            pdf_manager = PDFTemplateManager(get_resource_path("visual-templates"))
+
+            dialog = AddDeviceDialog(
+                pdf_manager,
+                self._current_profile,
+                self.device_mapping,
+                parent=self
+            )
+
+            if dialog.exec():
+                template, slot_str = dialog.get_selected_device_and_slot()
+                if template and slot_str:
+                    self._add_device_to_profile(template, slot_str)
+
+        except Exception as e:
+            logger.error(f"Error in add device dialog: {e}", exc_info=True)
+            QMessageBox.warning(self, "Error", f"Failed to open add device dialog:\n{e}")
+
+    def _add_device_to_profile(self, template, slot_str: str):
+        """
+        Add a new device to the profile
+
+        Args:
+            template: PDFDeviceTemplate to add
+            slot_str: Joystick slot string (e.g., "js2")
+        """
+        try:
+            from src.models.profile_model import Device
+
+            # Extract slot number (js2 -> 2)
+            slot_number = int(slot_str[2:])
+
+            # Create new Device object
+            new_device = Device(
+                device_type="joystick",
+                instance=slot_number,
+                product_name=template.name,
+                product_id=template.product_ids[0] if template.product_ids else None
+            )
+
+            # Add to profile
+            self._current_profile.devices.append(new_device)
+            self._current_profile.is_modified = True
+
+            # Update device mapping
+            self.device_mapping[slot_str] = template.name
+
+            # Save device mapping
+            self.settings.set_device_config(self.device_mapping)
+
+            # Rebuild the js1/js2/js3 combo dropdowns
+            self._rebuild_mapping_combos()
+
+            # Emit devices_changed signal so Device View and other widgets update
+            self.devices_changed.emit(self.current_devices)
+
+            logger.info(f"Added device '{template.name}' to slot '{slot_str}'")
+            QMessageBox.information(
+                self,
+                "Device Added",
+                f"'{template.name}' has been added to slot '{slot_str}'.\n\n"
+                f"The device now appears in Device View and Controls Table.\n"
+                f"You can now map buttons to this device."
+            )
+
+        except Exception as e:
+            logger.error(f"Error adding device to profile: {e}", exc_info=True)
+            QMessageBox.warning(self, "Error", f"Failed to add device to profile:\n{e}")
+
+    def _rebuild_mapping_combos(self):
+        """Rebuild the js1/js2/js3 mapping combo boxes with current devices and mapping"""
+        try:
+            # Get list of currently connected device names
+            connected_device_names = []
+            for device in self.current_devices:
+                if device.get('type') == 'joystick':
+                    connected_device_names.append(device.get('name', f"Joystick {device.get('instance', 0)}"))
+
+            # Add devices from the profile's device list
+            if self._current_profile:
+                for device in self._current_profile.devices:
+                    if device.device_type == 'joystick' and device.product_name:
+                        if device.product_name not in connected_device_names:
+                            connected_device_names.append(device.product_name)
+
+            # Rebuild combos
+            for js_label, combo in self.mapping_combos.items():
+                combo.blockSignals(True)
+                combo.clear()
+                combo.addItem("-- None --", None)
+
+                # Add all devices (both connected and from profile)
+                for device_name in sorted(set(connected_device_names)):
+                    combo.addItem(device_name, device_name)
+
+                # Restore current selection from mapping
+                current_device = self.device_mapping.get(js_label)
+                if current_device:
+                    for i in range(combo.count()):
+                        if combo.itemData(i) == current_device:
+                            combo.setCurrentIndex(i)
+                            break
+                else:
+                    combo.setCurrentIndex(0)
+
+                combo.blockSignals(False)
+
+            logger.debug("Rebuilt mapping combo boxes")
+
+        except Exception as e:
+            logger.error(f"Error rebuilding mapping combos: {e}", exc_info=True)
 
     def on_browse_sc_directory(self):
         """Handle Browse button click for Star Citizen directory"""

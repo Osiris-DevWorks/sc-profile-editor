@@ -164,6 +164,32 @@ class PDFTemplateManager:
         """Get all available templates (excluding deprecated)"""
         return [t for t in self.templates if not t.deprecated]
 
+    def get_templates_with_field_mapping(self) -> List[PDFDeviceTemplate]:
+        """
+        Get all available templates that have a field mapping.
+
+        These are the templates eligible for adding a new device to a profile.
+        A template is eligible if:
+        - It's not deprecated
+        - Its PDF file exists (guaranteed by load_templates)
+        - Its field_mapping.json exists (either inline or as separate file)
+
+        Returns:
+            List of PDFDeviceTemplate objects with valid field mappings
+        """
+        eligible = []
+        for template in self.templates:
+            if template.deprecated:
+                continue
+
+            # Check if template has a field mapping
+            field_mapping = self.load_field_mapping(template)
+            if field_mapping is not None:
+                eligible.append(template)
+
+        logger.debug(f"Found {len(eligible)} eligible templates with field mappings")
+        return eligible
+
     def get_pdf_form_fields(self, template: PDFDeviceTemplate) -> Dict[str, Dict]:
         """
         Extract form fields from a PDF template

@@ -937,6 +937,10 @@ class MainWindow(QMainWindow):
             self.pdf_device_widget.refresh_device_mapper()
             logger.debug("Loaded profile into Device View with updated device mapper")
 
+        # Update Config tab with current profile (for add device feature)
+        if hasattr(self, 'config_tab'):
+            self.config_tab.set_current_profile(profile)
+
     def populate_controls_table(self):
         """Populate the controls table with bindings"""
         if not self.current_profile:
