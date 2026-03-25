@@ -2,10 +2,10 @@
 ; Created with Inno Setup
 
 #define MyAppName "Star Citizen Profile Editor"
-#define MyAppVersion "0.9.0"
+#define MyAppVersion "0.9.1"
 #define MyAppPublisher "SC Profile Tools"
 #define MyAppURL "https://github.com/yourusername/scpe-releases"
-#define MyAppExeName "SCProfileEditor-v0.9.0.exe"
+#define MyAppExeName "SCProfileEditor-v0.9.1.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
