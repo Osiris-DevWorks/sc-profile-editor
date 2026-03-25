@@ -135,13 +135,15 @@ class PDFTemplateManager:
                             return template
 
         # Fallback matching: Try device name pattern matching (skip deprecated templates)
-        device_name_lower = device_name.lower()
+        # Normalize whitespace: collapse multiple spaces to single space
+        device_name_lower = ' '.join(device_name.lower().split())
         for template in self.templates:
             if template.deprecated:
                 continue
 
             for pattern in template.device_match_patterns:
-                if pattern.lower() in device_name_lower:
+                pattern_lower = ' '.join(pattern.lower().split())
+                if pattern_lower in device_name_lower:
                     if product_id:
                         logger.debug(f"Matched device '{device_name}' to template '{template.name}' via name pattern (product ID {product_id} not found in templates)")
                     else:

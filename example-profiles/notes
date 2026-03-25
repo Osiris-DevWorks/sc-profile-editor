@@ -1,0 +1,2 @@
+try saving panic to F1 button on right omni
+  <action name="v_weapon_countermeasure_decoy_launch_panic">

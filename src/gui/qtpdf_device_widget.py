@@ -694,7 +694,8 @@ class QtPdfDeviceWidget(QWidget):
 
         # Fallback to name matching
         if device_name:
-            device_name_lower = device_name.lower().strip()
+            # Normalize whitespace: collapse multiple spaces to single space
+            device_name_lower = ' '.join(device_name.lower().split())
 
             # Determine device side for filtering
             device_upper = device_name.upper()
@@ -704,7 +705,7 @@ class QtPdfDeviceWidget(QWidget):
             for template in self.pdf_manager.templates:
                 # Check each device match pattern
                 for pattern in template.device_match_patterns:
-                    pattern_lower = pattern.lower().strip()
+                    pattern_lower = ' '.join(pattern.lower().split())
 
                     # Match pattern to device name
                     if pattern_lower in device_name_lower or device_name_lower in pattern_lower:

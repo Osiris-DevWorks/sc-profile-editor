@@ -30,6 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed C1 placement (button 17) and SW1 positioning (buttons 25-27)
   - Corrected MODE button mapping and swaps in standalone field mapping
 - **VKB Profile Loading** - Fixed field mapping not loading correctly for VKB SEM standalone variant
+- **VKB SEM Device Detection** - Fixed standalone VKB SEM module not being detected due to extra whitespace in device names:
+  - Root cause: Device names from Windows contained leading/trailing/multiple internal spaces
+  - Solution: Normalize whitespace in device name pattern matching (collapse multiple spaces to single)
+  - Affects: PDFTemplateManager and Device View template matching
+  - Resolves "VKBSim NXT SEM is not detected" popup on profile load
 
 ## [0.8.2] - 2026-02-07
 
