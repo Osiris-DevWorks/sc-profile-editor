@@ -11,6 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-03-24
+
+### Fixed
+- **VKB SEM Device Detection** - Fixed standalone VKB SEM module not being detected due to extra whitespace in device names:
+  - Root cause: Device names from Windows contained leading/trailing/multiple internal spaces
+  - Solution: Normalize whitespace in device name pattern matching (collapse multiple spaces to single)
+  - Affects: PDFTemplateManager and Device View template matching
+  - Resolves "VKBSim NXT SEM is not detected" popup on profile load
+
+- **Binding Duplication in Profile Overlay** - Fixed critical bug causing bindings to multiply during profile loading:
+  - Root cause: Master template (UNBIND_ALL.xml) has multiple unmapped rebind entries per action (e.g., 5 for v_eject: kb1_, mouse1_, gp1_, js1_, js2_)
+  - Bug: Overlay logic applied source binding once per template rebind, duplicating user bindings 5x
+  - Solution: Track processed actions in overlay, apply source binding only once per action
+  - Impact: Profiles now load with correct binding counts (e.g., 4,764 vs 5,320 bindings)
+  - Fixes: Bindings no longer multiply on load/save cycles, Device View shows correct count
+
+- **Duplicate SEM Template Entries** - Fixed Device View dropdown showing SEM template twice:
+  - Root cause: Both vkb_sem_standalone and vkb_sem matched "VKBSim NXT SEM" device name
+  - Solution: Deduplicate dropdown entries by tracking added template names
+  - Result: SEM template now appears only once in Device View device selection
+
 ## [0.9.0] - 2026-03-24
 
 ### Added
@@ -30,18 +51,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed C1 placement (button 17) and SW1 positioning (buttons 25-27)
   - Corrected MODE button mapping and swaps in standalone field mapping
 - **VKB Profile Loading** - Fixed field mapping not loading correctly for VKB SEM standalone variant
-- **VKB SEM Device Detection** - Fixed standalone VKB SEM module not being detected due to extra whitespace in device names:
-  - Root cause: Device names from Windows contained leading/trailing/multiple internal spaces
-  - Solution: Normalize whitespace in device name pattern matching (collapse multiple spaces to single)
-  - Affects: PDFTemplateManager and Device View template matching
-  - Resolves "VKBSim NXT SEM is not detected" popup on profile load
-
-- **Binding Duplication in Profile Overlay** - Fixed critical bug causing bindings to multiply during profile loading:
-  - Root cause: Master template (UNBIND_ALL.xml) has multiple unmapped rebind entries per action (e.g., 5 for v_eject: kb1_, mouse1_, gp1_, js1_, js2_)
-  - Bug: Overlay logic applied source binding once per template rebind, duplicating user bindings 5x
-  - Solution: Track processed actions in overlay, apply source binding only once per action
-  - Impact: Profiles now load with correct binding counts (e.g., 4,764 vs 5,320 bindings)
-  - Fixes: Bindings no longer multiply on load/save cycles, Device View shows correct count
 
 ## [0.8.2] - 2026-02-07
 
