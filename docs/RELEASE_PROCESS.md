@@ -111,7 +111,7 @@ This creates: `installer_output/SCProfileEditor-vX.Y.Z-Setup.exe`
 
 1. **Go to GitHub Release Page:**
    ```
-   https://github.com/Osiris-RK/sc-profile-editor/releases/new?tag=vX.Y.Z
+   https://github.com/Osiris-DevWorks/sc-profile-editor/releases/new?tag=vX.Y.Z
    ```
 
 2. **Fill in Release Information:**
@@ -144,12 +144,12 @@ This creates: `installer_output/SCProfileEditor-vX.Y.Z-Setup.exe`
 
 **Post the release:**
 ```bash
-.venv\Scripts\python.exe scripts/discord_notify.py vX.Y.Z https://github.com/Osiris-RK/sc-profile-editor/releases/tag/vX.Y.Z
+.venv\Scripts\python.exe scripts/discord_notify.py vX.Y.Z https://github.com/Osiris-DevWorks/sc-profile-editor/releases/tag/vX.Y.Z
 ```
 
 Example:
 ```bash
-.venv\Scripts\python.exe scripts/discord_notify.py v0.4.0 https://github.com/Osiris-RK/sc-profile-editor/releases/tag/v0.4.0
+.venv\Scripts\python.exe scripts/discord_notify.py v0.4.0 https://github.com/Osiris-DevWorks/sc-profile-editor/releases/tag/v0.4.0
 ```
 
 The script will:
@@ -211,11 +211,11 @@ The script will:
 
 ## 📝 Full Changelog
 
-See [CHANGELOG.md](https://github.com/Osiris-RK/sc-profile-editor/blob/main/docs/CHANGELOG.md) for complete version history.
+See [CHANGELOG.md](https://github.com/Osiris-DevWorks/sc-profile-editor/blob/main/docs/CHANGELOG.md) for complete version history.
 
 ---
 
-**First time using SC Profile Editor?** Check out the [User Guide](https://github.com/Osiris-RK/sc-profile-editor/blob/main/README.md) to get started!
+**First time using SC Profile Editor?** Check out the [User Guide](https://github.com/Osiris-DevWorks/sc-profile-editor/blob/main/README.md) to get started!
 
 **Need help?** Join our [Discord community](https://discord.gg/BNzRegKZ7k) for support and discussions.
 
@@ -236,7 +236,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 - [ ] Test installer download and installation
 - [ ] **Post to Discord** (see step 11 - this is REQUIRED, not optional):
   ```bash
-  .venv\Scripts\python.exe scripts/discord_notify.py vX.Y.Z https://github.com/Osiris-RK/sc-profile-editor/releases/tag/vX.Y.Z
+  .venv\Scripts\python.exe scripts/discord_notify.py vX.Y.Z https://github.com/Osiris-DevWorks/sc-profile-editor/releases/tag/vX.Y.Z
   ```
 - [ ] Create new development branch for next version (if needed)
 - [ ] Update docs/CHANGELOG.md with new `[Unreleased]` section

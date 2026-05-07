@@ -60,9 +60,11 @@ class InputFilterDialog(QDialog):
         self.detect_button.clicked.connect(self._on_detect_clicked)
         detection_layout.addWidget(self.detect_button)
 
-        # Detection result label
+        # Detection result label — secondary text role keeps it readable
+        # across all themes via the app-level QSS rule.
         self.result_label = QLabel("No input detected yet...")
-        self.result_label.setStyleSheet("color: gray; font-style: italic;")
+        self.result_label.setProperty("role", "secondary")
+        self.result_label.setStyleSheet("font-style: italic;")
         detection_layout.addWidget(self.result_label)
 
         detection_group.setLayout(detection_layout)

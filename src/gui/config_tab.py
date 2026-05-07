@@ -8,7 +8,7 @@ import logging
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLabel, QPushButton,
                               QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLineEdit, QFileDialog, QCheckBox,
                               QListWidget, QListWidgetItem, QAbstractItemView)
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 from PyQt6.QtGui import QShowEvent
 
 # Add parent directory to path
@@ -16,6 +16,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from utils.input_detector import InputDetector
 from utils.settings import AppSettings
+from gui.theme import (apply_theme, AVAILABLE_THEMES,
+                       THEME_LIGHT, THEME_DARK, THEME_DEFAULT, THEME_ODW)
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +54,33 @@ class ConfigTab(QWidget):
         layout.setSpacing(5)  # Reduce spacing between sections
         layout.setContentsMargins(5, 5, 5, 5)  # Reduce margins
         self.setLayout(layout)
+
+        # === APPEARANCE SECTION ===
+        appearance_group = QGroupBox("Appearance")
+        appearance_layout = QHBoxLayout()
+        appearance_layout.setContentsMargins(8, 5, 8, 8)
+        appearance_group.setLayout(appearance_layout)
+
+        appearance_layout.addWidget(QLabel("Theme:"))
+        self.theme_combo = QComboBox()
+        self.theme_combo.setToolTip(
+            "Switch the app theme. Takes effect immediately across the main "
+            "window, header buttons, tabs, and dialogs."
+        )
+        self.theme_combo.addItem("Default", THEME_DEFAULT)
+        self.theme_combo.addItem("Light", THEME_LIGHT)
+        self.theme_combo.addItem("Dark", THEME_DARK)
+        self.theme_combo.addItem("ODW", THEME_ODW)
+        current = self.settings.get_theme()
+        idx = self.theme_combo.findData(current)
+        if idx >= 0:
+            self.theme_combo.setCurrentIndex(idx)
+        self.theme_combo.currentIndexChanged.connect(self._on_theme_changed)
+        self.theme_combo.setMaximumWidth(150)
+        appearance_layout.addWidget(self.theme_combo)
+        appearance_layout.addStretch()
+
+        layout.addWidget(appearance_group)
 
         # === CONNECTED DEVICES SECTION ===
         devices_group = QGroupBox("Connected Devices")
@@ -267,6 +296,30 @@ class ConfigTab(QWidget):
 
         # Load current filters into the list
         self.load_ignored_inputs()
+
+    def _on_theme_changed(self, _index: int):
+        """Defer the actual swap to the next event-loop tick. Calling
+        app.setPalette() directly from a QComboBox.currentIndexChanged slot
+        crashes Qt 6 because the combo's event chain hasn't finished unwinding.
+        """
+        theme = self.theme_combo.currentData()
+        if theme not in AVAILABLE_THEMES:
+            return
+        QTimer.singleShot(0, lambda: self._apply_theme_change(theme))
+
+    def _apply_theme_change(self, theme: str):
+        """Persist and apply the theme. Runs via QTimer.singleShot so we're
+        outside the combo's event handling — required for setPalette safety.
+        Asks the main window to re-apply per-button stylesheets so the colored
+        header buttons recolor without a restart."""
+        from PyQt6.QtWidgets import QApplication
+        self.settings.set_theme(theme)
+        app = QApplication.instance()
+        if app is not None:
+            apply_theme(app, theme)
+        mw = self.window()
+        if hasattr(mw, "refresh_action_buttons"):
+            mw.refresh_action_buttons()
 
     def refresh_devices(self):
         """Refresh the list of connected devices"""

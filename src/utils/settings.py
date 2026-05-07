@@ -259,3 +259,41 @@ class AppSettings:
         self.settings.remove("ignored_inputs")
         self.settings.sync()
         logger.info("Cleared all ignored inputs")
+
+    def get_theme(self) -> str:
+        """Get the current UI theme name. Falls back to DEFAULT_THEME if unset
+        or invalid (e.g. settings file written by an older version with a
+        retired theme name).
+
+        The theme module is imported lazily and via two paths because
+        AppSettings is reachable both through the bare ``utils.settings``
+        path (after main_window's sys.path munge) and through the absolute
+        ``src.utils.settings`` path (during early app startup, before any
+        widget imports). Whichever path is importable wins."""
+        AVAILABLE_THEMES, DEFAULT_THEME = _theme_constants()
+        theme = self.settings.value("theme", DEFAULT_THEME, type=str)
+        if theme not in AVAILABLE_THEMES:
+            logger.warning(f"Persisted theme {theme!r} not recognized; using {DEFAULT_THEME}")
+            return DEFAULT_THEME
+        return theme
+
+    def set_theme(self, theme: str):
+        """Save the selected UI theme. Validated against AVAILABLE_THEMES."""
+        AVAILABLE_THEMES, _ = _theme_constants()
+        if theme not in AVAILABLE_THEMES:
+            logger.error(f"Refusing to save unknown theme {theme!r}")
+            return
+        self.settings.setValue("theme", theme)
+        self.settings.sync()
+        logger.info(f"Saved theme: {theme}")
+
+
+def _theme_constants():
+    """Resolve theme constants regardless of which import path is on sys.path.
+    Tried absolute first (works during early startup), bare second (works
+    after main_window's path munge)."""
+    try:
+        from src.gui.theme import AVAILABLE_THEMES, DEFAULT_THEME
+    except ImportError:
+        from gui.theme import AVAILABLE_THEMES, DEFAULT_THEME
+    return AVAILABLE_THEMES, DEFAULT_THEME

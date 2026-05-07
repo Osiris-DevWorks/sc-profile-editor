@@ -7,7 +7,7 @@ A desktop application for editing and exporting Star Citizen control profiles in
 
 ## Download & Installation
 
-You can download SC Profile Editor from the [GitHub Releases page](https://github.com/Osiris-RK/sc-profile-editor/releases). Two options are available:
+You can download SC Profile Editor from the [GitHub Releases page](https://github.com/Osiris-DevWorks/sc-profile-editor/releases). Two options are available:
 
 ### Option 1: Installer (Recommended)
 

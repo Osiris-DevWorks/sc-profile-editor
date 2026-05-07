@@ -2,10 +2,10 @@
 ; Created with Inno Setup
 
 #define MyAppName "Star Citizen Profile Editor"
-#define MyAppVersion "0.9.1"
+#define MyAppVersion "0.10.0"
 #define MyAppPublisher "SC Profile Tools"
 #define MyAppURL "https://github.com/yourusername/scpe-releases"
-#define MyAppExeName "SCProfileEditor-v0.9.1.exe"
+#define MyAppExeName "SCProfileEditor-v0.10.0.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -44,6 +44,7 @@ SCDirectoryDefaultPath=C:\Program Files\Roberts Space Industries\StarCitizen\LIV
 [Files]
 Source: "dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "assets\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "assets\fonts\*"; DestDir: "{app}\assets\fonts"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "label_overrides.json"; DestDir: "{app}"; Flags: ignoreversion
 ; Visual templates are embedded in the .onefile executable

@@ -339,9 +339,11 @@ class QtPdfDeviceWidget(QWidget):
         self.view.field_clicked.connect(self.on_field_clicked)
         layout.addWidget(self.view)
 
-        # Status label
+        # Status label — secondary text, color resolved per-theme via the
+        # app-level QSS rule on [role="secondary"].
         self.status_label = QLabel("No device selected")
-        self.status_label.setStyleSheet("color: #666; font-size: 11px;")
+        self.status_label.setProperty("role", "secondary")
+        self.status_label.setStyleSheet("font-size: 11px;")
         layout.addWidget(self.status_label)
 
     def set_connected_devices(self, devices: list):
@@ -350,7 +352,7 @@ class QtPdfDeviceWidget(QWidget):
 
         Args:
             devices: List of device dicts from InputDetector.get_available_devices()
-                     Each dict has: {'type': 'joystick'|'keyboard'|'mouse', 'instance': N, 'name': 'Device Name'}
+                     Each dict has: {'type': 'joystick'|'keyboard'|'mouse', 'instance': N, 'name': 'Device Name', 'vid_pid': (vid, pid) | None}
         """
         self.connected_devices = devices
         logger.debug(f"Connected devices updated: {len(devices)} devices")
@@ -800,6 +802,23 @@ class QtPdfDeviceWidget(QWidget):
 
         self.load_device_pdf()
 
+    def _current_device_vid_pid(self):
+        """Return the (vid, pid) tuple for the currently selected device,
+        looked up from the connected_devices list. None if the device isn't
+        in the connected list, isn't a joystick (keyboard/mouse have no
+        DI product GUID), or didn't expose a parseable SDL GUID.
+
+        This is the bridge that lets the JS-index matcher use VID/PID
+        identity comparison instead of fuzzy name matching at every call
+        site that knows the current device's name."""
+        # current_device is a name string here (the dropdown stores names)
+        if not self.current_device or not isinstance(self.current_device, str):
+            return None
+        for device_dict in self.connected_devices:
+            if device_dict.get('name') == self.current_device:
+                return device_dict.get('vid_pid')
+        return None
+
     def refresh_device_mapper(self):
         """Refresh device mapper after profile devices have been updated
         This is called after auto-detecting and adding joystick devices"""
@@ -905,9 +924,13 @@ class QtPdfDeviceWidget(QWidget):
                 logger.warning("Missing current_device, current_profile, or device_mapper")
                 return field_values
 
-            # Get joystick index for this device
-            # current_device is now a device name string (from connected_devices)
-            js_index = self.device_mapper.get_js_index_for_device(self.current_device or "")
+            # Get joystick index for this device. VID/PID-first match — falls
+            # back to name match when the profile or connected device lacks
+            # a parseable DirectInput product GUID.
+            js_index = self.device_mapper.get_js_index_for_device(
+                self.current_device or "",
+                vid_pid=self._current_device_vid_pid(),
+            )
 
             if js_index is None:
                 logger.warning(f"No JS index found for device: {self.current_device}")
@@ -1017,7 +1040,16 @@ class QtPdfDeviceWidget(QWidget):
 
             logger.debug(f"Looking for JS index for device: '{device_product_name}'")
 
-            js_index = self.device_mapper.get_js_index_for_device(device_product_name)
+            # VID/PID-first match if the connected-device side has it.
+            # When current_device is a Device object (not a string), prefer
+            # its own vid_pid (already populated by xml_parser); otherwise
+            # look up the connected-devices dict by name.
+            current_vid_pid = None
+            if not isinstance(self.current_device, str) and getattr(self.current_device, 'vid_pid', None) is not None:
+                current_vid_pid = self.current_device.vid_pid
+            else:
+                current_vid_pid = self._current_device_vid_pid()
+            js_index = self.device_mapper.get_js_index_for_device(device_product_name, vid_pid=current_vid_pid)
             if not js_index:
                 logger.warning(f"No JS index found for device: {device_product_name}")
                 if hasattr(self.current_device, 'instance'):
@@ -1188,11 +1220,13 @@ class QtPdfDeviceWidget(QWidget):
             logger.warning(f"map_pdf_field_to_input_code: No device_mapper available")
             return None
 
-        # Get JS index for this device
-        # current_device is now a device name string (from connected_devices)
+        # Get JS index for this device. VID/PID-first match.
         device_name = self.current_device or ""
         logger.debug(f"map_pdf_field_to_input_code: Looking up JS index for device '{device_name}'")
-        js_index = self.device_mapper.get_js_index_for_device(device_name)
+        js_index = self.device_mapper.get_js_index_for_device(
+            device_name,
+            vid_pid=self._current_device_vid_pid(),
+        )
         if not js_index:
             logger.warning(f"map_pdf_field_to_input_code: Could not find JS index for device '{device_name}'")
             logger.debug(f"map_pdf_field_to_input_code: Available mappings: {self.device_mapper.device_to_js}")

@@ -180,12 +180,13 @@ class ActionAssignmentWidget(QWidget):
 
         layout.addLayout(label_layout)
 
-        # Border styling
+        # Border styling — palette-driven so the panel reads correctly on
+        # every theme background.
         self.setStyleSheet("""
             ActionAssignmentWidget {
-                border: 1px solid #ddd;
+                border: 1px solid palette(mid);
                 border-radius: 4px;
-                background-color: #f9f9f9;
+                background-color: palette(alternate-base);
                 margin: 4px 0px;
             }
         """)
@@ -462,7 +463,9 @@ class RemapDialog(QDialog):
         button_layout = QHBoxLayout()
 
         clear_all_btn = QPushButton("Clear All")
-        clear_all_btn.setStyleSheet("color: #d32f2f;")
+        # Use the palette's BrightText role for the destructive action — it's
+        # red in light/dark, orange in default (navy), and copper in ODW.
+        clear_all_btn.setStyleSheet("color: palette(bright-text);")
         clear_all_btn.clicked.connect(self.clear_all_bindings)
         clear_all_btn.setToolTip("Remove all mappings for this button")
         button_layout.addWidget(clear_all_btn)

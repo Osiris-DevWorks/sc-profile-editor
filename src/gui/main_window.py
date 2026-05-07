@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                               QStyledItemDelegate, QDialog, QTextBrowser, QInputDialog,
                               QListWidget, QListWidgetItem, QSystemTrayIcon, QMenu)
 from PyQt6.QtCore import Qt, QSortFilterProxyModel, QTimer, QUrl, QEvent
-from PyQt6.QtGui import QStandardItemModel, QStandardItem, QDesktopServices, QPixmap, QCursor, QIcon
+from PyQt6.QtGui import QStandardItemModel, QStandardItem, QDesktopServices, QPixmap, QCursor, QIcon, QFont
 from PyQt6.QtGui import QAction
 import sys
 import os
@@ -38,6 +38,7 @@ from models.profile_model import ControlProfile
 from utils.settings import AppSettings
 from utils.version import get_version
 from utils.device_splitter import get_device_for_input
+from gui.theme import action_button_stylesheet, get_title_color, BRAND_FONT_FAMILY
 
 # Import PDF widget - QtPdf is the only PDF viewer (WebEngine removed to reduce installer size)
 PDF_WIDGET_AVAILABLE = False
@@ -64,8 +65,8 @@ class SelectAllDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
         """Create editor with proper configuration"""
         editor = QLineEdit(parent)
-        # Force solid white background and black text
-        editor.setStyleSheet("QLineEdit { background-color: white; color: black; }")
+        # Inherit Base/Text palette roles from the active theme — explicit
+        # white/black breaks the dark and ODW themes.
         return editor
 
     def setEditorData(self, editor, index):
@@ -133,91 +134,102 @@ class MainWindow(QMainWindow):
         main_layout = QVBoxLayout()
         central_widget.setLayout(main_layout)
 
-        # Header
+        # Header — title alone on its own row.
         header_layout = QHBoxLayout()
-        title_label = QLabel(f"Star Citizen Profile Editor v{self.version}")
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold; margin: 10px;")
-        header_layout.addWidget(title_label)
+        self.title_label = QLabel(f"STAR CITIZEN PROFILE EDITOR V{self.version}")
+        # Branded display font (Hyperspace Race, registered at startup); Qt
+        # falls back to the system default if the OTF didn't load. Color is
+        # supplied by _refresh_title_style() and re-applied on theme swap.
+        title_font = QFont(BRAND_FONT_FAMILY)
+        title_font.setPointSize(18)
+        self.title_label.setFont(title_font)
+        self._refresh_title_style()
+        header_layout.addWidget(self.title_label)
         header_layout.addStretch()
-
-        # Import button (leftmost)
-        import_btn = QPushButton("Import Profile XML")
-        import_btn.setStyleSheet("QPushButton { padding: 10px 20px; font-size: 14px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; } QPushButton:hover { background-color: #45a049; }")
-        import_btn.clicked.connect(self.import_profile)
-        header_layout.addWidget(import_btn)
-
-        # New Profile button
-        new_profile_btn = QPushButton("New Profile")
-        new_profile_btn.setStyleSheet("QPushButton { padding: 10px 20px; font-size: 14px; background-color: #2196F3; color: white; border: none; border-radius: 4px; } QPushButton:hover { background-color: #0b7dda; }")
-        new_profile_btn.clicked.connect(self.create_new_profile)
-        header_layout.addWidget(new_profile_btn)
-
-        # Load Preset Profile button
-        load_preset_btn = QPushButton("Load Preset Profile")
-        load_preset_btn.setStyleSheet("QPushButton { padding: 10px 20px; font-size: 14px; background-color: #9C27B0; color: white; border: none; border-radius: 4px; } QPushButton:hover { background-color: #7B1FA2; }")
-        load_preset_btn.clicked.connect(self.load_preset_profile)
-        header_layout.addWidget(load_preset_btn)
-
-        # Save Profile button (for remapped controls)
-        self.save_profile_btn = QPushButton("💾 Save Profile")
-        self.save_profile_btn.setStyleSheet("QPushButton { padding: 10px 20px; font-size: 14px; background-color: #2196F3; color: white; border: none; border-radius: 4px; } QPushButton:hover { background-color: #0b7dda; }")
-        self.save_profile_btn.clicked.connect(self.save_profile)
-        self.save_profile_btn.setEnabled(False)  # Disabled until profile is modified
-        header_layout.addWidget(self.save_profile_btn)
-
-        # Export buttons
-        self.export_csv_btn = QPushButton("Export CSV")
-        self.export_csv_btn.setStyleSheet("padding: 10px 20px; font-size: 14px;")
-        self.export_csv_btn.clicked.connect(self.export_csv)
-        self.export_csv_btn.setEnabled(False)
-        header_layout.addWidget(self.export_csv_btn)
-
-        self.export_pdf_btn = QPushButton("Export PDF")
-        self.export_pdf_btn.setStyleSheet("padding: 10px 20px; font-size: 14px;")
-        self.export_pdf_btn.clicked.connect(self.export_pdf)
-        self.export_pdf_btn.setEnabled(False)
-        header_layout.addWidget(self.export_pdf_btn)
-
-        self.export_word_btn = QPushButton("Export Word")
-        self.export_word_btn.setStyleSheet("padding: 10px 20px; font-size: 14px;")
-        self.export_word_btn.clicked.connect(self.export_word)
-        self.export_word_btn.setEnabled(False)
-        header_layout.addWidget(self.export_word_btn)
-
-        self.export_graphic_btn = QPushButton("Export Graphic")
-        self.export_graphic_btn.setStyleSheet("padding: 10px 20px; font-size: 14px;")
-        self.export_graphic_btn.clicked.connect(self.export_graphic)
-        self.export_graphic_btn.setEnabled(False)
-        header_layout.addWidget(self.export_graphic_btn)
-
-        # Help button (rightmost)
-        help_btn = QPushButton("Help")
-        help_btn.setStyleSheet("padding: 10px 20px; font-size: 14px;")
-        help_btn.clicked.connect(self.show_help)
-        header_layout.addWidget(help_btn)
-
         main_layout.addLayout(header_layout)
 
-        # Profile name section with editable field
-        profile_name_layout = QHBoxLayout()
-        profile_name_layout.setContentsMargins(5, 5, 5, 5)
+        # Action row — profile name field + all action buttons share one row
+        # beneath the title. Profile name input takes the slack so the buttons
+        # cluster on the right at their natural sizes.
+        action_row = QHBoxLayout()
+        action_row.setContentsMargins(5, 5, 5, 5)
+        action_row.setSpacing(6)
 
-        profile_name_layout.addWidget(QLabel("Profile Name:"))
+        action_row.addWidget(QLabel("Profile Name:"))
         self.profile_name_input = QLineEdit()
         self.profile_name_input.setPlaceholderText("Enter profile name...")
         self.profile_name_input.setEnabled(False)
-        profile_name_layout.addWidget(self.profile_name_input, 1)
+        action_row.addWidget(self.profile_name_input, 1)
 
         self.update_profile_name_btn = QPushButton("Update Name")
         self.update_profile_name_btn.setEnabled(False)
         self.update_profile_name_btn.clicked.connect(self.on_update_profile_name)
-        profile_name_layout.addWidget(self.update_profile_name_btn)
+        action_row.addWidget(self.update_profile_name_btn)
 
-        main_layout.addLayout(profile_name_layout)
+        # Primary actions (themed). refresh_action_buttons() re-applies these
+        # stylesheets on theme swap.
+        self.import_btn = QPushButton("Import Profile XML")
+        self.import_btn.setStyleSheet(action_button_stylesheet("import"))
+        self.import_btn.clicked.connect(self.import_profile)
+        action_row.addWidget(self.import_btn)
 
-        # Profile info label (for other info)
+        self.new_profile_btn = QPushButton("New Profile")
+        self.new_profile_btn.setStyleSheet(action_button_stylesheet("new_profile"))
+        self.new_profile_btn.clicked.connect(self.create_new_profile)
+        action_row.addWidget(self.new_profile_btn)
+
+        self.load_preset_btn = QPushButton("Load Preset Profile")
+        self.load_preset_btn.setStyleSheet(action_button_stylesheet("preset"))
+        self.load_preset_btn.clicked.connect(self.load_preset_profile)
+        action_row.addWidget(self.load_preset_btn)
+
+        self.save_profile_btn = QPushButton("💾 Save Profile")
+        self.save_profile_btn.setStyleSheet(action_button_stylesheet("save"))
+        self.save_profile_btn.clicked.connect(self.save_profile)
+        self.save_profile_btn.setEnabled(False)  # Disabled until profile is modified
+        action_row.addWidget(self.save_profile_btn)
+
+        # Neutral-chrome buttons (export + help) inherit the theme's default
+        # Button palette role.
+        _neutral_btn_qss = "QPushButton { padding: 10px 20px; font-size: 14px; }"
+
+        self.export_csv_btn = QPushButton("Export CSV")
+        self.export_csv_btn.setStyleSheet(_neutral_btn_qss)
+        self.export_csv_btn.clicked.connect(self.export_csv)
+        self.export_csv_btn.setEnabled(False)
+        action_row.addWidget(self.export_csv_btn)
+
+        self.export_pdf_btn = QPushButton("Export PDF")
+        self.export_pdf_btn.setStyleSheet(_neutral_btn_qss)
+        self.export_pdf_btn.clicked.connect(self.export_pdf)
+        self.export_pdf_btn.setEnabled(False)
+        action_row.addWidget(self.export_pdf_btn)
+
+        self.export_word_btn = QPushButton("Export Word")
+        self.export_word_btn.setStyleSheet(_neutral_btn_qss)
+        self.export_word_btn.clicked.connect(self.export_word)
+        self.export_word_btn.setEnabled(False)
+        action_row.addWidget(self.export_word_btn)
+
+        self.export_graphic_btn = QPushButton("Export Graphic")
+        self.export_graphic_btn.setStyleSheet(_neutral_btn_qss)
+        self.export_graphic_btn.clicked.connect(self.export_graphic)
+        self.export_graphic_btn.setEnabled(False)
+        action_row.addWidget(self.export_graphic_btn)
+
+        help_btn = QPushButton("Help")
+        help_btn.setStyleSheet(_neutral_btn_qss)
+        help_btn.clicked.connect(self.show_help)
+        action_row.addWidget(help_btn)
+
+        main_layout.addLayout(action_row)
+
+        # Profile info label (for other info). Color is supplied by the
+        # app-level QSS rule for [role="secondary"] so it stays readable on
+        # every theme background.
         self.profile_info_label = QLabel("No profile loaded")
-        self.profile_info_label.setStyleSheet("font-size: 12px; margin: 5px; color: #666;")
+        self.profile_info_label.setProperty("role", "secondary")
+        self.profile_info_label.setStyleSheet("font-size: 12px; margin: 5px;")
         main_layout.addWidget(self.profile_info_label)
 
         # Filter toolbar
@@ -391,22 +403,26 @@ class MainWindow(QMainWindow):
         # Connect tab change signal to sync device selection
         self.tab_widget.currentChanged.connect(self.on_tab_changed)
 
-        # Footer with Osiris DevWorks (left) and PayPal (right)
+        # Footer — Osiris logo + Discord on the left, donation cluster on
+        # the right. Layout mirrors smart-citizen for suite-wide consistency.
         footer_layout = QHBoxLayout()
+        footer_layout.setContentsMargins(8, 8, 8, 0)
 
-        # Osiris DevWorks button (left side)
+        # Osiris DevWorks logo (left). Static for now — smart-citizen pulses
+        # the eye-glow overlay while a background worker is running, but SCPE
+        # has no equivalent worker plumbing yet, so we just show the base
+        # logo. The eye-glow asset is bundled so we can wire pulsing later
+        # without another asset round-trip.
         self.osiris_button = QLabel()
         osiris_image_path = get_resource_path(os.path.join("assets", "osiris-devworks.png"))
-
-        # Try to load Osiris image, fall back to text if not found
         if os.path.exists(osiris_image_path):
             pixmap = QPixmap(osiris_image_path)
-            # Scale to reasonable size (max height 40px to accommodate the logo design)
             if pixmap.height() > 40:
                 pixmap = pixmap.scaledToHeight(40, Qt.TransformationMode.SmoothTransformation)
             self.osiris_button.setPixmap(pixmap)
         else:
-            # Fallback to styled text button
+            # Fallback to styled text button (brand identity, deliberately
+            # not themed)
             self.osiris_button.setText("Osiris DevWorks")
             self.osiris_button.setStyleSheet("""
                 QLabel {
@@ -423,16 +439,31 @@ class MainWindow(QMainWindow):
             """)
 
         self.osiris_button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.osiris_button.mousePressEvent = self.open_discord_link
+        self.osiris_button.setToolTip("Open the SC Profile Editor GitHub repository")
+        self.osiris_button.mousePressEvent = self.open_osiris_github
         footer_layout.addWidget(self.osiris_button)
 
-        # Stretch to push donation buttons to the right
-        footer_layout.addStretch()
+        # Discord button (next to Osiris). Image link to the SCPE Discord
+        # community; falls back to a styled text label if the asset is
+        # missing.
+        footer_layout.addSpacing(10)
+        self.discord_button = QLabel()
+        discord_image_path = get_resource_path(os.path.join("assets", "discord.png"))
+        if os.path.exists(discord_image_path):
+            discord_pixmap = QPixmap(discord_image_path)
+            if discord_pixmap.height() > 40:
+                discord_pixmap = discord_pixmap.scaledToHeight(40, Qt.TransformationMode.SmoothTransformation)
+            self.discord_button.setPixmap(discord_pixmap)
+        else:
+            self.discord_button.setText("Join the Discord")
+            self.discord_button.setStyleSheet("font-size: 12px;")
+        self.discord_button.setToolTip("Join the SCPE Discord community for support and feature requests")
+        self.discord_button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.discord_button.mousePressEvent = self.open_discord_link
+        footer_layout.addWidget(self.discord_button)
 
-        # Donation label
-        donation_label = QLabel("Support this project:")
-        donation_label.setStyleSheet("font-size: 12px; color: #666; margin-right: 5px;")
-        footer_layout.addWidget(donation_label)
+        # Stretch to push the donation cluster to the right.
+        footer_layout.addStretch()
 
         # PayPal button (right side)
         self.paypal_button = QLabel()
@@ -505,6 +536,22 @@ class MainWindow(QMainWindow):
 
         # Status bar
         self.statusBar().showMessage("Ready")
+
+    def _refresh_title_style(self):
+        """Re-apply the per-theme color to the title label. The branded font
+        is set once at construction via QFont; QSS here only supplies color
+        and margin so the font-family from QFont propagates."""
+        self.title_label.setStyleSheet(f"color: {get_title_color()}; margin: 10px;")
+
+    def refresh_action_buttons(self):
+        """Re-apply per-theme stylesheets to the colored header buttons.
+        Called by ConfigTab after a theme swap so the buttons recolor without
+        requiring an app restart."""
+        self.import_btn.setStyleSheet(action_button_stylesheet("import"))
+        self.new_profile_btn.setStyleSheet(action_button_stylesheet("new_profile"))
+        self.load_preset_btn.setStyleSheet(action_button_stylesheet("preset"))
+        self.save_profile_btn.setStyleSheet(action_button_stylesheet("save"))
+        self._refresh_title_style()
 
     def restore_window_state(self):
         """Restore saved window geometry and state"""
@@ -2681,6 +2728,10 @@ class MainWindow(QMainWindow):
         """Navigate to a section in the browser by anchor ID"""
         if anchor_id:
             browser.scrollToAnchor(anchor_id)
+
+    def open_osiris_github(self, event):
+        """Open the SCPE GitHub repository in the browser."""
+        QDesktopServices.openUrl(QUrl("https://github.com/Osiris-DevWorks/sc-profile-editor"))
 
     def open_discord_link(self, event):
         """Open Discord invite link in browser"""

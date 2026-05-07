@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from models.profile_model import ControlProfile, Device, ActionMap, ActionBinding
 from registry.action_registry import get_action_registry
+from utils.directinput_guid import parse_di_product_guid
 
 logger = logging.getLogger(__name__)
 
@@ -133,6 +134,7 @@ class ProfileParser:
                     # Try to find product info from options elements
                     product_id = None
                     product_name = None
+                    vid_pid = None
 
                     for options in self.root.findall('options'):
                         if (options.get('type') == device_type and
@@ -146,13 +148,15 @@ class ProfileParser:
                                     product_name = product.split('{')[0].strip()
                                 else:
                                     product_name = product.strip()
+                                vid_pid = parse_di_product_guid(product)
                             break
 
                     devices.append(Device(
                         device_type=device_type,
                         instance=instance,
                         product_id=product_id,
-                        product_name=product_name
+                        product_name=product_name,
+                        vid_pid=vid_pid
                     ))
         # Fallback: If no devices found and no CustomisationUIHeader, extract from options elements
         # This handles preset profiles that don't have CustomisationUIHeader
@@ -172,6 +176,7 @@ class ProfileParser:
 
                     product_id = None
                     product_name = None
+                    vid_pid = None
 
                     if product:
                         product_id = product
@@ -181,12 +186,14 @@ class ProfileParser:
                             product_name = product.split('{')[0].strip()
                         else:
                             product_name = product.strip()
+                        vid_pid = parse_di_product_guid(product)
 
                     devices.append(Device(
                         device_type=device_type,
                         instance=instance,
                         product_id=product_id,
-                        product_name=product_name
+                        product_name=product_name,
+                        vid_pid=vid_pid
                     ))
 
         return devices
@@ -376,6 +383,7 @@ class ProfileParser:
 
                     product_id = None
                     product_name = None
+                    vid_pid = None
 
                     for options in root.findall('options'):
                         if (options.get('type') == device_type and
@@ -387,13 +395,15 @@ class ProfileParser:
                                     product_name = product.split('{')[0].strip()
                                 else:
                                     product_name = product.strip()
+                                vid_pid = parse_di_product_guid(product)
                             break
 
                     devices.append(Device(
                         device_type=device_type,
                         instance=instance,
                         product_id=product_id,
-                        product_name=product_name
+                        product_name=product_name,
+                        vid_pid=vid_pid
                     ))
 
         # Fallback: extract from options elements in ActionProfiles
@@ -412,6 +422,7 @@ class ProfileParser:
 
                     product_id = None
                     product_name = None
+                    vid_pid = None
 
                     if product:
                         product_id = product
@@ -419,12 +430,14 @@ class ProfileParser:
                             product_name = product.split('{')[0].strip()
                         else:
                             product_name = product.strip()
+                        vid_pid = parse_di_product_guid(product)
 
                     devices.append(Device(
                         device_type=device_type,
                         instance=instance,
                         product_id=product_id,
-                        product_name=product_name
+                        product_name=product_name,
+                        vid_pid=vid_pid
                     ))
 
         return devices

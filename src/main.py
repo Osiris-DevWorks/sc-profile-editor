@@ -7,6 +7,8 @@ import sys
 import logging
 from PyQt6.QtWidgets import QApplication, QMessageBox
 from src.gui.main_window import MainWindow
+from src.gui.theme import apply_theme, load_application_fonts
+from src.utils.settings import AppSettings
 from src.utils.single_instance import SingleInstanceManager
 
 
@@ -40,6 +42,12 @@ def main():
     app = QApplication(sys.argv)
     app.setApplicationName("Star Citizen Profile Editor")
     app.setOrganizationName("SC Tools")
+
+    # Register branded display font and apply persisted theme. Must happen
+    # before any widgets are constructed so they pick up the palette and
+    # font on first paint rather than flashing the system default.
+    load_application_fonts()
+    apply_theme(app, AppSettings().get_theme())
 
     # Check for single instance
     instance_manager = SingleInstanceManager("SC-Profile-Editor")

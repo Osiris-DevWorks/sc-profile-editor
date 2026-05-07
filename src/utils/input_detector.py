@@ -793,10 +793,30 @@ class InputDetector:
                         joy = pygame.joystick.Joystick(i)
                         joy.init()
                         instance_counter += 1
+
+                        # Capture VID/PID via SDL joystick GUID. The VID/PID
+                        # lets us synthesize the DirectInput product GUID and
+                        # match against the GUID SC writes into profile XML —
+                        # more reliable than name-string matching, especially
+                        # for devices whose name varies between SDL builds.
+                        vid_pid = None
+                        try:
+                            from utils.directinput_guid import parse_sdl_joystick_guid
+                            sdl_guid = joy.get_guid()
+                            vid_pid = parse_sdl_joystick_guid(sdl_guid)
+                            if vid_pid:
+                                logger.debug(
+                                    f"Joystick {instance_counter} ({joy.get_name()}): "
+                                    f"VID=0x{vid_pid[0]:04X} PID=0x{vid_pid[1]:04X} (SDL GUID: {sdl_guid})"
+                                )
+                        except Exception as e:
+                            logger.debug(f"Could not extract VID/PID for joystick {i}: {e}")
+
                         devices.append({
                             "type": "joystick",
                             "instance": instance_counter,
-                            "name": joy.get_name()
+                            "name": joy.get_name(),
+                            "vid_pid": vid_pid,
                         })
                     except Exception as e:
                         logger.debug(f"Could not initialize joystick {i}: {e}")

@@ -3,7 +3,7 @@ Data models for Star Citizen profiles
 """
 
 from dataclasses import dataclass
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 
 
 @dataclass
@@ -11,8 +11,9 @@ class Device:
     """Represents a game controller device"""
     device_type: str  # keyboard, mouse, joystick
     instance: int
-    product_id: Optional[str] = None
-    product_name: Optional[str] = None
+    product_id: Optional[str] = None      # Raw Product attribute string from XML (legacy; may include name + GUID)
+    product_name: Optional[str] = None    # Human-readable name with GUID stripped
+    vid_pid: Optional[Tuple[int, int]] = None  # (vendor_id, product_id) parsed from DI product GUID, when available
 
 
 @dataclass

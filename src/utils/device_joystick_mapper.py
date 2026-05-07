@@ -47,6 +47,11 @@ class DeviceJoystickMapper:
         # Create mappings
         self.device_to_js: Dict[str, str] = {}  # device name -> js index
         self.js_to_device: Dict[str, Device] = {}  # js index -> Device object
+        # Authoritative VID/PID -> js index map. Populated from devices that
+        # had a parseable DirectInput product GUID in their profile XML.
+        # Checked before name-based matching because it's an exact identity
+        # comparison rather than fuzzy substring matching.
+        self.vid_pid_to_js: Dict[Tuple[int, int], str] = {}
         self._build_mappings()
 
     def load_template_registry(self, registry_path: str):
@@ -80,16 +85,51 @@ class DeviceJoystickMapper:
                 # Also add lowercase version for case-insensitive matching
                 self.device_to_js[device_name.lower()] = js_index
 
-    def get_js_index_for_device(self, device_name: str) -> Optional[str]:
+            # Index by VID/PID if the profile carried a DI product GUID. This
+            # is the authoritative match key — every physical device of a
+            # given model shares the same VID/PID, regardless of name spelling.
+            if device.vid_pid is not None:
+                self.vid_pid_to_js[device.vid_pid] = js_index
+                # Always populate js_to_device even when product_name is empty
+                # so vid/pid-only matches still resolve to a Device object.
+                if js_index not in self.js_to_device:
+                    self.js_to_device[js_index] = device
+
+    def get_js_index_for_vid_pid(self, vid_pid: Tuple[int, int]) -> Optional[str]:
         """
-        Get joystick index (e.g., "js1") for a device name
+        Look up the joystick index by (VID, PID).
+
+        This is the authoritative match path — VID/PID is a hardware identity
+        that survives renames, locale changes, and SDL/DirectInput naming
+        differences. Returns None if no profile device carried a parseable
+        DI product GUID, in which case the caller should fall back to name
+        matching via get_js_index_for_device().
+        """
+        if vid_pid is None:
+            return None
+        return self.vid_pid_to_js.get(vid_pid)
+
+    def get_js_index_for_device(self, device_name: str,
+                                 vid_pid: Optional[Tuple[int, int]] = None) -> Optional[str]:
+        """
+        Get joystick index (e.g., "js1") for a device.
 
         Args:
             device_name: Device name (e.g., "VKBSim Gunfighter MCG Ultimate")
+            vid_pid: Optional (VID, PID) tuple. When provided, matched first
+                via the authoritative DirectInput product GUID; falls back to
+                name-based matching if VID/PID isn't in the profile or doesn't
+                resolve.
 
         Returns:
             Joystick index (e.g., "js1") or None if not found
         """
+        # VID/PID first — exact, identity-based match.
+        if vid_pid is not None:
+            js_index = self.vid_pid_to_js.get(vid_pid)
+            if js_index:
+                return js_index
+
         # Try exact match first
         if device_name in self.device_to_js:
             return self.device_to_js[device_name]

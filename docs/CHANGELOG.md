@@ -11,6 +11,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-05-06
+
+### Added
+- **Theme System** - Four-theme UI ported from sibling `smart-citizen` for suite-wide visual consistency:
+  - Default (deep navy + cyan), Light, Dark, and ODW (navy + antique gold) palettes
+  - New "Appearance" section in Config tab for live theme switching with no restart
+  - Selection persists via QSettings under the `theme` key
+  - Branded *Hyperspace Race* title font loaded from `assets/fonts/`
+  - Header buttons recolor per theme via semantic roles (`import`, `new_profile`, `preset`, `save`)
+  - Donation/social footer brand colors (PayPal, Venmo, Discord, Osiris) deliberately untouched as brand identity
+
+- **DirectInput Product GUID Resolution** - Device matching now keys on VID/PID identity:
+  - New `src/utils/directinput_guid.py` parses both SC profile product GUIDs (`{HHHHHHHH-0000-0000-0000-504944564944}`) and SDL joystick GUIDs (from `pygame.joystick.get_guid()`)
+  - `Device.vid_pid` populated by the XML parser; pygame's joystick VID/PID extracted at detection time
+  - `DeviceJoystickMapper` has a new `vid_pid_to_js` index — exact-match path tried before legacy fuzzy name matching
+  - Should resolve preset-profile errors for unowned devices and similar mismatches caused by name-string variations
+  - 15 unit tests cover known devices (T.16000M VID 0x044F PID 0xB10A, VKB Gunfighter SCG/LH) and edge cases (XInput synthetic GUIDs, keyboard/mouse class GUIDs)
+  - No new runtime dependencies
+
+- **Visual Template Generator** - New `scripts/generate_pdf_template.py` automates PDF template authoring:
+  - `detect` — find label rectangles in a device image (color-based via `--fill-color blue|gray|H,S,V` or edge-based)
+  - `detect_paired` — paired-cell layouts (gray label + white-bordered mapping cells, X52-style)
+  - `auto_map` — OCR identifier strips with Tesseract and auto-populate `field_mapping.json` with parsed JOY_X / POV1_X / JOY_RZ+ codes
+  - `key` — render an index PNG showing each detected cell's field name for review
+  - `generate` — produce the final PDF with form fields, respecting any existing `field_mapping.json`
+  - 11 unit tests for the JOY_X label parser including high-number-slider boundary cases
+  - Documented Tesseract install path for OCR
+
+- **`/issues` Claude command** - Walks every open GitHub issue and produces a triage report grouped by recommended next action
+
+### Changed
+- **Header Layout** - Title now stands alone on its own row in the branded font; profile name field and all action buttons share a single row beneath
+- **Title Capitalization** - Now reads `STAR CITIZEN PROFILE EDITOR V<version>` in all caps, matching `smart-citizen`'s convention
+- **Footer Refresh** - New Discord button between Osiris logo and donation cluster; replaced `paypal.png` and `venmo.png` with current brand assets; added `osiris-eye-glow.png` for future pulse-animation hook
+- **GitHub Org Migration** - All `Osiris-RK/...` references migrated to `Osiris-DevWorks/...` across `README.md`, `ABOUT.md`, `docs/RELEASE_PROCESS.md`, and `scripts/discord_notify.py`. Osiris footer button now opens the SCPE GitHub repo (was the Discord invite)
+- **Documentation Cleanup** - `CLAUDE.md` and `docs/DEVELOPMENT.md` modernized: removed stale references to nonexistent build scripts (`scripts/build/build_exe.py`, `build_all.bat`), corrected version source-of-truth wording, rewrote build instructions to match the actual flow
+
+### Fixed
+- **Hardcoded UI Colors** - Replaced inline color hex strings throughout the UI with palette-aware values so themes apply correctly:
+  - `SelectAllDelegate` label-edit cell now inherits `Base`/`Text` palette roles (was hardcoded white/black, broke in dark theme)
+  - Status labels (`qtpdf_device_widget`, `input_filter_dialog`) use `[role="secondary"]` QSS rule
+  - `RemapDialog` uses `palette(alternate-base)` and `palette(bright-text)` for theme-correct rendering
+- **Generator Subcommand Clobbering Mapping** - `scripts/generate_pdf_template.py generate` no longer overwrites an existing `field_mapping.json` (so `auto_map`'s populated mapping survives subsequent generate runs)
+
 ## [0.9.1] - 2026-03-24
 
 ### Fixed

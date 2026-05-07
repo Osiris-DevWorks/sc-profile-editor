@@ -1,263 +1,148 @@
-# Star Citizen Profile Editor - Development Guide
-
-**Version:** 0.8.2+vkb-sem-fixes (in development)
-**Date:** 2026-03-21
-**For:** Developers - Setup, architecture, and development workflow
+# Star Citizen Profile Editor — Development Guide
 
 A desktop application for editing and converting Star Citizen control profile XML files into human-readable formats (PDF, Word, CSV) with annotated device graphics.
 
-> **Note:** This guide is for developers. For end-user documentation, see [README.md](../README.md).
+> For end-user documentation, see [README.md](../README.md). For architecture and AI-assistant context, see [CLAUDE.md](../CLAUDE.md).
 
-## Features
+The current version lives in `VERSION.TXT` and is the source of truth — keep `installer.iss` (`MyAppVersion`, `MyAppExeName`) in sync with it.
 
-- Import Star Citizen XML control profiles
-- Generate human-readable control mapping tables
-- Create annotated device graphics (VKB Gladiator EVO, and more)
-- Export to multiple formats: PDF, Word, CSV, PNG
-- Edit control labels with persistent custom overrides
-- Support for keyboard, mouse, and HOTAS devices
-- Interactive PDF-based template system for device graphics
-- Filter and search control bindings
-- Auto-save last opened profile
+---
 
-## Project Structure
+## Setup
 
-```
-sc-profile-editor/
-├── src/                        # Source code
-│   ├── main.py                # Application entry point
-│   ├── gui/                   # GUI components (PyQt6)
-│   │   ├── main_window.py    # Main application window
-│   │   ├── qtpdf_device_widget.py # Interactive PDF device viewer (QtPdf-based)
-│   │   ├── remap_dialog.py   # Dialog for editing button assignments with input detection
-│   │   └── config_tab.py      # Config tab for device management
-│   ├── parser/                # XML parsing and label generation
-│   │   ├── xml_parser.py     # SC profile XML parser
-│   │   └── label_generator.py # Human-readable label generator
-│   ├── exporters/             # Export modules
-│   │   ├── csv_exporter.py   # CSV export
-│   │   ├── pdf_exporter.py   # PDF export
-│   │   ├── word_exporter.py  # Word document export
-│   │   └── graphic_exporter.py # Graphics export
-│   ├── graphics/              # Graphics and template management
-│   │   └── pdf_template_manager.py # PDF template loader
-│   ├── models/                # Data models
-│   │   └── profile_model.py  # Control profile data structures
-│   └── utils/                 # Utilities
-│       ├── settings.py       # Application settings persistence
-│       ├── label_overrides.py # Custom label override manager
-│       ├── input_detector.py # Input detection for joystick, keyboard, mouse
-│       └── device_mapper.py   # Device-to-joystick mapping management
-├── scripts/                    # Build and utility scripts
-│   ├── build/                 # Build scripts
-│   │   ├── build_exe.py      # Standard build
-│   │   ├── build_all.bat      # Build executable and installer
-│   │   └── discord_notify.py  # Discord release notifications
-│   └── prototypes/            # Research and prototype code
-├── visual-templates/          # Device graphics templates
-├── example-profiles/          # Sample SC profile XML files
-├── assets/                    # Application assets (icons, images)
-├── tests/                     # Unit tests
-├── label_overrides.json       # Global label overrides
-├── VERSION.TXT                # Current version number
-├── README.md                  # End-user documentation and user guide
-└── docs/                      # Developer documentation
-    ├── CHANGELOG.md           # Version history and changes
-    ├── DEVELOPMENT.md         # This file
-    ├── CLAUDE.md              # Project context for AI assistants
-    ├── RELEASE_PROCESS.md     # Release workflow
-    └── FILE_LOCATIONS.md      # File storage documentation
+**Prerequisites:** Python 3.12+, Git, Inno Setup 6 (for installer builds only).
+
+```powershell
+git clone <repository-url>
+cd sc-profile-editor
+
+python -m venv .venv
+.venv\Scripts\activate           # PowerShell / cmd
+# source .venv/bin/activate      # bash / WSL
+
+pip install -r requirements.txt
 ```
 
-## Setup for Development
+---
 
-### Prerequisites
-- Python 3.12 or higher
-- Git (for version control)
+## Running
 
-### Installation Steps
-
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd sc-profile-viewer
-   ```
-
-2. **Create virtual environment:**
-   ```bash
-   python -m venv .venv
-   ```
-
-3. **Activate virtual environment:**
-   ```bash
-   # Windows
-   .venv\Scripts\activate
-
-   # Linux/Mac
-   source .venv/bin/activate
-   ```
-
-4. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Running the Application
-
-### Development Mode
 ```bash
+python src/main.py
+# or:
 python -m src.main
 ```
 
-Or directly:
-```bash
-python src/main.py
-```
+Logging level is set in `src/main.py` — flip `logging.INFO` → `logging.DEBUG` for verbose output.
 
-## Version Management
-
-The project uses [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH).
-
-### Current Version
-The current version is stored in `VERSION.TXT` and is displayed in:
-- Window title
-- Main application header
-- Help dialog
-
-### Version Utilities
-Located in `src/utils/version.py`:
-- `get_version()` - Get current version
-- `increment_version(version, type)` - Increment major/minor/patch
-- `set_version(version)` - Update VERSION.TXT
-
-### Updating the Version
-You can update the version manually by editing `VERSION.TXT`, or use the build scripts with the `--increment` flag (see Building section below).
-
-## Building Executables
-
-### Standard Build
-
-```bash
-# Build without version increment
-python scripts/build/build_exe.py
-
-# Build and increment patch version (0.1.0 -> 0.1.1)
-python scripts/build/build_exe.py --increment patch
-
-# Build and increment minor version (0.1.0 -> 0.2.0)
-python scripts/build/build_exe.py --increment minor
-
-# Build and increment major version (0.1.0 -> 1.0.0)
-python scripts/build/build_exe.py --increment major
-```
-
-**Output:** `dist/SCProfileViewer.exe`
-
-### Version Increment Guidelines
-
-- **Patch** (`--increment patch`): Bug fixes, minor tweaks ui tweaks, no new features
-- **Minor** (`--increment minor`): New features, additional device support backward-compatible changes
-- **Major** (`--increment major`): Breaking changes, major rewrites
-
-### Build Process Details
-
-The build scripts:
-1. Display current version or increment if requested
-2. Clean previous build artifacts
-3. Bundle all required files (templates, assets, etc.)
-4. Create standalone executable using PyInstaller
-5. Place output in `dist/` directory
-
-**Important Files Bundled:**
-- `VERSION.TXT` - Version number
-- `label_overrides.json` - Global label mappings
-- `README.md` - User documentation and guide
-- `assets/` - Icons and images
-- `visual-templates/` - Device templates
-- `example-profiles/` - Sample profiles
-
-## Creating Installer Packages
-
-> **TODO:** Document installer creation process when implemented
-
-For distribution, you may want to create installer packages:
-- Windows: Use NSIS, Inno Setup, or WiX
-- macOS: Create .dmg or .pkg
-- Linux: Create .deb, .rpm, or AppImage
+---
 
 ## Testing
 
-Run unit tests:
+There is no UI test harness; the unit tests cover the parser only.
+
 ```bash
 pytest tests/
-```
-
-Run tests with coverage:
-```bash
 pytest --cov=src tests/
 ```
 
-## Release Process
+For UI / device / export work, manual smoke testing is required. `test_plan.md` and `TEST_PLAN_v0.8.2.md` at the repo root are historical references for what coverage typically looks like.
 
-See [RELEASE_PROCESS.md](RELEASE_PROCESS.md) for the complete release workflow.
+---
 
-## Development Workflow
+## Project layout
 
-### Adding New Features
-1. Create feature branch: `git checkout -b feature/your-feature`
-2. Implement changes
-3. Update tests
-4. Add entry to docs/CHANGELOG.md under `[Unreleased]`
-5. Update README.md if user-facing changes
-6. Submit pull request
+```
+sc-profile-editor/
+├── src/                     # application code (gui/, parser/, exporters/, graphics/, models/, registry/, utils/)
+├── tests/                   # pytest unit tests
+├── visual-templates/        # device PDF templates + template_registry.json
+├── example-profiles/        # sample SC XML profiles incl. BLANK.xml
+├── default-bindings/        # default SC keybind references
+├── assets/                  # icons, images bundled with the app
+├── scripts/                 # ad-hoc utility scripts (NOT build scripts — see Building below)
+├── deprecated/              # old SVG/PNG/OCR system removed in v0.4.0
+├── docs/                    # CHANGELOG, DEVELOPMENT (this file), RELEASE_PROCESS, CREATING_PDF_TEMPLATES
+├── CLAUDE.md                # AI-assistant context and architecture overview
+├── README.md                # end-user guide (also rendered in the About tab)
+├── VERSION.TXT              # current version (single source of truth)
+├── installer.iss            # Inno Setup script — must be kept in sync with VERSION.TXT
+├── label_overrides.json     # bundled global label defaults
+├── requirements.txt
+└── UNBIND_ALL.xml           # full SC action database (loaded by action_registry at startup)
+```
 
-### Bug Fixes
-1. Create bugfix branch: `git checkout -b bugfix/issue-name`
-2. Fix the issue
-3. Add tests to prevent regression
-4. Update docs/CHANGELOG.md
-5. Submit pull request
+See [CLAUDE.md](../CLAUDE.md#architecture) for the architecture walkthrough (data flow, three-tier label override system, PDF template system, composite devices, `_MEIPASS` resource paths).
 
-## Technology Stack
+---
 
-- **Python 3.12+** - Programming language
-- **PyQt6** - GUI framework
-- **python-docx** - Word document generation
-- **reportlab** - PDF generation
-- **Pillow** - Image processing
-- **PyInstaller** - Executable packaging
-- **pytest** - Testing framework
+## Building
 
-## Contributing
+There is **no in-repo build script** despite older docs referencing `scripts/build/build_exe.py` or `build_*.bat`. The actual release flow is orchestrated by the user-level `/release-scpe` skill, which runs PyInstaller against `src/main.py` and then compiles `installer.iss` with Inno Setup.
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests
-5. Update documentation
-6. Submit pull request
+### Manual exe build
 
-## Troubleshooting
+```powershell
+.venv\Scripts\activate
+$version = (Get-Content VERSION.TXT).Trim()
 
-### Build Issues
-- **Permission Error:** Close any running instances of the application
-- **Import Error:** Ensure virtual environment is activated and dependencies are installed
-- **Missing Files:** Check that all required assets are in the correct directories
+pyinstaller --onefile --windowed --icon=assets\icon.ico `
+    --add-data "VERSION.TXT;." `
+    --add-data "label_overrides.json;." `
+    --add-data "README.md;." `
+    --add-data "UNBIND_ALL.xml;." `
+    --add-data "assets;assets" `
+    --add-data "visual-templates;visual-templates" `
+    --add-data "example-profiles;example-profiles" `
+    --add-data "default-bindings;default-bindings" `
+    --name "SCProfileEditor-v$version" src\main.py
+```
 
-### Development Issues
-- **PyQt6 Import Error:** Reinstall PyQt6: `pip install --upgrade PyQt6`
-- **Version Not Displaying:** Ensure VERSION.TXT exists in project root
+Output: `dist\SCProfileEditor-v{version}.exe`.
 
-## Documentation
+When adding new bundled resources, two things must change together: the `--add-data` list above, and the lookup in code must route through the `_MEIPASS`-aware resource-path helper (otherwise it works in dev but breaks in the packaged build).
 
-- **README.md** - End-user documentation and guide (in-app Help)
-- **docs/CHANGELOG.md** - Version history and changes
-- **docs/ROADMAP.md** - Planned releases and device support roadmap
-- **docs/CLAUDE.md** - Project context and AI assistant instructions
-- **docs/DEVELOPMENT.md** - This file (developer guide)
-- **docs/RELEASE_PROCESS.md** - Release workflow and checklist
-- **docs/FILE_LOCATIONS.md** - File storage documentation
+### Manual installer build
 
-## License
+Requires Inno Setup 6 on PATH (`iscc`).
 
-TBD
+```powershell
+iscc installer.iss
+```
+
+`installer.iss` reads from `dist\SCProfileEditor-v{version}.exe`, so build the exe first. The installer output also lands in `dist\`.
+
+---
+
+## Version management
+
+`VERSION.TXT` is the source of truth — `installer.iss` and the window title both consume it. Helpers in `src/utils/version.py`:
+
+- `get_version()`
+- `increment_version(version, type)` — `'patch' | 'minor' | 'major'`
+- `set_version(version)` — writes `VERSION.TXT`
+
+Bump policy:
+- **Patch** (0.9.1 → 0.9.2) — bug fixes only
+- **Minor** (0.9.1 → 0.10.0) — new features, additional device support
+- **Major** — breaking changes or major rewrites
+
+When you bump `VERSION.TXT`, also update `installer.iss` (`MyAppVersion`, `MyAppExeName`) in the same commit.
+
+---
+
+## Release
+
+See [RELEASE_PROCESS.md](RELEASE_PROCESS.md) for the full checklist. The `/release-scpe` skill automates most of it.
+
+---
+
+## Adding device templates
+
+See [CREATING_PDF_TEMPLATES.md](CREATING_PDF_TEMPLATES.md). New templates need: a PDF with form fields under `visual-templates/{device-id}/`, a corresponding entry in `visual-templates/template_registry.json`, and (if it's a composite device) handling in `src/utils/device_splitter.py`.
+
+---
+
+## Tech stack
+
+PyQt6 (GUI + native QtPdf rendering), PyMuPDF (PDF form-field manipulation), python-docx, reportlab, Pillow, pygame (joystick input), pynput (keyboard/mouse input), PyInstaller (packaging), Inno Setup (Windows installer), pytest.

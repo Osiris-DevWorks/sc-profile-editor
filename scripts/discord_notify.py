@@ -3,7 +3,7 @@ Discord Release Notification Script
 
 Posts release announcements to Discord via webhook.
 Usage: python scripts/discord_notify.py <version> <release_url>
-Example: python scripts/discord_notify.py v0.4.0 https://github.com/Osiris-RK/sc-profile-editor/releases/tag/v0.4.0
+Example: python scripts/discord_notify.py v0.4.0 https://github.com/Osiris-DevWorks/sc-profile-editor/releases/tag/v0.4.0
 """
 
 import os
@@ -110,7 +110,7 @@ def create_embed(version: str, release_url: str) -> dict:
             "text": "SC Profile Editor"
         },
         "thumbnail": {
-            "url": "https://raw.githubusercontent.com/Osiris-RK/sc-profile-editor/main/assets/icon.png"
+            "url": "https://raw.githubusercontent.com/Osiris-DevWorks/sc-profile-editor/main/assets/icon.png"
         }
     }
 
@@ -167,7 +167,7 @@ def send_discord_notification(version: str, release_url: str) -> bool:
 def main():
     if len(sys.argv) != 3:
         print("Usage: python scripts/discord_notify.py <version> <release_url>")
-        print("Example: python scripts/discord_notify.py v0.4.0 https://github.com/Osiris-RK/sc-profile-editor/releases/tag/v0.4.0")
+        print("Example: python scripts/discord_notify.py v0.4.0 https://github.com/Osiris-DevWorks/sc-profile-editor/releases/tag/v0.4.0")
         sys.exit(1)
 
     version = sys.argv[1]

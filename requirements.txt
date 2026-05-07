@@ -20,5 +20,15 @@ pynput>=1.7.0               # Keyboard and mouse input detection
 pyinstaller>=6.3.0          # For building standalone executable
 python-dotenv>=1.0.0        # Environment variable management for scripts
 
+# Template Authoring Tools (dev-time only, not bundled into the app)
+# Used by scripts/generate_pdf_template.py to detect label rectangles in
+# device images and produce starter template PDFs. The packaged app does
+# not import cv2 — a missing install fails the script with a clear error
+# rather than the runtime.
+opencv-python>=4.8.0        # Rectangle detection for template generator
+pytesseract>=0.3.10         # OCR identifier strips for auto_map subcommand
+                            # NOTE: requires Tesseract binary separately:
+                            # https://github.com/UB-Mannheim/tesseract/wiki
+
 # Note: The project now uses PDF templates exclusively
 # SVG/PNG templates and OCR utilities have been deprecated as of v0.4.0
