@@ -87,9 +87,11 @@ There is **no in-repo build script** despite older docs referencing `scripts/bui
 $version = (Get-Content VERSION.TXT).Trim()
 
 pyinstaller --onefile --windowed --icon=assets\icon.ico `
+    --paths src `
     --add-data "VERSION.TXT;." `
     --add-data "label_overrides.json;." `
     --add-data "README.md;." `
+    --add-data "ABOUT.md;." `
     --add-data "UNBIND_ALL.xml;." `
     --add-data "assets;assets" `
     --add-data "visual-templates;visual-templates" `
@@ -100,7 +102,12 @@ pyinstaller --onefile --windowed --icon=assets\icon.ico `
 
 Output: `dist\SCProfileEditor-v{version}.exe`.
 
-When adding new bundled resources, two things must change together: the `--add-data` list above, and the lookup in code must route through the `_MEIPASS`-aware resource-path helper (otherwise it works in dev but breaks in the packaged build).
+Two flags are easy to forget and cause silent runtime failures:
+
+- **`--paths src`** — tells PyInstaller that `src/` is a source root so the bare imports inside `main_window.py` (e.g. `from parser.xml_parser import …`, `from models.profile_model import …`) resolve at frozen-import time. Without it, the runtime `sys.path.insert` in `main_window.py:33` doesn't help — PyInstaller's frozen import system uses a pre-baked module table, not live `sys.path`. v0.10.0's first build shipped without this and crashed with `ModuleNotFoundError: No module named 'parser'` on every launch.
+- **`--add-data "ABOUT.md;."`** — `main_window.py` reads `ABOUT.md` for the About tab via `get_resource_path("ABOUT.md")`. If it's not bundled, the About tab silently fails to render even though the rest of the app works.
+
+When adding new bundled resources, two things must change together: the `--add-data` list above, **and** the lookup in code must route through the `_MEIPASS`-aware resource-path helper (otherwise it works in dev but breaks in the packaged build).
 
 ### Manual installer build
 
