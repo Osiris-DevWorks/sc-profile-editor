@@ -2202,15 +2202,34 @@ class MainWindow(QMainWindow):
                 if already_in_profile:
                     logger.debug(f"_add_missing_joystick_devices: Device {device_name} (js{instance}) already in profile")
                 else:
-                    # Add this joystick to the profile
+                    # Synthesize the SC-format Product string from VID/PID so
+                    # XMLExporter.create_new_profile emits <options Product="…">.
+                    # Without product_id set, the saved XML omits the device
+                    # from the top-level <options> block and SC cannot bind
+                    # the controller on load.
+                    vid_pid = device.get('vid_pid')
+                    product_id = None
+                    if vid_pid is not None:
+                        try:
+                            from utils.directinput_guid import make_di_product_guid
+                            guid = make_di_product_guid(vid_pid[0], vid_pid[1])
+                            product_id = f"{device_name} {guid}"
+                        except Exception as e:
+                            logger.warning(f"_add_missing_joystick_devices: Could not synthesize Product GUID for {device_name}: {e}")
+
                     joystick_device = Device(
                         device_type='joystick',
                         instance=instance,
-                        product_name=device_name
+                        product_id=product_id,
+                        product_name=device_name,
+                        vid_pid=vid_pid,
                     )
                     self.current_profile.devices.append(joystick_device)
                     devices_added = True
-                    logger.info(f"_add_missing_joystick_devices: Added joystick device: {device_name} (js{instance})")
+                    logger.info(
+                        f"_add_missing_joystick_devices: Added joystick device: {device_name} "
+                        f"(js{instance}, vid_pid={vid_pid}, product_id={'set' if product_id else 'missing'})"
+                    )
 
             if devices_added:
                 logger.info(f"_add_missing_joystick_devices: Profile now has {len(self.current_profile.devices)} devices after adding connected joysticks")
