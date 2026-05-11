@@ -11,7 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.10.0] - 2026-05-06
+## [0.10.1] - 2026-05-11
+
+### Fixed
+- **False "Profile Devices Not Connected" warning on hot-plug / enumeration shift** (issue #17) — The disconnected-devices check at profile load gated identity on `pygame.joystick`'s positional `instance` counter, which renumbers whenever a joystick is hot-plugged or USB enumeration order changes. iNgeon's repro: connect T16000 + TWCS, plug in a Logitech Rumblepad, and every profile joystick (including the now-renumbered T16000 and TWCS) is falsely reported as disconnected. Replaced the instance-equality match with VID/PID identity matching — the GUID plumbing v0.10.0 introduced (`directinput_guid.py`, `Device.vid_pid`) is now actually used by the check. Falls back to fuzzy name match (no instance gate) and then to the user's Config-tab js1/js2/js3 pin.
+
+- **New profiles saved without a `<options Product="…">` line for added joysticks** (issue #17, original v0.8.0 report) — `_add_missing_joystick_devices` constructed `Device` objects with only `product_name` set, leaving `product_id` empty. `XMLExporter.create_new_profile` only emits the top-level `<options>` block for devices that have `product_id`, so newly-added joysticks landed in saved XMLs as bare `<joystick instance="N">` entries with no GUID and Star Citizen couldn't bind them. Now synthesizes the SC-format Product string (`"<name> {PIDVID-0000-0000-0000-504944564944}"`) from the VID/PID `InputDetector` already captures, using the existing `make_di_product_guid()` helper. Round-trip verified against the bundled preset format.
+
+### Added
+- **Pinned-but-disconnected devices reserved in new profiles** (issue #17, original v0.8.0 report) — Config tab's Device-to-Joystick Mapping now remembers VID/PID per pinned slot via a `device_config_v2` schema (legacy `device_config` key preserved for backwards compatibility with all existing readers). `_add_missing_joystick_devices` walks the v2 mapping and reserves a js slot for any pinned device with a stored VID/PID that isn't physically connected — so a profile authored without your occasional-use gamepad plugged in still gets a valid `<options Product="…">` entry for it. Once we capture a device's identity (any save when the device is connected), it persists across subsequent saves even when unplugged.
+
+
 
 ### Added
 - **Theme System** - Four-theme UI ported from sibling `smart-citizen` for suite-wide visual consistency:

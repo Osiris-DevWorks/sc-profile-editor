@@ -2202,15 +2202,85 @@ class MainWindow(QMainWindow):
                 if already_in_profile:
                     logger.debug(f"_add_missing_joystick_devices: Device {device_name} (js{instance}) already in profile")
                 else:
-                    # Add this joystick to the profile
+                    # Synthesize the SC-format Product string from VID/PID so
+                    # XMLExporter.create_new_profile emits <options Product="…">.
+                    # Without product_id set, the saved XML omits the device
+                    # from the top-level <options> block and SC cannot bind
+                    # the controller on load.
+                    vid_pid = device.get('vid_pid')
+                    product_id = None
+                    if vid_pid is not None:
+                        try:
+                            from utils.directinput_guid import make_di_product_guid
+                            guid = make_di_product_guid(vid_pid[0], vid_pid[1])
+                            product_id = f"{device_name} {guid}"
+                        except Exception as e:
+                            logger.warning(f"_add_missing_joystick_devices: Could not synthesize Product GUID for {device_name}: {e}")
+
                     joystick_device = Device(
                         device_type='joystick',
                         instance=instance,
-                        product_name=device_name
+                        product_id=product_id,
+                        product_name=device_name,
+                        vid_pid=vid_pid,
                     )
                     self.current_profile.devices.append(joystick_device)
                     devices_added = True
-                    logger.info(f"_add_missing_joystick_devices: Added joystick device: {device_name} (js{instance})")
+                    logger.info(
+                        f"_add_missing_joystick_devices: Added joystick device: {device_name} "
+                        f"(js{instance}, vid_pid={vid_pid}, product_id={'set' if product_id else 'missing'})"
+                    )
+
+            # Also reserve slots for devices the user has pinned in Config but
+            # isn't physically connecting right now (e.g. a gamepad they only
+            # plug in occasionally). Requires a stored VID/PID — without it
+            # we can't write a valid <options Product="..."> line, so we skip
+            # pinned entries that have only a name.
+            try:
+                v2_mapping = self.settings.get_device_config_with_vid_pid() if self.settings else {}
+                for js_label, entry in v2_mapping.items():
+                    if not entry or not entry.get('name') or not entry.get('vid_pid'):
+                        continue
+                    try:
+                        pinned_instance = int(js_label.replace('js', ''))
+                    except ValueError:
+                        continue
+
+                    pinned_name = entry['name']
+                    pinned_vid_pid = entry['vid_pid']
+
+                    # Skip if a joystick at this instance is already in the profile
+                    if any(d.device_type == 'joystick' and d.instance == pinned_instance
+                           for d in self.current_profile.devices):
+                        continue
+                    # Skip if this device is already in the profile under any instance
+                    # (it was added by the connected-joysticks loop above)
+                    if any(d.device_type == 'joystick' and d.vid_pid == pinned_vid_pid
+                           for d in self.current_profile.devices):
+                        continue
+
+                    try:
+                        from utils.directinput_guid import make_di_product_guid
+                        guid = make_di_product_guid(pinned_vid_pid[0], pinned_vid_pid[1])
+                        product_id = f"{pinned_name} {guid}"
+                    except Exception as e:
+                        logger.warning(f"_add_missing_joystick_devices: Could not synthesize Product GUID for pinned {pinned_name}: {e}")
+                        continue
+
+                    self.current_profile.devices.append(Device(
+                        device_type='joystick',
+                        instance=pinned_instance,
+                        product_id=product_id,
+                        product_name=pinned_name,
+                        vid_pid=pinned_vid_pid,
+                    ))
+                    devices_added = True
+                    logger.info(
+                        f"_add_missing_joystick_devices: Reserved {js_label} for pinned-but-disconnected device "
+                        f"{pinned_name} (vid_pid={pinned_vid_pid})"
+                    )
+            except Exception as e:
+                logger.warning(f"_add_missing_joystick_devices: Could not add pinned-disconnected devices: {e}", exc_info=True)
 
             if devices_added:
                 logger.info(f"_add_missing_joystick_devices: Profile now has {len(self.current_profile.devices)} devices after adding connected joysticks")
@@ -2221,10 +2291,53 @@ class MainWindow(QMainWindow):
             logger.error(f"_add_missing_joystick_devices: Could not add joystick devices to profile: {e}", exc_info=True)
             # Continue anyway - this is not critical
 
+    @staticmethod
+    def _is_profile_joystick_connected(profile_device, connected_joysticks, device_mapping):
+        # Tier 1: VID/PID — stable across reboots, USB ports, and SDL name drift.
+        profile_vid_pid = getattr(profile_device, 'vid_pid', None)
+        if profile_vid_pid is not None:
+            for c in connected_joysticks:
+                if c.get('vid_pid') == profile_vid_pid:
+                    return True
+
+        # Tier 2: fuzzy name match across all joysticks — no instance gating.
+        if profile_device.product_name:
+            product = profile_device.product_name.lower()
+            product_words = [w for w in product.split() if len(w) > 2]
+            for c in connected_joysticks:
+                name = (c.get('name') or '').lower()
+                if not name:
+                    continue
+                if product in name or name in product:
+                    return True
+                if product_words and any(w in name for w in product_words):
+                    return True
+
+        # Tier 3: explicit user pin in Config tab (js1/js2/js3 → device name).
+        if device_mapping and profile_device.product_name:
+            js_label = f"js{profile_device.instance}"
+            pinned_name = device_mapping.get(js_label)
+            if pinned_name:
+                pinned = pinned_name.lower()
+                product = profile_device.product_name.lower()
+                if product in pinned or pinned in product:
+                    return True
+
+        return False
+
     def _check_and_warn_disconnected_devices(self, profile):
-        """Check if profile has disconnected devices and show warning if needed"""
+        """Check if profile has disconnected devices and show warning if needed.
+
+        Matching strategy, in order:
+          1. DirectInput product GUID (VID/PID) — the only stable identity. A
+             device's pygame `instance` is a positional counter that shifts
+             whenever a joystick is hot-plugged or USB enumeration order
+             changes, so it must not gate identity (see issue #17).
+          2. Fuzzy name match across *all* connected joysticks (no instance
+             gating).
+          3. User's Config-tab js1/js2/js3 mapping as an explicit override.
+        """
         try:
-            # Get connected devices from config tab
             if not hasattr(self, 'config_tab') or not self.config_tab:
                 return
 
@@ -2232,33 +2345,19 @@ class MainWindow(QMainWindow):
             if not connected_devices:
                 return
 
-            # Find joystick devices in profile
             profile_joysticks = [d for d in profile.devices if d.device_type == 'joystick']
             if not profile_joysticks:
                 return
 
-            # Check which profile devices are disconnected
+            connected_joysticks = [c for c in connected_devices if c.get('type') == 'joystick']
+            device_mapping = self.settings.get_device_config() if self.settings else {}
+
             disconnected = []
             for profile_device in profile_joysticks:
-                is_connected = False
-                device_name = profile_device.product_name if profile_device.product_name else f"Joystick {profile_device.instance}"
-
-                for connected in connected_devices:
-                    if connected.get('type') == 'joystick':
-                        if connected.get('instance') == profile_device.instance:
-                            # Check product name match
-                            if profile_device.product_name:
-                                connected_name = connected.get('name', '').lower()
-                                device_product = profile_device.product_name.lower()
-                                if device_product in connected_name or any(
-                                    word in connected_name for word in device_product.split()
-                                ):
-                                    is_connected = True
-                                    break
-                            else:
-                                is_connected = True
-                                break
-
+                device_name = profile_device.product_name or f"Joystick {profile_device.instance}"
+                is_connected = self._is_profile_joystick_connected(
+                    profile_device, connected_joysticks, device_mapping
+                )
                 if not is_connected:
                     disconnected.append(device_name)
 

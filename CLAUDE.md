@@ -54,9 +54,13 @@ Edits propagate **in real time** to both the Controls Table and the Device View 
 
 **Composite devices (`src/utils/device_splitter.py`)** — Some hardware presents as a stick + add-on module (e.g., VKB Gladiator + SEM module). The splitter logic separates a single physical device into multiple logical templates so each gets its own diagram.
 
+**DirectInput product-GUID matching (`src/utils/directinput_guid.py`)** — SC profile XML stores joysticks with a `Product` attribute like `{PIDVID-0000-0000-0000-504944564944}` (the trailing constant is "PIDVID" in ASCII; the first 8 hex chars encode `(PID << 16) | VID`). This module parses VID/PID out of that GUID so connected pygame joysticks (whose `get_guid()` returns SDL's joystick-GUID format) can be matched to profile entries without ever calling DirectInput. Pure parsing, zero runtime deps. This powers the Config tab's device-to-joystick mapping.
+
+**Theme system (`src/gui/theme.py`)** — Ported from sibling project `smart-citizen` for visual cohesion. Themes are applied by swapping the `QPalette` on the `QApplication`; widgets relying on `WindowText`/`Text` palette roles re-color automatically. Secondary/dim labels opt in via `setProperty("role", "secondary")` and an app-level QSS rule installed by `apply_theme`. The branded `Hyperspace Race Expanded` font (`assets/fonts/HyperspaceRace-ExpandedBold.otf`) is registered at startup via `load_application_fonts()` — the family name Qt reports is the prefixed `"FONTSPRING DEMO - …"` string, which is what the title bar matches.
+
 **Input detection (`src/utils/input_detector.py`)** — Joystick (pygame), keyboard with modifier support (pynput), mouse (pynput). Runs in a thread with a 10-second timeout; communicates with the UI via Qt signals. Used by the Remap Dialog.
 
-**Settings persistence** — `QSettings` writes to the Windows registry under this user. Window geometry, last-opened profile, and view options are auto-saved.
+**Settings persistence** — `QSettings` writes to the Windows registry under this user. Window geometry, last-opened profile, and view options are auto-saved. The current app version is read at runtime from bundled `VERSION.TXT` via `src/utils/version.py`.
 
 **PyInstaller resource paths** — All bundled resources are loaded via a `_MEIPASS`-aware helper. When adding new bundled assets, route the lookup through that helper or the packaged build will fail to find them in dev paths.
 
@@ -81,10 +85,18 @@ def get_resource_path(relative_path):
 src/                  application code (gui/, parser/, exporters/, graphics/, models/, registry/, utils/)
 visual-templates/     per-device PDF templates + template_registry.json
 example-profiles/     sample SC XML profiles incl. BLANK.xml (master with all 1,085 actions)
+default-bindings/     default SC keybind references
 docs/                 CHANGELOG, DEVELOPMENT, RELEASE_PROCESS, CREATING_PDF_TEMPLATES
 scripts/              ad-hoc utility scripts (NOT build scripts — see Build below)
+                      includes generate_pdf_template.py used by the Add-Device-from-Template flow
 deprecated/           old SVG/PNG/OCR system removed in v0.4.0; ignore unless excavating history
-tests/                pytest unit tests (currently just test_parser.py)
+tests/                pytest unit tests: test_parser.py, test_directinput_guid.py, test_parse_joy_label.py
+ABOUT.md              rendered in the About tab at runtime (bundled into the exe)
+README.md             end-user guide (also rendered in-app)
+VERSION.TXT           single source of truth for version (read by src/utils/version.py)
+installer.iss         Inno Setup script — MyAppVersion / MyAppExeName must match VERSION.TXT
+UNBIND_ALL.xml        full SC action database (loaded by action_registry at startup)
+label_overrides.json  bundled global label defaults (tier 2)
 ```
 
 ---
@@ -107,20 +119,29 @@ If you need to rebuild manually:
 
 ```powershell
 .venv\Scripts\activate
+$version = (Get-Content VERSION.TXT).Trim()
+
 pyinstaller --onefile --windowed --icon=assets\icon.ico `
+    --paths src `
     --add-data "VERSION.TXT;." `
     --add-data "label_overrides.json;." `
     --add-data "README.md;." `
+    --add-data "ABOUT.md;." `
+    --add-data "UNBIND_ALL.xml;." `
     --add-data "assets;assets" `
     --add-data "visual-templates;visual-templates" `
     --add-data "example-profiles;example-profiles" `
     --add-data "default-bindings;default-bindings" `
-    --add-data "UNBIND_ALL.xml;." `
-    --name "SCProfileEditor-v$(Get-Content VERSION.TXT)" src\main.py
+    --name "SCProfileEditor-v$version" src\main.py
 
 # Then build the installer (requires Inno Setup 6):
 iscc installer.iss
 ```
+
+Two flags here are easy to forget and cause silent runtime failures (see `docs/DEVELOPMENT.md`):
+
+- **`--paths src`** — `main_window.py` uses bare imports like `from parser.xml_parser import …`. Without this flag, PyInstaller's frozen import system (which uses a pre-baked module table, not live `sys.path`) crashes on launch with `ModuleNotFoundError: No module named 'parser'`. v0.10.0's first build shipped without it.
+- **`--add-data "ABOUT.md;."`** — `main_window.py` reads `ABOUT.md` via `get_resource_path("ABOUT.md")` for the About tab. If missing, that tab silently fails to render.
 
 Update `installer.iss` (`MyAppVersion`, `MyAppExeName`) and `VERSION.TXT` together — they must agree, or the installer will fail to find the exe.
 
