@@ -2231,6 +2231,57 @@ class MainWindow(QMainWindow):
                         f"(js{instance}, vid_pid={vid_pid}, product_id={'set' if product_id else 'missing'})"
                     )
 
+            # Also reserve slots for devices the user has pinned in Config but
+            # isn't physically connecting right now (e.g. a gamepad they only
+            # plug in occasionally). Requires a stored VID/PID — without it
+            # we can't write a valid <options Product="..."> line, so we skip
+            # pinned entries that have only a name.
+            try:
+                v2_mapping = self.settings.get_device_config_with_vid_pid() if self.settings else {}
+                for js_label, entry in v2_mapping.items():
+                    if not entry or not entry.get('name') or not entry.get('vid_pid'):
+                        continue
+                    try:
+                        pinned_instance = int(js_label.replace('js', ''))
+                    except ValueError:
+                        continue
+
+                    pinned_name = entry['name']
+                    pinned_vid_pid = entry['vid_pid']
+
+                    # Skip if a joystick at this instance is already in the profile
+                    if any(d.device_type == 'joystick' and d.instance == pinned_instance
+                           for d in self.current_profile.devices):
+                        continue
+                    # Skip if this device is already in the profile under any instance
+                    # (it was added by the connected-joysticks loop above)
+                    if any(d.device_type == 'joystick' and d.vid_pid == pinned_vid_pid
+                           for d in self.current_profile.devices):
+                        continue
+
+                    try:
+                        from utils.directinput_guid import make_di_product_guid
+                        guid = make_di_product_guid(pinned_vid_pid[0], pinned_vid_pid[1])
+                        product_id = f"{pinned_name} {guid}"
+                    except Exception as e:
+                        logger.warning(f"_add_missing_joystick_devices: Could not synthesize Product GUID for pinned {pinned_name}: {e}")
+                        continue
+
+                    self.current_profile.devices.append(Device(
+                        device_type='joystick',
+                        instance=pinned_instance,
+                        product_id=product_id,
+                        product_name=pinned_name,
+                        vid_pid=pinned_vid_pid,
+                    ))
+                    devices_added = True
+                    logger.info(
+                        f"_add_missing_joystick_devices: Reserved {js_label} for pinned-but-disconnected device "
+                        f"{pinned_name} (vid_pid={pinned_vid_pid})"
+                    )
+            except Exception as e:
+                logger.warning(f"_add_missing_joystick_devices: Could not add pinned-disconnected devices: {e}", exc_info=True)
+
             if devices_added:
                 logger.info(f"_add_missing_joystick_devices: Profile now has {len(self.current_profile.devices)} devices after adding connected joysticks")
             else:

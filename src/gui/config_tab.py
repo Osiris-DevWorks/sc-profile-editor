@@ -443,7 +443,7 @@ class ConfigTab(QWidget):
                 if device_name:
                     new_mapping[js_label] = device_name
 
-            self.settings.set_device_config(new_mapping)
+            self.settings.set_device_config(new_mapping, self.current_devices)
             self.device_mapping = new_mapping
             logger.info(f"Device config saved: {new_mapping}")
 
@@ -478,7 +478,7 @@ class ConfigTab(QWidget):
 
             if updated_mapping != self.device_mapping:
                 self.device_mapping = updated_mapping
-                self.settings.set_device_config(updated_mapping)
+                self.settings.set_device_config(updated_mapping, self.current_devices)
 
             # Now restore the (cleaned up) mapping to combos
             for js_label, combo in self.mapping_combos.items():
@@ -511,7 +511,7 @@ class ConfigTab(QWidget):
                                 break
 
                 # Save the updated mapping
-                self.settings.set_device_config(self.device_mapping)
+                self.settings.set_device_config(self.device_mapping, self.current_devices)
         else:
             # No saved config, auto-detect mapping from current devices
             logger.info("Auto-detecting device mapping based on current detection")
@@ -627,7 +627,7 @@ class ConfigTab(QWidget):
             self.device_mapping[slot_str] = template.name
 
             # Save device mapping
-            self.settings.set_device_config(self.device_mapping)
+            self.settings.set_device_config(self.device_mapping, self.current_devices)
 
             # Rebuild the js1/js2/js3 combo dropdowns
             self._rebuild_mapping_combos()

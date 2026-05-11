@@ -2,6 +2,7 @@
 Application settings management using QSettings
 """
 
+import json
 import logging
 from PyQt6.QtCore import QSettings
 
@@ -68,35 +69,103 @@ class AppSettings:
 
     def get_device_config(self) -> dict:
         """
-        Get the device-to-joystick mapping configuration
+        Get the legacy device-to-joystick mapping ({js_label: name}).
 
-        Returns:
-            Dictionary mapping device names to js slots, e.g.:
-            {
-                "js1": "VKBsim Gladiator EVO R",
-                "js2": "Thrustmaster TWCS Throttle",
-                "js3": None
-            }
+        This is the name-only shape callers have always consumed; preserved
+        so existing readers don't need updating. For VID/PID-aware lookups
+        (e.g. to add a pinned-but-disconnected device to a new profile),
+        use get_device_config_with_vid_pid().
         """
-        # Get the raw setting value (stored as a dictionary in QSettings)
         device_config = self.settings.value("device_config", {}, type=dict)
-        logger.debug(f"Retrieved device config: {device_config}")
+        logger.debug(f"Retrieved device config (legacy): {device_config}")
         return device_config
 
-    def set_device_config(self, config: dict):
+    def get_device_config_with_vid_pid(self) -> dict:
         """
-        Save the device-to-joystick mapping configuration
+        Return the v2 mapping enriched with per-slot VID/PID.
+
+        Shape: {js_label: {"name": str, "vid_pid": (vid, pid) | None} | None}
+
+        Reads the v2 JSON if present (written by set_device_config when a
+        connected_devices list was provided); otherwise upgrades the legacy
+        name-only mapping in place (vid_pid = None for every slot).
+        """
+        v2_raw = self.settings.value("device_config_v2", "", type=str)
+        if v2_raw:
+            try:
+                parsed = json.loads(v2_raw)
+                result = {}
+                for slot, val in parsed.items():
+                    if val is None:
+                        result[slot] = None
+                    elif isinstance(val, dict):
+                        vp = val.get("vid_pid")
+                        if isinstance(vp, list) and len(vp) == 2:
+                            vp = (int(vp[0]), int(vp[1]))
+                        else:
+                            vp = None
+                        result[slot] = {"name": val.get("name"), "vid_pid": vp}
+                logger.debug(f"Retrieved device config (v2): {result}")
+                return result
+            except (json.JSONDecodeError, TypeError, ValueError) as e:
+                logger.warning(f"Could not parse device_config_v2 ({v2_raw!r}): {e} — falling back to legacy")
+
+        legacy = self.get_device_config()
+        return {
+            slot: ({"name": name, "vid_pid": None} if name else None)
+            for slot, name in legacy.items()
+        }
+
+    def set_device_config(self, config: dict, connected_devices: list = None):
+        """
+        Save the device-to-joystick mapping. Writes both the legacy
+        name-only shape (so older readers keep working) AND a v2 schema
+        that remembers VID/PID per pinned slot.
 
         Args:
-            config: Dictionary mapping js slots to device names
+            config: {js_label: name_or_None}
+            connected_devices: optional list of dicts from
+                InputDetector.get_available_devices(). When provided, each
+                pinned slot whose device name matches a connected joystick
+                will have that joystick's vid_pid captured into v2.
+                Otherwise, any VID/PID already stored in v2 for an unchanged
+                slot/name is preserved (we don't lose identity just because
+                the device happens to be unplugged at save time).
         """
-        self.settings.setValue("device_config", config)
+        legacy = {slot: name for slot, name in config.items() if name}
+        self.settings.setValue("device_config", legacy)
+
+        # Build name → vid_pid index from connected_devices if given.
+        connected_vid_pid = {}
+        if connected_devices:
+            for d in connected_devices:
+                if d.get('type') == 'joystick' and d.get('name') and d.get('vid_pid'):
+                    connected_vid_pid[d['name']] = tuple(d['vid_pid'])
+
+        # Preserve prior v2 vid_pid for slots whose name hasn't changed.
+        prior = self.get_device_config_with_vid_pid()
+
+        v2 = {}
+        for slot, name in config.items():
+            if not name:
+                v2[slot] = None
+                continue
+            vp = connected_vid_pid.get(name)
+            if vp is None:
+                # Fall back to prior v2 if the same device name is still pinned here
+                prev = prior.get(slot)
+                if prev and prev.get('name') == name and prev.get('vid_pid'):
+                    vp = prev['vid_pid']
+            v2[slot] = {"name": name, "vid_pid": list(vp) if vp else None}
+
+        self.settings.setValue("device_config_v2", json.dumps(v2))
         self.settings.sync()
-        logger.info(f"Saved device config: {config}")
+        logger.info(f"Saved device config (legacy={legacy}, v2={v2})")
 
     def clear_device_config(self):
-        """Clear the device configuration"""
+        """Clear both legacy and v2 device configuration."""
         self.settings.remove("device_config")
+        self.settings.remove("device_config_v2")
         self.settings.sync()
         logger.info("Cleared device configuration")
 
