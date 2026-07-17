@@ -152,6 +152,8 @@ Edit `VERSION.TXT` and `installer.iss` together. Bump:
 - **Minor** (0.9.1 → 0.10.0) — new features, additional device support
 - **Major** — breaking changes
 
+On every release, also update the SC Profile Editor entry in `../osiris-devworks-website/src/data/projects.ts` (sibling workspace repo): bump the static `version` fallback and refresh `features`/`status`/screenshots for what shipped. The site auto-fetches the live version from this repo's `VERSION.TXT` on `main`, but everything else on the tile is manual. Pushing the website repo's `main` deploys it.
+
 ---
 
 ## Development workflow
