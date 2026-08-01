@@ -3,7 +3,7 @@
 
 #define MyAppName "Star Citizen Profile Editor"
 #define MyAppVersion "0.10.1"
-#define MyAppPublisher "SC Profile Tools"
+#define MyAppPublisher "Osiris DevWorks, LLC"
 #define MyAppURL "https://github.com/yourusername/scpe-releases"
 #define MyAppExeName "SCProfileEditor-v0.10.1.exe"
 
