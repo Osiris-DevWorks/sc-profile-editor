@@ -361,7 +361,7 @@ For development setup, building from source, and contributing:
 SC Profile Editor is a free, open-source project created to help Star Citizen players manage their control profiles. If you find it useful and would like to support the development:
 
 **Donate:**
-- 💳 **[PayPal Donation](https://paypal.me/RighteousKill)** - Support via PayPal
+- 💳 **[PayPal Donation](https://www.paypal.com/ncp/payment/YAWXHMGZH8T76)** - Support via PayPal
 - 💰 **[Venmo Donation](https://venmo.com/u/Amr-Abouelleil)** - Support via Venmo
 
 **Contribute:**
