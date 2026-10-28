@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Hat/button bindings stuck in "hold" actions (e.g. look left/right/behind)** — The Remap dialog forced `activationMode="press"` onto every non-axis binding it saved. Star Citizen defines the view yaw / look-behind actions as `hold` in `defaultProfile.xml`, so the explicit `press` overrode that and the camera stayed locked after the hat was released. The dialog now defaults to **(Game default)**, which writes no `activationMode` attribute at all, and only emits one when the user explicitly picks `press`, `release`, `hold`, `double_tap` or `tap`. Existing explicit modes in a profile are preserved (case-insensitively).
+- **Unit tests failed on a clean checkout** — `tests/test_parser.py` pointed at a gitignored personal profile; it now uses the committed `layout_osiris-vkb-2025-10-25_exported.xml` fixture.
+- **Mislabeled Virpil templates** (issue #31) — `VPC MT-50CM3 (Left/Right)` are actually Alpha Prime grip diagrams on a MongoosT-50CM3 base and are now named that way. A dedicated MT-50CM3 **throttle** template still needs to be authored.
+
+### Added
+- **GitHub Actions `Tests` workflow** — runs `pytest tests/` on Windows for every push to `main` and every pull request.
+
 ## [0.10.1] - 2026-05-11
 
 ### Fixed

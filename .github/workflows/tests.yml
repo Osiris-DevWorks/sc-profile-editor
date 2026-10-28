@@ -1,0 +1,22 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install test dependencies
+        # The unit tests only exercise the parser, GUID helpers and the
+        # template-generator label parser, so the GUI/input stack is not needed.
+        run: pip install pytest PyMuPDF
+      - name: Run unit tests
+        run: pytest tests/ -q
