@@ -23,11 +23,11 @@ class TestProfileParser(unittest.TestCase):
         self.test_dir = Path(__file__).parent.parent
         self.example_dir = self.test_dir / "example-profiles"
 
-        # Test with the simple Osiris profile
-        self.test_file = self.example_dir / "layout_Osiris-VKB-2025-10-14_exported.xml"
+        # Committed VKB profile: keyboard, mouse and two Gladiator EVO joysticks
+        self.test_file = self.example_dir / "layout_osiris-vkb-2025-10-25_exported.xml"
 
-        # Test with the BLANK profile (has joystick info)
-        self.test_file_joystick = self.example_dir / "layout_BLANK_exported.xml"
+        # Same profile doubles as the joystick-info fixture
+        self.test_file_joystick = self.test_file
 
     def test_parser_initialization(self):
         """Test parser can be initialized"""
@@ -41,7 +41,7 @@ class TestProfileParser(unittest.TestCase):
         profile = parser.parse()
 
         self.assertIsNotNone(profile)
-        self.assertEqual(profile.profile_name, "Osiris-VKB-2025-10-14")
+        self.assertEqual(profile.profile_name, "osiris-vkb-2025-10-25")
         self.assertGreater(len(profile.devices), 0)
         self.assertGreater(len(profile.action_maps), 0)
 
@@ -51,14 +51,14 @@ class TestProfileParser(unittest.TestCase):
         parser.parse()
 
         name = parser.get_profile_name()
-        self.assertEqual(name, "Osiris-VKB-2025-10-14")
+        self.assertEqual(name, "osiris-vkb-2025-10-25")
 
     def test_parse_devices(self):
         """Test device extraction"""
         parser = ProfileParser(str(self.test_file_joystick))
         profile = parser.parse()
 
-        # BLANK profile has keyboard, mouse, and 2 joysticks
+        # Fixture profile has keyboard, mouse, and 2 joysticks
         self.assertGreaterEqual(len(profile.devices), 2)
 
         # Check for keyboard

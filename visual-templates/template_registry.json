@@ -163,7 +163,7 @@
     },
     {
       "id": "vpc_mt50cm3_left",
-      "name": "VPC MT-50CM3 (Left)",
+      "name": "VPC Alpha Prime Grip L (MT-50CM3 base)",
       "pdf": "vpc_mt50cm3_left/vpc_mt50cm3_left.pdf",
       "device_match_patterns": [
         "LEFT VPC Stick MT-50CM3",
@@ -183,7 +183,7 @@
         32
       ],
       "field_mapping": "vpc_mt50cm3_left/field_mapping.json",
-      "notes": "Virpil MongoosT-50CM3 left stick configuration - 32 buttons with slider control",
+      "notes": "Virpil Alpha Prime grip (left) on a MongoosT-50CM3 base - 32 buttons with slider control. Not the MT-50CM3 throttle (see issue #31).",
       "product_ids": [
         "83903344-0000-0000-0000-504944564944",
         "80CB3344-0000-0000-0000-504944564944"
@@ -191,7 +191,7 @@
     },
     {
       "id": "vpc_mt50cm3_right",
-      "name": "VPC MT-50CM3 (Right)",
+      "name": "VPC Alpha Prime Grip R (MT-50CM3 base)",
       "pdf": "vpc_mt50cm3_right/vpc_mt50cm3_right.pdf",
       "device_match_patterns": [
         "RIGHT VPC Stick MT-50CM3",
@@ -211,7 +211,7 @@
         32
       ],
       "field_mapping": "vpc_mt50cm3_right/field_mapping.json",
-      "notes": "Virpil MongoosT-50CM3 right stick configuration - 32 buttons with slider control",
+      "notes": "Virpil Alpha Prime grip (right) on a MongoosT-50CM3 base - 32 buttons with slider control. Not the MT-50CM3 throttle (see issue #31).",
       "product_ids": [
         "43873344-0000-0000-0000-504944564944",
         "43903344-0000-0000-0000-504944564944"

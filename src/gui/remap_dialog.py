@@ -5,6 +5,7 @@ Remapping dialog for editing button assignments with multi-action support
 import sys
 import os
 import logging
+from typing import Optional
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
                               QLineEdit, QComboBox, QGroupBox, QMessageBox,
                               QFormLayout, QDialogButtonBox, QScrollArea, QWidget)
@@ -154,27 +155,32 @@ class ActionAssignmentWidget(QWidget):
         self.label_edit.setPlaceholderText(f"Default: {action_label}")
         label_layout.addRow("Custom Label:", self.label_edit)
 
-        # Activation mode dropdown
+        # Activation mode dropdown.
+        # "Game default" writes no activationMode attribute, so Star Citizen
+        # applies the action's own mode from defaultProfile.xml. That matters
+        # for hold-style actions such as the view yaw/look-behind hats: forcing
+        # "press" on them overrides the game's "hold" and the view never
+        # releases when the hat is let go.
         self.activation_mode_combo = QComboBox()
-        self.activation_mode_combo.addItem("press", "press")
-        self.activation_mode_combo.addItem("double_tap", "double_tap")
+        self.activation_mode_combo.addItem("(Game default)", None)
+        for mode in InputValidator.ACTIVATION_MODES:
+            if mode is not None:
+                self.activation_mode_combo.addItem(mode, mode)
 
         # Check if this is an analog axis - they don't support activation modes
         is_analog = InputValidator.is_analog_axis(self.binding.input_code)
 
         if is_analog:
             # Disable activation mode for analog axes
-            self.activation_mode_combo.setEnabled(False)
+            self.activation_mode_combo.clear()
             self.activation_mode_combo.addItem("(Analog axis - uses continuous input)", None)
-            self.activation_mode_combo.setCurrentIndex(2)
+            self.activation_mode_combo.setEnabled(False)
         else:
-            # Set current activation mode (default to "press" if not set)
-            current_activation = self.binding.activation_mode or "press"
-            index = self.activation_mode_combo.findData(current_activation)
-            if index >= 0:
-                self.activation_mode_combo.setCurrentIndex(index)
-            else:
-                self.activation_mode_combo.setCurrentIndex(0)  # Default to "press"
+            # Preserve whatever the profile already says; unknown modes fall
+            # back to the game default rather than being rewritten as "press".
+            current = (self.binding.activation_mode or "").lower() or None
+            index = self.activation_mode_combo.findData(current)
+            self.activation_mode_combo.setCurrentIndex(index if index >= 0 else 0)
 
         label_layout.addRow("Activation Mode:", self.activation_mode_combo)
 
@@ -207,9 +213,9 @@ class ActionAssignmentWidget(QWidget):
         """Get the custom label from the text field"""
         return self.label_edit.text().strip()
 
-    def get_activation_mode(self) -> str:
-        """Get the selected activation mode (or 'press' as default)"""
-        return self.activation_mode_combo.currentData() or "press"
+    def get_activation_mode(self) -> Optional[str]:
+        """Get the selected activation mode, or None for the game default"""
+        return self.activation_mode_combo.currentData()
 
 
 class RemapDialog(QDialog):
@@ -809,13 +815,14 @@ class RemapDialog(QDialog):
                 binding.custom_label = None
 
             # Set activation mode
-            # Analog axes should NOT have activationMode (they use continuous input)
-            # Only buttons, keys, and hat switches should have activationMode
+            # Analog axes should NOT have activationMode (they use continuous input).
+            # Buttons, keys and hats only get one when the user picked it explicitly;
+            # None leaves the attribute out so the game's per-action default applies.
             if InputValidator.is_analog_axis(binding.input_code):
                 binding.activation_mode = None
                 logger.debug(f"Analog axis detected: {binding.input_code}, setting activation_mode to None")
             else:
-                binding.activation_mode = activation_mode if activation_mode else "press"
+                binding.activation_mode = activation_mode
 
             # Update input code if it has changed
             # For single_action_mode (editing from table), apply the current input code to the binding
