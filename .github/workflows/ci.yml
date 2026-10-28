@@ -1,0 +1,77 @@
+name: CI
+
+# Runs on every PR targeting main or any release/* branch. Validates that
+# the unit tests pass and that the PyInstaller onedir build succeeds. Inno
+# Setup compilation is deliberately scoped out of CI — that lives in
+# release.yml and installer-preview.yml because it adds ~3 minutes of
+# toolchain install per run and produces an artifact only useful for
+# testers or at release time.
+#
+# main is intentionally excluded from push triggers — release.yml owns
+# that (it auto-tags from VERSION.TXT, builds the installer and publishes
+# the GitHub Release). PRs *to* main still run CI here.
+#
+# Windows-only: SC Profile Editor uses the Windows Registry via QSettings
+# and ships as a Windows installer, so Linux runners cannot build it.
+
+on:
+  pull_request:
+    branches: [main, "release/**"]
+  workflow_dispatch:
+
+# Skip in-flight runs when a newer commit lands on the same branch.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests + build verification
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run pytest
+        run: python -m pytest tests/ -q
+
+      - name: Build PyInstaller onedir
+        run: python scripts/build/build_exe.py
+
+      - name: Verify build output
+        # Catches regressions where build_exe.py "succeeds" but does not
+        # write dist/SCProfileEditor/SCProfileEditor.exe (the stable,
+        # unversioned name installer.iss and the shortcuts depend on).
+        shell: pwsh
+        run: |
+          $exe = "dist/SCProfileEditor/SCProfileEditor.exe"
+          if (-not (Test-Path $exe)) {
+            Write-Error "Expected build artifact not found: $exe"
+            Get-ChildItem dist -Recurse -Depth 2 | ForEach-Object { Write-Host $_.FullName }
+            exit 1
+          }
+          Write-Host "Build artifact verified: $exe ($((Get-Item $exe).Length) bytes)"
+
+      - name: Upload build artifact
+        # Lets reviewers grab the unsigned onedir for spot-testing without
+        # rebuilding locally. 7-day retention keeps storage trivial.
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scprofileeditor-onedir-${{ github.sha }}
+          path: dist/SCProfileEditor/
+          retention-days: 7
+          if-no-files-found: error

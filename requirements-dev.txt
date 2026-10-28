@@ -1,0 +1,6 @@
+# Development, test and build requirements for SC Profile Editor.
+# CI and the release workflow install this file on top of requirements.txt.
+
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pyinstaller>=6.3.0

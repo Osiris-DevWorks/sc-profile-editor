@@ -1,11 +1,20 @@
 ; Star Citizen Profile Editor Installer Script
 ; Created with Inno Setup
 
+; Single source of truth: VERSION.TXT at the project root. Update that file
+; and re-run the build — every version-stamped field below is derived from it.
+#define VersionFile FileOpen(AddBackslash(SourcePath) + "VERSION.TXT")
+#define MyAppVersion Trim(FileRead(VersionFile))
+#expr FileClose(VersionFile)
+#undef VersionFile
+
 #define MyAppName "Star Citizen Profile Editor"
-#define MyAppVersion "0.10.1"
 #define MyAppPublisher "Osiris DevWorks, LLC"
-#define MyAppURL "https://github.com/yourusername/scpe-releases"
-#define MyAppExeName "SCProfileEditor-v0.10.1.exe"
+#define MyAppURL "https://github.com/Osiris-DevWorks/sc-profile-editor"
+; Stable, unversioned exe name (PyInstaller --onedir via scripts/build/build_exe.py)
+; so Start Menu / desktop shortcuts survive version updates.
+#define MyAppExeName "SCProfileEditor.exe"
+#define MyAppBuildDir "dist\SCProfileEditor"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -41,16 +50,18 @@ SCDirectoryPromptDesc=Please specify your Star Citizen profiles directory for qu
 SCDirectoryDefaultDesc=This is typically located at:
 SCDirectoryDefaultPath=C:\Program Files\Roberts Space Industries\StarCitizen\LIVE\USER\Client\0\Controls\Mappings
 
+[InstallDelete]
+; Pre-0.10.2 installs shipped a versioned onefile exe next to loose resource
+; folders. Remove those so an upgrade leaves exactly one program file.
+Type: files; Name: "{app}\SCProfileEditor-v*.exe"
+Type: filesandordirs; Name: "{app}\_internal"
+
 [Files]
-Source: "dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+; The whole PyInstaller onedir output: SCProfileEditor.exe + _internal\ with
+; every bundled resource (templates, example profiles, fonts, UNBIND_ALL.xml).
+Source: "{#MyAppBuildDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "assets\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "assets\fonts\*"; DestDir: "{app}\assets\fonts"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "label_overrides.json"; DestDir: "{app}"; Flags: ignoreversion
-; Visual templates are embedded in the .onefile executable
-; Source: "dist\visual-templates\*"; DestDir: "{app}\visual-templates"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "example-profiles\*"; DestDir: "{app}\example-profiles"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "default-bindings\*"; DestDir: "{app}\default-bindings"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\icon.ico"

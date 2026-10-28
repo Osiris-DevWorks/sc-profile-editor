@@ -1,263 +1,54 @@
 # Release Process
 
-**Version:** 0.7.5
-**Date:** 2026-01-06
 **For:** Release managers - Creating and publishing new versions
 
-This document outlines the standard process for creating a new release of SC Profile Editor. This process was used successfully for v0.7.5 release.
+SC Profile Editor uses the same release model as its sibling project `smart-citizen`: **long-lived release branches as integration targets**, and a merge to `main` that *is* the release. GitHub Actions does the tagging, building and publishing.
 
-## Pre-Release Checklist
+## Branching model
 
-- [ ] All features for the release are complete and merged
-- [ ] Tests pass (if applicable)
-- [ ] Documentation is updated (README.md, docs/DEVELOPMENT.md)
-- [ ] docs/CHANGELOG.md has entries for all changes
+- After a release ships, the next `release/X.Y.Z` branch opens off `main` and `VERSION.TXT` bumps on it (`/start_release patch|minor|major`). That branch is the integration target until it ships.
+- **The version in the branch name signals scope.** A patch branch (e.g. `release/0.10.2`) takes bug fixes and minor polish only; features and new device support wait for the next minor.
+- **PRs target the active `release/X.Y.Z`, not `main`.** `main` only ever receives the release-branch merge.
+- When the branch is stable, add the **`build-installer` label** to the release PR. `installer-preview.yml` builds `SCProfileEditor-vX.Y.Z-Setup.exe` as a 30-day artifact and comments the download link on the PR so testers can verify before anything reaches `main`.
+- **Merging `release/X.Y.Z` → `main` is the release trigger.** Until then nothing on the release branch is "released".
 
-## Release Steps
+Don't propose tagging or merging to `main` mid-integration; the user drives that handoff.
 
-### 1. Prepare Release Branch
+## Branch protection (GitHub settings, set once by the owner)
 
-If working on a feature branch:
-```bash
-# Ensure branch is up to date
-git checkout <feature-branch>
-git pull origin <feature-branch>
-```
+- **`main`**: classic branch protection, PR required. Already in place.
+- **`release/*`**: a "Protect release branches" ruleset targeting `refs/heads/release/*` — require a pull request, require one approving review from the code owner (`.github/CODEOWNERS` gives `*` to `@Osiris-DevWorks`), block force-pushes and deletion. The owner (admin) bypasses it for the `/start_release` kickoff push.
+- **Secrets**: `DISCORD_RELEASE_WEBHOOK_URL` for the release announcement (optional; the release still publishes without it).
+- **Labels**: create `build-installer` once in the repo's label list.
 
-### 2. Update Version Files
+## Version
 
-Update the following files with the new version number:
+`VERSION.TXT` is the sole source of truth. `src/utils/version.py` reads it at runtime, `scripts/build/build_exe.py` prints it, `installer.iss` reads it at compile time via ISPP, and `release.yml` derives the git tag from it. Nothing else is edited for a bump.
 
-- `VERSION.TXT` - Update to new version (e.g., `0.2.0`)
-- `docs/CHANGELOG.md` - Move unreleased items to new version section with date
-- `installer.iss` - Update `#define MyAppVersion "X.Y.Z"`
+## Workflows
 
-### 3. Clean Up Repository
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `ci.yml` | PR to `main` or `release/**` | `pytest tests/`, PyInstaller onedir build, 7-day onedir artifact |
+| `installer-preview.yml` | `build-installer` label on a PR, or manual | Tests, build, Inno Setup compile, 30-day installer artifact + PR comment |
+| `installer-preview-cleanup.yml` | PR merged | Deletes that PR's preview artifacts |
+| `release.yml` | Push to `main` (skips if `v{VERSION}` is already released), push of a `v*.*.*` tag, or manual with a tag | Tests, build, installer, auto-tag, GitHub Release with the `## [X.Y.Z]` CHANGELOG section as body, Discord post |
+| `release-notify.yml` | Manual | Re-sends the Discord post for an existing tag |
 
-- Remove temporary/scratch files and directories
-- Update `.gitignore` if needed
-- Stage documentation and utility files for commit
+## Release cycle
 
-### 4. Build the Executable
+1. **Open the branch** — `/start_release patch` (or `minor`/`major`) on a clean, current `main`. Push it: `git push -u origin release/X.Y.Z`.
+2. **Integrate** — normal PRs against `release/X.Y.Z`. Keep `docs/CHANGELOG.md` `[Unreleased]` current as changes land.
+3. **Gate** — `/pre_release`: tests, CHANGELOG/doc currency, security review, open the release PR (`release/X.Y.Z` → `main`) and label it `build-installer`, then close tester-verified issues.
+4. **Ship** — `/ship_release`: rename `[Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` (land via PR; `release.yml` fails without this section), build and smoke-test a local installer, then merge the release PR with a merge commit. The push to `main` runs `release.yml`.
+5. **After** — watch the `Release` run, download the published installer once and smoke-test it, update the SC Profile Editor tile in `../osiris-devworks-website/src/data/projects.ts` (static `version` fallback, `features`, `status`, screenshots) and push that repo's `main`, then `/start_release patch` for the next cycle.
 
-```bash
-.venv\Scripts\python.exe scripts/build/build_exe.py
-```
+## Manual fallbacks
 
-Verify the build:
-```bash
-# Check that dist/SCProfileViewer.exe exists
-dir dist\SCProfileViewer.exe
-```
+- **Re-run a failed release**: Actions → Release → Run workflow with the existing tag, or push the tag again.
+- **Build locally**: `python scripts/build/build_exe.py` then `iscc installer.iss` (or `scripts\build\build_all.bat`). Output: `dist\SCProfileEditor-vX.Y.Z-Setup.exe`. Local builds are for smoke-testing; never attach one to a GitHub release by hand while `release.yml` is also publishing.
+- **Release notes**: `python scripts/release_notes.py X.Y.Z` prints what the release body will be.
 
-### 5. Create Release Commit
+## GitHub Release format
 
-On the feature branch, commit all version updates:
-```bash
-git add VERSION.TXT docs/CHANGELOG.md installer.iss [other-files]
-git commit -m "Release vX.Y.Z - <Brief Description>"
-```
-
-### 6. Merge to Main
-
-**Option A: Pull Request (Recommended)**
-```bash
-git push origin <feature-branch>
-# Create PR on GitHub to merge into main
-# After PR is approved and merged, proceed to step 7
-```
-
-**Option B: Direct Merge**
-```bash
-git checkout main
-git merge <feature-branch>
-git push origin main
-```
-
-### 7. Create Version Commit on Main
-
-After merging, ensure version files are correct on main:
-```bash
-git checkout main
-git pull origin main
-
-# Verify VERSION.TXT, docs/CHANGELOG.md, installer.iss are at correct version
-# If not, update them and commit:
-git add VERSION.TXT docs/CHANGELOG.md installer.iss
-git commit -m "Update version to X.Y.Z"
-git push origin main
-```
-
-### 8. Create Git Tag
-
-```bash
-git tag -a vX.Y.Z -m "Release vX.Y.Z - <Brief Description>"
-git push origin vX.Y.Z
-```
-
-### 9. Build Installer
-
-```bash
-cmd /c build_all.bat
-```
-
-This creates: `installer_output/SCProfileEditor-vX.Y.Z-Setup.exe`
-
-**⚠️ IMPORTANT:** The installer is a required release artifact and must be built and included in all releases.
-
-### 10. Create GitHub Release
-
-**⚠️ IMPORTANT:** You must COMPLETE this step (including publishing the release) BEFORE running the Discord notification in step 11. The Discord notification includes a link to the release, which must exist for users.
-
-1. **Go to GitHub Release Page:**
-   ```
-   https://github.com/Osiris-DevWorks/sc-profile-editor/releases/new?tag=vX.Y.Z
-   ```
-
-2. **Fill in Release Information:**
-   - **Tag:** vX.Y.Z (should be auto-selected)
-   - **Release Title:** `SC Profile Editor vX.Y.Z - <Brief Description>`
-   - **Description:** Use the docs/CHANGELOG.md content for this version (see template below)
-
-3. **Attach Build Artifacts:**
-   - Upload `installer_output/SCProfileEditor-vX.Y.Z-Setup.exe`
-   - Upload `dist/SCProfileEditor.exe` (optional, as standalone)
-
-4. **Publish Release**
-      - Look at previous release notes to make sure you're including sections included before
-      - Before officially publishing the release, review the release notes with the user. 
-      - Ask the user what the testing focus should be for the release.
-      - Publish the release when user gives approval
-
-5. **Verify Release is Live:**
-   - Visit the release URL to confirm it's accessible
-   - Verify download links work
-   - Only proceed to step 11 after confirmation
-
-### 11. Post Release to Discord
-
-**⚠️ PREREQUISITE:** The GitHub release from step 10 MUST be published and live before running this step.
-
-**Prerequisites:**
-- Set up Discord webhook URL in `.env` file (copy from `.env.example`)
-- Create webhook: Discord Server → Server Settings → Integrations → Webhooks → New Webhook
-
-**Post the release:**
-```bash
-.venv\Scripts\python.exe scripts/discord_notify.py vX.Y.Z https://github.com/Osiris-DevWorks/sc-profile-editor/releases/tag/vX.Y.Z
-```
-
-Example:
-```bash
-.venv\Scripts\python.exe scripts/discord_notify.py v0.4.0 https://github.com/Osiris-DevWorks/sc-profile-editor/releases/tag/v0.4.0
-```
-
-The script will:
-- Parse docs/CHANGELOG.md for the version's changes
-- Create a formatted Discord embed with release info
-- Post to the configured Discord channel
-- Skip gracefully if webhook URL is not configured
-
-## GitHub Release Notes Template
-
-```markdown
-# SC Profile Editor vX.Y.Z - <Brief Description>
-
-[1-2 sentence summary of the release]
-
-## 🆕 What's New
-
-### Added
-- Feature 1
-- Feature 2
-
-### Changed
-- Change 1
-- Change 2
-
-### Fixed
-- Fix 1
-- Fix 2
-
-## 📥 Downloads
-
-- **Installer:** [SCProfileEditor-vX.Y.Z-Setup.exe](link) - Recommended for most users
-- **Standalone:** [SCProfileEditor.exe](link) - Portable version (no installation required)
-
-## 📋 System Requirements
-
-- Windows 10 or later (64-bit)
-- No additional dependencies required
-
-## 🎮 Devices Supported
-
-[List all supported device types and specific models]
-
-**Examples:**
-- VKB Gladiator (EVO, SCG variants)
-- VKB Gunfighter (MCG, SCG variants)
-- VKB Space Sim Module (SEM)
-- VPC MongoosT-50CM3
-- Thrustmaster TWCS Throttle
-- Keyboard, Mouse, Joystick
-
-## 🐛 Known Issues
-
-[List any known issues, limitations, or workarounds]
-
-## 🧪 Testing Focus
-
-[Areas the community should focus testing on for this release]
-
-## 📝 Full Changelog
-
-See [CHANGELOG.md](https://github.com/Osiris-DevWorks/sc-profile-editor/blob/main/docs/CHANGELOG.md) for complete version history.
-
----
-
-**First time using SC Profile Editor?** Check out the [User Guide](https://github.com/Osiris-DevWorks/sc-profile-editor/blob/main/README.md) to get started!
-
-**Need help?** Join our [Discord community](https://discord.gg/BNzRegKZ7k) for support and discussions.
-
-**Support this project:** [PayPal](https://www.paypal.com/ncp/payment/YAWXHMGZH8T76) | [Venmo](https://venmo.com/u/Amr-Abouelleil)
-```
-
-## Version Numbering
-
-This project follows [Semantic Versioning](https://semver.org/):
-
-- **MAJOR** (X.0.0) - Incompatible API changes or major feature overhauls
-- **MINOR** (0.X.0) - New functionality in a backward-compatible manner
-- **PATCH** (0.0.X) - Backward-compatible bug fixes
-
-## Post-Release
-
-- [ ] Verify GitHub release is published
-- [ ] Test installer download and installation
-- [ ] **Post to Discord** (see step 11 - this is REQUIRED, not optional):
-  ```bash
-  .venv\Scripts\python.exe scripts/discord_notify.py vX.Y.Z https://github.com/Osiris-DevWorks/sc-profile-editor/releases/tag/vX.Y.Z
-  ```
-- [ ] Create new development branch for next version (if needed)
-- [ ] Update docs/CHANGELOG.md with new `[Unreleased]` section
-
-## Troubleshooting
-
-### Tag Already Exists
-```bash
-# Delete local tag
-git tag -d vX.Y.Z
-
-# Delete remote tag
-git push --delete origin vX.Y.Z
-
-# Recreate tag
-git tag -a vX.Y.Z -m "Release vX.Y.Z - <Description>"
-git push origin vX.Y.Z
-```
-
-### Version Mismatch
-If version files don't match after merge, update them on main and create a new commit before tagging.
-
-### Build Fails
-Check `build\SCProfileViewer\warn-SCProfileViewer.txt` for warnings and errors.
+Title: `SC Profile Editor vX.Y.Z` (set by the workflow). Body: the CHANGELOG section, so write CHANGELOG entries as release notes — user-facing, grouped under Added / Changed / Fixed, with issue numbers.

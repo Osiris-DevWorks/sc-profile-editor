@@ -78,48 +78,27 @@ See [CLAUDE.md](../CLAUDE.md#architecture) for the architecture walkthrough (dat
 
 ## Building
 
-There is **no in-repo build script** despite older docs referencing `scripts/build/build_exe.py` or `build_*.bat`. The actual release flow is orchestrated by the user-level `/release-scpe` skill, which runs PyInstaller against `src/main.py` and then compiles `installer.iss` with Inno Setup.
-
-### Manual exe build
+The build is scripted and mirrors `smart-citizen`:
 
 ```powershell
 .venv\Scripts\activate
-$version = (Get-Content VERSION.TXT).Trim()
-
-pyinstaller --onefile --windowed --icon=assets\icon.ico `
-    --paths src `
-    --add-data "VERSION.TXT;." `
-    --add-data "label_overrides.json;." `
-    --add-data "README.md;." `
-    --add-data "ABOUT.md;." `
-    --add-data "UNBIND_ALL.xml;." `
-    --add-data "assets;assets" `
-    --add-data "visual-templates;visual-templates" `
-    --add-data "example-profiles;example-profiles" `
-    --add-data "default-bindings;default-bindings" `
-    --name "SCProfileEditor-v$version" src\main.py
+python scripts\build\build_exe.py     # PyInstaller --onedir -> dist\SCProfileEditor\SCProfileEditor.exe
+iscc installer.iss                     # Inno Setup 6 -> dist\SCProfileEditor-v{version}-Setup.exe
+scripts\build\build_all.bat           # both steps
 ```
 
-Output: `dist\SCProfileEditor-v{version}.exe`.
+`VERSION.TXT` is the only place the version lives: `src/utils/version.py` reads it at runtime, `scripts/build/build_exe.py` prints it, and `installer.iss` reads it at compile time through ISPP (`#define MyAppVersion Trim(FileRead(...))`). There is nothing else to bump.
 
-Two flags are easy to forget and cause silent runtime failures:
+The exe name is the stable `SCProfileEditor.exe` (not versioned) so Start Menu and desktop shortcuts survive upgrades; the installer's `[InstallDelete]` removes the pre-0.10.2 `SCProfileEditor-v*.exe` on upgrade.
 
-- **`--paths src`** — tells PyInstaller that `src/` is a source root so the bare imports inside `main_window.py` (e.g. `from parser.xml_parser import …`, `from models.profile_model import …`) resolve at frozen-import time. Without it, the runtime `sys.path.insert` in `main_window.py:33` doesn't help — PyInstaller's frozen import system uses a pre-baked module table, not live `sys.path`. v0.10.0's first build shipped without this and crashed with `ModuleNotFoundError: No module named 'parser'` on every launch.
-- **`--add-data "ABOUT.md;."`** — `main_window.py` reads `ABOUT.md` for the About tab via `get_resource_path("ABOUT.md")`. If it's not bundled, the About tab silently fails to render even though the rest of the app works.
+Two PyInstaller details in `build_exe.py` are load-bearing and easy to lose if the arg list is edited:
 
-When adding new bundled resources, two things must change together: the `--add-data` list above, **and** the lookup in code must route through the `_MEIPASS`-aware resource-path helper (otherwise it works in dev but breaks in the packaged build).
+- **`--paths src`** — tells PyInstaller that `src/` is a source root so the bare imports inside `main_window.py` (e.g. `from parser.xml_parser import …`) resolve at frozen-import time. Without it the exe crashes on launch with `ModuleNotFoundError: No module named 'parser'` (v0.10.0's first build shipped that way).
+- **`--add-data "ABOUT.md;."`** — `main_window.py` reads `ABOUT.md` via `get_resource_path("ABOUT.md")` for the About tab. If missing, that tab silently fails to render.
 
-### Manual installer build
+When adding new bundled resources, two things must change together: the `--add-data` list in `build_exe.py`, **and** the lookup in code must route through the `_MEIPASS`-aware resource-path helper (otherwise it works in dev but breaks in the packaged build). In an onedir build `_MEIPASS` points at `dist\SCProfileEditor\_internal\`.
 
-Requires Inno Setup 6 on PATH (`iscc`).
-
-```powershell
-iscc installer.iss
-```
-
-`installer.iss` reads from `dist\SCProfileEditor-v{version}.exe`, so build the exe first. The installer output also lands in `dist\`.
-
----
+CI (`.github/workflows/ci.yml`) runs the tests and this build on every PR to `main` or `release/**`, and uploads the onedir as a 7-day artifact. Adding the `build-installer` label to a PR makes `installer-preview.yml` compile a full installer for testers (30-day artifact, link commented on the PR).
 
 ## Version management
 
@@ -140,7 +119,7 @@ When you bump `VERSION.TXT`, also update `installer.iss` (`MyAppVersion`, `MyApp
 
 ## Release
 
-See [RELEASE_PROCESS.md](RELEASE_PROCESS.md) for the full checklist. The `/release-scpe` skill automates most of it.
+See [RELEASE_PROCESS.md](RELEASE_PROCESS.md) for the release-branch model. The `/start_release`, `/pre_release` and `/ship_release` commands walk it with checkpoints; merging `release/X.Y.Z` into `main` triggers `release.yml`, which tags, builds and publishes.
 
 ---
 
