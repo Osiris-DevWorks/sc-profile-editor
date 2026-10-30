@@ -1,0 +1,49 @@
+name: Preview Artifact Cleanup
+
+# When a PR is merged, delete the tester-build artifacts that
+# installer-preview.yml uploaded for it, so storage does not accumulate
+# stale builds while waiting for the 30-day retention. Merged PRs only —
+# a close-without-merge may be reopened. Deletes ARTIFACTS, not the runs,
+# so the "this PR shipped N tester builds" history stays in the Actions tab.
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.merged == true
+    name: Delete preview artifacts for merged PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Delete preview artifacts for PR's head branch
+        # A 404 on DELETE means the artifact already expired between listing
+        # and deletion; treated as success so benign races don't red-X.
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          HEAD_REF="${{ github.event.pull_request.head.ref }}"
+          WORKFLOWS=("installer-preview.yml")
+          for wf in "${WORKFLOWS[@]}"; do
+            echo "== $wf (branch: $HEAD_REF)"
+            run_ids=$(gh api "repos/$REPO/actions/workflows/$wf/runs?branch=$HEAD_REF&per_page=100" --paginate --jq '.workflow_runs[].id' || true)
+            for run_id in $run_ids; do
+              artifact_ids=$(gh api "repos/$REPO/actions/runs/$run_id/artifacts" --paginate --jq '.artifacts[] | select(.expired == false) | .id' || true)
+              for artifact_id in $artifact_ids; do
+                if gh api -X DELETE "repos/$REPO/actions/artifacts/$artifact_id" >/dev/null 2>&1; then
+                  echo "  deleted artifact $artifact_id (run $run_id)"
+                else
+                  echo "  artifact $artifact_id already gone (run $run_id)"
+                fi
+              done
+            done
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

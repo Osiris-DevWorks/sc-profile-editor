@@ -1,0 +1,149 @@
+name: Installer Preview
+
+# Build a tester-installable installer outside the standard release flow.
+# Output is a workflow artifact (a downloadable
+# SCProfileEditor-v{VERSION}-Setup.exe) accessible to anyone with read
+# access on the repo — testers need a GitHub account but no special
+# permission.
+#
+# Two triggers, both opt-in to keep CI minutes lean:
+#
+#   1. workflow_dispatch — manually triggered from the Actions tab against
+#      any branch.
+#   2. pull_request labeled `build-installer` — add the label to a PR and a
+#      build kicks off. Later pushes to a labeled PR rebuild on every commit
+#      (synchronize), so the artifact tracks the PR head. Remove the label
+#      to stop the rebuilds.
+#
+# Output: artifact `scprofileeditor-installer-{SHA}` (30-day retention)
+# containing SCProfileEditor-v{VERSION}-Setup.exe.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [labeled, synchronize, reopened]
+
+# Only the latest tip of a PR is interesting for testers; cancel older
+# in-flight builds for the same PR/branch.
+concurrency:
+  group: installer-preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-installer:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'build-installer')
+    name: Build installer
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      # Needed for the `gh pr comment` step that posts the download link.
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run pytest
+        # Testers should not get an installer compiled from a broken commit.
+        run: python -m pytest tests/ -q
+
+      - name: Build PyInstaller onedir
+        run: python scripts/build/build_exe.py
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress --yes
+
+      - name: Compile installer
+        shell: pwsh
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            Write-Error "ISCC.exe not found at $iscc — Inno Setup install failed?"
+            exit 1
+          }
+          & $iscc installer.iss
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Inno Setup compile failed with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+
+      - name: Locate installer + capture version
+        id: artifact
+        shell: pwsh
+        run: |
+          $version = (Get-Content VERSION.TXT).Trim()
+          $installer = "dist/SCProfileEditor-v${version}-Setup.exe"
+          if (-not (Test-Path $installer)) {
+            Write-Error "Installer not found at $installer"
+            Get-ChildItem dist -Recurse -Depth 2 | ForEach-Object { Write-Host $_.FullName }
+            exit 1
+          }
+          $size_mb = [math]::Round((Get-Item $installer).Length / 1MB, 1)
+          Write-Host "Installer: $installer ($size_mb MB)"
+          "installer_path=$installer" | Out-File -Append $env:GITHUB_OUTPUT
+          "version=$version" | Out-File -Append $env:GITHUB_OUTPUT
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scprofileeditor-installer-${{ github.sha }}
+          path: ${{ steps.artifact.outputs.installer_path }}
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Hide prior installer-preview comments
+        # Each rebuild posts a new link; minimize the older ones so the
+        # latest is the only one shown at full opacity.
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        run: |
+          $pr = ${{ github.event.pull_request.number }}
+          $comments = gh api "repos/${{ github.repository }}/issues/$pr/comments" --paginate --jq '.[] | select(.body | contains("Tester installer built for this PR")) | select(.user.login == "github-actions[bot]") | .node_id'
+          if (-not $comments) {
+            Write-Host "No prior installer-preview comments to hide"
+            exit 0
+          }
+          foreach ($node_id in $comments -split "`n") {
+            if (-not $node_id) { continue }
+            $mutation = "mutation { minimizeComment(input: { subjectId: ""$node_id"", classifier: OUTDATED }) { minimizedComment { isMinimized } } }"
+            gh api graphql -f query="$mutation" 2>&1 | Out-Null
+            Write-Host "Hid prior comment: $node_id"
+          }
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Comment on PR with download instructions
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        run: |
+          $version = "${{ steps.artifact.outputs.version }}"
+          $run_url = "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          $body = @"
+          📦 **Tester installer built for this PR**
+
+          - Version: ``$version``
+          - Commit: ``${{ github.sha }}``
+          - [Download from workflow run]($run_url) → scroll to **Artifacts** → ``scprofileeditor-installer-${{ github.sha }}``
+
+          Testers need a GitHub account but no special repo permissions. The download is a zip; inside is ``SCProfileEditor-v$version-Setup.exe``. Artifact expires in 30 days. Pushing more commits to this PR will rebuild and post a new link.
+          "@
+          gh pr comment ${{ github.event.pull_request.number }} --body $body
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true

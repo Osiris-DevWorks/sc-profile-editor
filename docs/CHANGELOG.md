@@ -17,7 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Mislabeled Virpil templates** (issue #31) — `VPC MT-50CM3 (Left/Right)` are actually Alpha Prime grip diagrams on a MongoosT-50CM3 base and are now named that way. A dedicated MT-50CM3 **throttle** template still needs to be authored.
 
 ### Added
-- **GitHub Actions `Tests` workflow** — runs `pytest tests/` on Windows for every push to `main` and every pull request.
+- **Release process ported from smart-citizen** — Long-lived `release/X.Y.Z` integration branches; PRs target the release branch and merging it to `main` is the release trigger. New workflows: `ci.yml` (tests + PyInstaller build verification on every PR to `main`/`release/**`), `release.yml` (on merge to `main`: auto-tags `v{VERSION}` from `VERSION.TXT`, builds the installer, publishes the GitHub Release with the CHANGELOG section as its body, posts to Discord), `installer-preview.yml` (add the `build-installer` label to a PR for a tester installer artifact), `installer-preview-cleanup.yml`, and `release-notify.yml` (manual Discord re-post). `.github/CODEOWNERS` requests review from the maintainer on every PR. `/start_release`, `/pre_release` and `/ship_release` commands walk the cycle with checkpoints; `docs/RELEASE_PROCESS.md` documents it.
+- **Scripted build** — `scripts/build/build_exe.py` (PyInstaller `--onedir`, stable `SCProfileEditor.exe` name so shortcuts survive upgrades) and `scripts/build/build_all.bat`. `installer.iss` now reads the version from `VERSION.TXT` at compile time, so `VERSION.TXT` is the single place to bump. `scripts/release_notes.py` extracts a version's CHANGELOG section for the release body. `requirements-dev.txt` holds the test/build deps.
 
 ## [0.10.1] - 2026-05-11
 

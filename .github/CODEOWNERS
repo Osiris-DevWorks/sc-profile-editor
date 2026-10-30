@@ -1,0 +1,10 @@
+# Code owners for SC Profile Editor.
+#
+# @Osiris-DevWorks owns the entire tree, so every pull request requests their
+# review automatically. Pair this with a "Protect release branches" ruleset on
+# refs/heads/release/* (require a PR + code-owner review) and a PR goes into a
+# release branch only with an approval from @Osiris-DevWorks.
+#
+# GitHub reads CODEOWNERS from the PR's base branch, so this file lives on main
+# and every release/X.Y.Z branched off main inherits it.
+* @Osiris-DevWorks

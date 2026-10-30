@@ -1,0 +1,36 @@
+name: Notify Discord on Release (manual recovery)
+
+# Manual-only workflow for re-firing the Discord notification when the
+# automatic post inside release.yml didn't land (usually a transient webhook
+# error). Also handy for a release created by hand in the GitHub UI.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release tag to notify for (e.g. v0.10.2)'
+        required: true
+        type: string
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Check out the tag itself so docs/CHANGELOG.md is read as it was
+          # at release time.
+          ref: ${{ github.event.inputs.version }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install python-dotenv
+
+      - name: Send Discord notification
+        run: python scripts/discord_notify.py "${{ github.event.inputs.version }}" "${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.event.inputs.version }}"
+        env:
+          DISCORD_RELEASE_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK_URL }}

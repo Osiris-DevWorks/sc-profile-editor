@@ -1,0 +1,220 @@
+name: Release
+
+# Ported from smart-citizen's release.yml. Three trigger paths, all
+# converging on the same build-and-publish job:
+#
+#   1. Push to main — the primary release event. The workflow reads
+#      VERSION.TXT, derives the tag (`v{VERSION}`), checks whether a
+#      release with that tag already exists, and skips if it does. So
+#      merging a non-version-bump PR into main is a no-op; merging a
+#      release/X.Y.Z branch that bumped VERSION.TXT triggers a release.
+#      The workflow auto-creates and pushes the tag from the merge commit.
+#   2. Push of a v*.*.* tag — explicit re-release path. Skips the
+#      "already exists" check; always proceeds.
+#   3. workflow_dispatch — manual rebuild against an existing tag (e.g. if
+#      the first attempt failed mid-publish).
+#
+# Builds the Inno Setup installer, attaches it to the GitHub Release with
+# the CHANGELOG section for that version as the body, then posts the
+# Discord notification.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to (re)build a release for (e.g. v0.10.2)"
+        required: true
+        type: string
+
+jobs:
+  build-and-release:
+    name: Build & Release
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      # Required for softprops/action-gh-release (create release + upload
+      # assets) AND `git push origin <tag>` on the branch-push path.
+      contents: write
+
+    steps:
+      - name: Checkout (at tag, branch HEAD, or dispatch input)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve trigger + tag + version
+        id: resolve
+        shell: pwsh
+        run: |
+          $eventName = "${{ github.event_name }}"
+          $refType   = "${{ github.ref_type }}"
+          if ($eventName -eq "workflow_dispatch") {
+            $tag = "${{ github.event.inputs.tag }}"
+            $trigger = "dispatch"
+          } elseif ($refType -eq "tag") {
+            $tag = "${{ github.ref_name }}"
+            $trigger = "tag"
+          } else {
+            $version_raw = (Get-Content VERSION.TXT).Trim()
+            $tag = "v$version_raw"
+            $trigger = "branch"
+          }
+          $version = $tag -replace "^v", ""
+          Write-Host "Trigger: $trigger | Tag: $tag | Version: $version"
+          "tag=$tag"         | Out-File -Append $env:GITHUB_OUTPUT
+          "version=$version" | Out-File -Append $env:GITHUB_OUTPUT
+          "trigger=$trigger" | Out-File -Append $env:GITHUB_OUTPUT
+
+      - name: Skip if release already exists (branch-push only)
+        # Branch-push fires on EVERY merge to main, including doc-only or
+        # bug-fix merges that don't bump VERSION.TXT. Skip in that case.
+        id: gate
+        shell: pwsh
+        run: |
+          $trigger = "${{ steps.resolve.outputs.trigger }}"
+          $tag = "${{ steps.resolve.outputs.tag }}"
+          if ($trigger -ne "branch") {
+            Write-Host "Trigger=$trigger — proceed unconditionally"
+            "skip=false" | Out-File -Append $env:GITHUB_OUTPUT
+            exit 0
+          }
+          $existing = gh release view $tag --repo "${{ github.repository }}" 2>$null
+          $existsCode = $LASTEXITCODE
+          if ($existsCode -eq 0) {
+            Write-Host "Release $tag already exists — skipping (no version bump in this push)"
+            "skip=true" | Out-File -Append $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "No release for $tag yet — proceeding to build + publish"
+            "skip=false" | Out-File -Append $env:GITHUB_OUTPUT
+          }
+          exit 0
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify VERSION.TXT matches tag
+        if: steps.gate.outputs.skip == 'false'
+        shell: pwsh
+        run: |
+          $expected = "${{ steps.resolve.outputs.version }}"
+          $actual = (Get-Content VERSION.TXT).Trim()
+          if ($expected -ne $actual) {
+            Write-Error "Tag version ($expected) does not match VERSION.TXT ($actual). Bump VERSION.TXT and re-tag."
+            exit 1
+          }
+          Write-Host "VERSION.TXT matches tag: $actual"
+
+      - name: Set up Python 3.12
+        if: steps.gate.outputs.skip == 'false'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        if: steps.gate.outputs.skip == 'false'
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run tests
+        if: steps.gate.outputs.skip == 'false'
+        run: python -m pytest tests/ -q
+
+      - name: Build PyInstaller onedir
+        if: steps.gate.outputs.skip == 'false'
+        run: python scripts/build/build_exe.py
+
+      - name: Install Inno Setup
+        if: steps.gate.outputs.skip == 'false'
+        shell: pwsh
+        run: choco install innosetup --no-progress --yes
+
+      - name: Compile installer
+        if: steps.gate.outputs.skip == 'false'
+        shell: pwsh
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            Write-Error "ISCC.exe not found at $iscc — Inno Setup install failed?"
+            exit 1
+          }
+          & $iscc installer.iss
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Inno Setup compile failed with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+
+      - name: Verify installer exists
+        if: steps.gate.outputs.skip == 'false'
+        id: artifacts
+        shell: pwsh
+        run: |
+          $version = "${{ steps.resolve.outputs.version }}"
+          $installer = "dist/SCProfileEditor-v${version}-Setup.exe"
+          if (-not (Test-Path $installer)) {
+            Write-Error "Missing artifact: $installer"
+            Get-ChildItem dist -Recurse -Depth 2 | ForEach-Object { Write-Host $_.FullName }
+            exit 1
+          }
+          Write-Host "Installer: $installer ($((Get-Item $installer).Length) bytes)"
+          "installer_path=$installer" | Out-File -Append $env:GITHUB_OUTPUT
+
+      - name: Build release notes from CHANGELOG
+        # The release body is the `## [X.Y.Z]` section of docs/CHANGELOG.md.
+        # Fails if that section is missing so we never publish an empty
+        # release by accident.
+        if: steps.gate.outputs.skip == 'false'
+        shell: pwsh
+        run: python scripts/release_notes.py "${{ steps.resolve.outputs.version }}" release-notes.md
+
+      - name: Create + push tag (branch-push only)
+        # Idempotent: a manually pushed tag races with this workflow's
+        # branch-push trigger, so pre-check origin and bail out cleanly.
+        # Pushing tags via GITHUB_TOKEN does NOT recursively trigger this
+        # workflow (GitHub's built-in workflow-loop safety).
+        if: steps.gate.outputs.skip == 'false' && steps.resolve.outputs.trigger == 'branch'
+        shell: pwsh
+        run: |
+          $tag = "${{ steps.resolve.outputs.tag }}"
+          $exists = git ls-remote --tags origin "refs/tags/$tag"
+          if ($exists) {
+            Write-Host "Tag $tag already exists on origin — skipping auto-tag step"
+            exit 0
+          }
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a $tag -m "Release $tag (auto-tagged by release.yml on merge to ${{ github.ref_name }})"
+          git push origin $tag
+
+      - name: Publish GitHub Release
+        if: steps.gate.outputs.skip == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.resolve.outputs.tag }}
+          name: "SC Profile Editor ${{ steps.resolve.outputs.tag }}"
+          body_path: release-notes.md
+          files: ${{ steps.artifacts.outputs.installer_path }}
+          fail_on_unmatched_files: true
+          draft: false
+          prerelease: false
+
+      - name: Post Discord notification
+        # Inlined here because a `release: published` event raised by a
+        # GITHUB_TOKEN-based action never triggers downstream workflows.
+        # release-notify.yml stays as a manual recovery path.
+        if: steps.gate.outputs.skip == 'false'
+        shell: pwsh
+        run: |
+          python -m pip install python-dotenv --quiet
+          python scripts/discord_notify.py "${{ steps.resolve.outputs.tag }}" "${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ steps.resolve.outputs.tag }}"
+        env:
+          DISCORD_RELEASE_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK_URL }}
+        # The release is already published; a transient webhook error must
+        # not red-X the run. Retry via release-notify.yml.
+        continue-on-error: true
