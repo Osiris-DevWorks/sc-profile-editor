@@ -254,7 +254,7 @@ The application uses a three-tier label priority system:
 
 The application includes PDF templates for 20+ devices:
 - **VKB:** Gladiator (EVO/SCG variants), Gunfighter (MCG/SCG), Space Sim Module, STECS Throttle, Throttle Quadrants, F16 MFD
-- **VPC:** MongoosT-50CM3
+- **VPC:** Alpha Prime grip (left/right, on a MongoosT-50CM3 base)
 - **Thrustmaster:** T.16000M, TWCS Throttle
 
 For devices without templates, you can still use the Controls Table, CSV, PDF, and Word exports.
