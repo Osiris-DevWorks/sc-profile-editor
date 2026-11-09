@@ -1,0 +1,7 @@
+{
+  "_comment": "Matches example-profiles/layout_HOTAS-SCPE.xml (js1 VKB Gladiator EVO R, js2 Thrustmaster TWCS). Default preset for --mock-joysticks.",
+  "devices": [
+    {"name": " VKBsim Gladiator EVO R    ", "product": "{0200231D-0000-0000-0000-504944564944}", "buttons": 34, "hats": 1, "axes": 6},
+    {"name": "TWCS Throttle", "product": "{B687044F-0000-0000-0000-504944564944}", "buttons": 14, "hats": 1, "axes": 7}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "_comment": "Scripted replay: noise that should be ignored, then a real press. A detector listening on this should report js2_hat1_up first.",
+  "devices": [
+    {"name": "VKBsim Gladiator EVO R", "vid": "0x231D", "pid": "0x0200", "buttons": 34, "hats": 1, "axes": 6},
+    {"name": "TWCS Throttle", "vid": "0x044F", "pid": "0xB687", "buttons": 14, "hats": 1, "axes": 7}
+  ],
+  "script": [
+    {"after_ms": 0,  "kind": "axis",   "js": 1, "axis": "x", "value": 0.12},
+    {"after_ms": 10, "kind": "button", "js": 1, "button": 3, "value": 0},
+    {"after_ms": 20, "kind": "hat",    "js": 2, "hat": 1, "value": "center"},
+    {"after_ms": 30, "kind": "hat",    "js": 2, "hat": 1, "value": "up"},
+    {"after_ms": 40, "kind": "button", "js": 1, "button": 5}
+  ]
+}

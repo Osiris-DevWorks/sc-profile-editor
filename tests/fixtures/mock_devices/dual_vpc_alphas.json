@@ -1,0 +1,8 @@
+{
+  "_comment": "Matches example-profiles/layout_DualVPCAlphas_exported.xml (two Virpil sticks + Control Panel 3).",
+  "devices": [
+    {"name": "RIGHT VPC Stick MT-50CM3", "product": "{43873344-0000-0000-0000-504944564944}", "buttons": 32, "hats": 1, "axes": 6},
+    {"name": "LEFT VPC Stick WarBRD", "product": "{80CB3344-0000-0000-0000-504944564944}", "buttons": 32, "hats": 1, "axes": 6},
+    {"name": "VPC Control Panel 3", "product": "{025F3344-0000-0000-0000-504944564944}", "buttons": 48, "hats": 0, "axes": 0}
+  ]
+}

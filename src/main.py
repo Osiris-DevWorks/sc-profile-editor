@@ -30,6 +30,12 @@ def main():
     logger = logging.getLogger(__name__)
     logger.info("Starting Star Citizen Profile Editor")
 
+    # Developer mode: virtual joysticks instead of real hardware.
+    # `--mock-joysticks [devices.json]` or SCPE_MOCK_JOYSTICKS=devices.json
+    from src.utils.joystick_backend import configure_from_argv, get_backend
+    configure_from_argv(sys.argv)
+    joystick_backend = get_backend()
+
     # Initialize action registry (loads UNBIND_ALL.xml with 1,085 actions)
     try:
         from src.registry.action_registry import get_action_registry
@@ -63,6 +69,12 @@ def main():
 
     window = MainWindow()
     window.show()
+
+    if joystick_backend.is_mock:
+        from src.gui.virtual_joystick_panel import VirtualJoystickPanel
+        virtual_panel = VirtualJoystickPanel(joystick_backend, window)
+        virtual_panel.move(window.frameGeometry().topRight())
+        virtual_panel.show()
 
     # Connect signal to bring window to focus if another instance tries to start
     instance_manager.another_instance_requested.connect(
