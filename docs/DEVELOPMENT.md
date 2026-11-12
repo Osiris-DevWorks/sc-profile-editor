@@ -39,14 +39,58 @@ Logging level is set in `src/main.py` — flip `logging.INFO` → `logging.DEBUG
 
 ## Testing
 
-There is no UI test harness; the unit tests cover the parser only.
+There is no UI test harness. Unit tests cover the parser, DirectInput GUID parsing, label parsing, and joystick input translation / the mock backend; all run without hardware.
 
 ```bash
 pytest tests/
 pytest --cov=src tests/
 ```
 
-For UI / device / export work, manual smoke testing is required. `test_plan.md` and `TEST_PLAN_v0.8.2.md` at the repo root are historical references for what coverage typically looks like.
+For UI / device / export work, manual smoke testing is required, but it no longer needs real joysticks (see below).
+
+### Working without joysticks (mock mode)
+
+All joystick access goes through `src/utils/joystick_backend.py`. The default `PygameBackend` talks to real hardware; `MockBackend` serves virtual sticks from a JSON file instead.
+
+```bash
+python src/main.py --mock-joysticks                       # default preset; follows each profile you open
+python src/main.py --mock-joysticks tests/fixtures/mock_devices/dual_vpc_alphas.json
+SCPE_MOCK_JOYSTICKS=1 python src/main.py                 # same thing via env var
+```
+
+In PowerShell: `$env:SCPE_MOCK_JOYSTICKS = "1"; python src/main.py`.
+
+**Mirror any profile.** With the default preset, the panel's **Match the profile I open** box is ticked: every profile you load (File > Load, last-opened, or a preset) rebuilds the virtual sticks from that profile's `<options type="joystick" Product="…">` entries, so its js1, js2… devices show up as connected with the right names and VID/PID, and every button and hat it binds has a control to click. **Load setup…** builds the sticks from any other SC profile `.xml` or devices `.json` and keeps them (it unticks the box). You can also start straight from a profile:
+
+```bash
+python src/main.py --mock-joysticks "C:/…/Controls/Mappings/layout_my_setup_exported.xml"
+```
+
+Counts are inferred from the profile: buttons = the highest one bound (at least 32), hats = the highest bound (at least 1), and all 8 standard axes. A missing instance (e.g. a profile that binds js3 but only lists js1/js2) gets a placeholder "Virtual stick js3" so numbering stays aligned. Untick the box if you want to see the "devices not connected" warning a mismatched profile normally triggers.
+
+A **Virtual Joysticks** window opens next to the main window. Open a binding, press **Detect Input**, then click a button, hat arrow, or drag an axis slider past halfway: the Remap dialog receives `js2_button7`, `js1_hat1_up`, `js1_rotz` and so on, just as it would from a real stick. The Config tab lists the virtual devices, with VID/PID, so device-to-joystick mapping and Device View templates resolve as they would on the hardware machine. Keyboard and mouse detection still use the real keyboard and mouse.
+
+**Device files** (`tests/fixtures/mock_devices/*.json`):
+
+```json
+{
+  "devices": [
+    {"name": "VKBsim Gladiator EVO R", "product": "{0200231D-0000-0000-0000-504944564944}",
+     "buttons": 34, "hats": 1, "axes": 6}
+  ],
+  "script": [
+    {"after_ms": 500, "kind": "button", "js": 1, "button": 5},
+    {"after_ms": 900, "kind": "hat", "js": 1, "hat": 1, "value": "up"},
+    {"after_ms": 1200, "kind": "axis", "js": 1, "axis": "rotz", "value": -0.9}
+  ]
+}
+```
+
+Copy `product` straight from an `<options type="joystick" Product="…">` line in an SC profile (or give `"vid"`/`"pid"` as hex strings) to mimic your own sticks. The optional `script` replays events each time detection starts; tests use it to run the real detection loop against recorded sequences (`tests/test_joystick_backend.py`, `recorded_session.json`).
+
+The devices file's order is the js order: the first device is `js1`. Mock mode is a developer flag only; release builds behave exactly as before unless it is passed.
+
+**Other routes** if you need Star Citizen itself to see a fake stick (not just SCPE): install vJoy on Windows and drive it from a feeder app or `pyvjoy`. SCPE's pygame backend picks vJoy devices up like any other stick, no mock mode needed. `test_plan.md` and `TEST_PLAN_v0.8.2.md` at the repo root are historical references for what coverage typically looks like.
 
 ---
 
