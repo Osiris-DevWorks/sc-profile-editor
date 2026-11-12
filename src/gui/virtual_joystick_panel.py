@@ -5,17 +5,21 @@ Shown only when the app runs with ``--mock-joysticks`` (or the
 ``SCPE_MOCK_JOYSTICKS`` env var). Each mock device gets its buttons, hats
 and axes as widgets; using them injects events into the mock backend, so
 the Remap Dialog's "Detect Input" sees them exactly as it would see a
-real stick. Nothing here runs in a normal (hardware) session.
+real stick. The sticks can be rebuilt from any SC profile, either by
+following each profile the main window opens or via "Load setup…".
+Nothing here runs in a normal (hardware) session.
 """
 
 import logging
+import os
+from typing import Callable, Optional
 
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtWidgets import (QGridLayout, QGroupBox, QHBoxLayout, QLabel,
-                             QPushButton, QScrollArea, QSlider, QVBoxLayout,
-                             QWidget)
+from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QGridLayout, QGroupBox,
+                             QHBoxLayout, QLabel, QMessageBox, QPushButton,
+                             QScrollArea, QSlider, QVBoxLayout, QWidget)
 
-from utils.joystick_backend import AXIS_NAMES, JoyEvent, MockBackend
+from utils.joystick_backend import AXIS_NAMES, JoyEvent, MockBackend, devices_from_profile
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +27,19 @@ BUTTONS_PER_ROW = 8
 
 
 class VirtualJoystickPanel(QWidget):
+    """Floating window of virtual stick controls.
 
-    def __init__(self, backend: MockBackend, parent=None):
+    ``follow_profiles``: rebuild the sticks to match each profile the main
+    window opens (connect ``attach_to_main_window``).
+    ``on_devices_changed``: called after the sticks change, so the app can
+    re-scan devices (Config tab, Device View).
+    """
+
+    def __init__(self, backend: MockBackend, parent=None, follow_profiles: bool = True,
+                 on_devices_changed: Optional[Callable[[], None]] = None):
         super().__init__(parent, Qt.WindowType.Tool)
         self.backend = backend
+        self.on_devices_changed = on_devices_changed
         self.setWindowTitle("Virtual Joysticks (mock mode)")
         self.resize(460, 640)
 
@@ -35,26 +48,87 @@ class VirtualJoystickPanel(QWidget):
         self.status.setWordWrap(True)
         outer.addWidget(self.status)
 
-        source = QLabel(f"Devices from: {backend.source or '(in memory)'}")
-        source.setProperty("role", "secondary")
-        source.setWordWrap(True)
-        outer.addWidget(source)
+        controls = QHBoxLayout()
+        self.follow_checkbox = QCheckBox("Match the profile I open")
+        self.follow_checkbox.setToolTip(
+            "Rebuild the virtual sticks from each profile you load, so its js1, js2… "
+            "devices are 'connected'.")
+        self.follow_checkbox.setChecked(follow_profiles)
+        controls.addWidget(self.follow_checkbox)
+        controls.addStretch(1)
+        load_btn = QPushButton("Load setup…")
+        load_btn.setToolTip("Build the virtual sticks from any SC profile (.xml) or devices file (.json)")
+        load_btn.clicked.connect(self._choose_setup_file)
+        controls.addWidget(load_btn)
+        outer.addLayout(controls)
 
-        body = QWidget()
-        body_layout = QVBoxLayout(body)
-        for joy_index, info in enumerate(backend.devices):
-            body_layout.addWidget(self._device_box(joy_index, info))
-        body_layout.addStretch(1)
+        self.source_label = QLabel()
+        self.source_label.setProperty("role", "secondary")
+        self.source_label.setWordWrap(True)
+        outer.addWidget(self.source_label)
 
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll.setWidget(body)
-        outer.addWidget(scroll, 1)
+        self.scroll = QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        outer.addWidget(self.scroll, 1)
+        self._rebuild()
 
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._refresh_status)
         self._timer.start(250)
         self._refresh_status()
+
+    # -- switching setups -------------------------------------------------
+
+    def attach_to_main_window(self, main_window) -> None:
+        """Follow profiles the main window loads (when the box is ticked)."""
+        main_window.profile_loaded.connect(self._on_profile_loaded)
+
+    def _on_profile_loaded(self, path: str) -> None:
+        if self.follow_checkbox.isChecked():
+            self.load_setup(path)
+
+    def _choose_setup_file(self) -> None:
+        start = os.path.dirname(self.backend.source) if self.backend.source else ""
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Load virtual joystick setup", start,
+            "SC profiles or device files (*.xml *.json);;All Files (*)")
+        if path:
+            # Picking a setup by hand means "keep this one".
+            self.follow_checkbox.setChecked(False)
+            self.load_setup(path)
+
+    def load_setup(self, path: str) -> bool:
+        """Replace the virtual sticks with the ones described by ``path``."""
+        try:
+            if path.lower().endswith(".xml"):
+                devices = devices_from_profile(path)
+            else:
+                devices = MockBackend.from_file(path).devices
+        except Exception as e:
+            logger.error(f"Could not load virtual joystick setup from {path}: {e}", exc_info=True)
+            QMessageBox.warning(self, "Virtual Joysticks", f"Could not load a setup from:\n{path}\n\n{e}")
+            return False
+
+        self.backend.set_devices(devices, source=path)
+        logger.info(f"Virtual joysticks now mirror {path}: {[d.name for d in devices]}")
+        self._rebuild()
+        if self.on_devices_changed:
+            try:
+                self.on_devices_changed()
+            except Exception as e:
+                logger.error(f"Refreshing devices after setup change failed: {e}", exc_info=True)
+        return True
+
+    def _rebuild(self) -> None:
+        self.source_label.setText(f"Sticks from: {self.backend.source or '(in memory)'}")
+        body = QWidget()
+        body_layout = QVBoxLayout(body)
+        if not self.backend.devices:
+            body_layout.addWidget(QLabel("This setup has no joysticks."))
+        for joy_index, info in enumerate(self.backend.devices):
+            body_layout.addWidget(self._device_box(joy_index, info))
+        body_layout.addStretch(1)
+        self.scroll.setWidget(body)  # deletes the previous body
 
     # -- layout -----------------------------------------------------------
 

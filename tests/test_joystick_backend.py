@@ -139,6 +139,72 @@ class TestMockDevicesMatchProfile(unittest.TestCase):
         self.assertEqual(mapper.get_js_index_for_vid_pid(infos[1].vid_pid), "js2")
 
 
+class TestDevicesFromProfile(unittest.TestCase):
+    """Any SC profile can be turned into a matching virtual setup."""
+
+    def _profile(self, name):
+        return os.path.join(ROOT, "example-profiles", name)
+
+    def test_names_and_vid_pid_come_from_profile(self):
+        devices = jb.devices_from_profile(self._profile("layout_DualVPCAlphas_exported.xml"))
+        self.assertEqual([d.name for d in devices],
+                         ["RIGHT VPC Stick MT-50CM3", "LEFT VPC Stick WarBRD", "VPC Control Panel 3"])
+        self.assertEqual(devices[0].vid_pid, (0x3344, 0x4387))
+
+    def test_counts_cover_every_bound_control(self):
+        # OSAM binds js1 buttons up to 64 (Gladiator + SEM module)
+        devices = jb.devices_from_profile(self._profile("layout_OSAM_BINDINGS_exported.xml"))
+        self.assertEqual(devices[0].buttons, 64)
+        # Floors keep room for binding new controls
+        small = jb.devices_from_profile(self._profile("layout_SCprof070_ingeon_1a.xml"))
+        self.assertTrue(all(d.buttons >= 32 and d.hats >= 1 for d in small))
+
+    def test_profile_maps_onto_itself(self):
+        from utils.device_joystick_mapper import create_mapper_from_xml
+        path = self._profile("layout_19APR2025_exported.xml")
+        mapper = create_mapper_from_xml(path)
+        for i, d in enumerate(jb.devices_from_profile(path)):
+            self.assertEqual(mapper.get_js_index_for_vid_pid(d.vid_pid), f"js{i + 1}")
+
+    def test_instance_gaps_get_placeholders(self):
+        import tempfile
+        xml = (
+            '<ActionMaps><options type="joystick" instance="1" '
+            'Product="Stick A {0200231D-0000-0000-0000-504944564944}"/>'
+            '<actionmap name="m"><action name="a"><rebind input="js3_button40"/></action>'
+            '<action name="b"><rebind input="js1_hat2_up"/></action></actionmap></ActionMaps>'
+        )
+        with tempfile.NamedTemporaryFile("w", suffix=".xml", delete=False) as f:
+            f.write(xml)
+        try:
+            devices = jb.devices_from_profile(f.name)
+        finally:
+            os.unlink(f.name)
+        self.assertEqual([d.name for d in devices], ["Stick A", "Virtual stick js2", "Virtual stick js3"])
+        self.assertEqual(devices[0].hats, 2)
+        self.assertEqual(devices[2].buttons, 40)
+
+    def test_env_var_accepts_profile_xml(self):
+        os.environ[jb.ENV_VAR] = self._profile("layout_HOTAS-SCPE.xml")
+        try:
+            jb.set_backend(None)
+            backend = jb.get_backend()
+            self.assertTrue(backend.is_mock)
+            self.assertEqual([d.name for d in backend.devices], ["VKBsim Gladiator EVO R", "TWCS Throttle"])
+        finally:
+            os.environ.pop(jb.ENV_VAR, None)
+            jb.set_backend(None)
+
+    def test_set_devices_swaps_sticks_and_drops_queued_clicks(self):
+        backend = MockBackend.from_file(HOTAS)
+        backend.open()
+        backend.inject(JoyEvent("button", 0, 0, 1))
+        backend.set_devices(jb.devices_from_profile(self._profile("layout_DualVPCAlphas_exported.xml")), "x.xml")
+        self.assertEqual(len(backend.list_joysticks()), 3)
+        self.assertEqual(backend.poll(), [])
+        backend.inject(JoyEvent("button", 2, 0, 1))  # js3 exists now
+
+
 class TestDetectorWithMock(unittest.TestCase):
     """Runs the real InputDetectorThread joystick loop against a recorded
     script, without starting Qt's event loop or touching hardware."""

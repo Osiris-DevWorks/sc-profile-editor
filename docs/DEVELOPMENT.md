@@ -53,12 +53,20 @@ For UI / device / export work, manual smoke testing is required, but it no longe
 All joystick access goes through `src/utils/joystick_backend.py`. The default `PygameBackend` talks to real hardware; `MockBackend` serves virtual sticks from a JSON file instead.
 
 ```bash
-python src/main.py --mock-joysticks                       # default preset (VKB Gladiator EVO R + TWCS)
+python src/main.py --mock-joysticks                       # default preset; follows each profile you open
 python src/main.py --mock-joysticks tests/fixtures/mock_devices/dual_vpc_alphas.json
 SCPE_MOCK_JOYSTICKS=1 python src/main.py                 # same thing via env var
 ```
 
 In PowerShell: `$env:SCPE_MOCK_JOYSTICKS = "1"; python src/main.py`.
+
+**Mirror any profile.** With the default preset, the panel's **Match the profile I open** box is ticked: every profile you load (File > Load, last-opened, or a preset) rebuilds the virtual sticks from that profile's `<options type="joystick" Product="…">` entries, so its js1, js2… devices show up as connected with the right names and VID/PID, and every button and hat it binds has a control to click. **Load setup…** builds the sticks from any other SC profile `.xml` or devices `.json` and keeps them (it unticks the box). You can also start straight from a profile:
+
+```bash
+python src/main.py --mock-joysticks "C:/…/Controls/Mappings/layout_my_setup_exported.xml"
+```
+
+Counts are inferred from the profile: buttons = the highest one bound (at least 32), hats = the highest bound (at least 1), and all 8 standard axes. A missing instance (e.g. a profile that binds js3 but only lists js1/js2) gets a placeholder "Virtual stick js3" so numbering stays aligned. Untick the box if you want to see the "devices not connected" warning a mismatched profile normally triggers.
 
 A **Virtual Joysticks** window opens next to the main window. Open a binding, press **Detect Input**, then click a button, hat arrow, or drag an axis slider past halfway: the Remap dialog receives `js2_button7`, `js1_hat1_up`, `js1_rotz` and so on, just as it would from a real stick. The Config tab lists the virtual devices, with VID/PID, so device-to-joystick mapping and Device View templates resolve as they would on the hardware machine. Keyboard and mouse detection still use the real keyboard and mouse.
 

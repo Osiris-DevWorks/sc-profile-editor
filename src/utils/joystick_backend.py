@@ -37,6 +37,7 @@ import json
 import logging
 import os
 import queue
+import re
 import sys
 import threading
 import time
@@ -339,6 +340,20 @@ class MockBackend(JoystickBackend):
         return cls.from_dict(data, source=path)
 
     @classmethod
+    def from_path(cls, path: str) -> "MockBackend":
+        """A devices JSON file, or an SC profile XML to mirror."""
+        if path.lower().endswith(".xml"):
+            return cls(devices_from_profile(path), source=path)
+        return cls.from_file(path)
+
+    def set_devices(self, devices: List[JoystickInfo], source: str = "") -> None:
+        """Swap the virtual sticks (e.g. to match a newly opened profile)."""
+        with self._lock:
+            self.devices = list(devices)
+            self.source = source
+            self._drain()
+
+    @classmethod
     def from_dict(cls, data: dict, source: str = "") -> "MockBackend":
         from utils.directinput_guid import parse_di_product_guid
 
@@ -410,6 +425,66 @@ class MockBackend(JoystickBackend):
                 return out
 
 
+_INPUT_RE = re.compile(r"\bjs(\d+)_(button|hat)(\d+)", re.IGNORECASE)
+_ANY_JS_RE = re.compile(r"\bjs(\d+)_", re.IGNORECASE)
+
+
+def devices_from_profile(path: str) -> List[JoystickInfo]:
+    """Build virtual sticks that mirror the joysticks in an SC profile XML.
+
+    Names and VID/PID come from ``<options type="joystick" instance="N"
+    Product="Name {GUID}">``. Button and hat counts are the highest ones
+    the profile binds, with a floor of 32 buttons and 1 hat, so
+    every binding in the profile has a control to click. Instance gaps
+    get a placeholder so js numbering stays aligned with the profile.
+    """
+    import xml.etree.ElementTree as ET
+    from utils.directinput_guid import parse_di_product_guid
+
+    root = ET.parse(path).getroot()
+
+    products: Dict[int, str] = {}
+    for opt in root.iter("options"):
+        if (opt.get("type") or "").lower() != "joystick":
+            continue
+        try:
+            instance = int(opt.get("instance", "1"))
+        except ValueError:
+            continue
+        products.setdefault(instance, opt.get("Product", "") or "")
+
+    max_button: Dict[int, int] = {}
+    max_hat: Dict[int, int] = {}
+    seen: Set[int] = set(products)
+    for elem in root.iter():
+        value = elem.get("input")
+        if not value:
+            continue
+        for m in _ANY_JS_RE.finditer(value):
+            seen.add(int(m.group(1)))
+        for m in _INPUT_RE.finditer(value):
+            js, kind, num = int(m.group(1)), m.group(2).lower(), int(m.group(3))
+            table = max_button if kind == "button" else max_hat
+            table[js] = max(table.get(js, 0), num)
+
+    seen.discard(0)
+    if not seen:
+        return []
+
+    devices = []
+    for js in range(1, max(seen) + 1):
+        product = products.get(js, "")
+        name = product.split("{")[0].strip() if product else ""
+        devices.append(JoystickInfo(
+            name=name or f"Virtual stick js{js}",
+            vid_pid=parse_di_product_guid(product) if product else None,
+            buttons=max(max_button.get(js, 0), 32),
+            hats=max(max_hat.get(js, 0), 1),
+            axes=8,
+        ))
+    return devices
+
+
 def script_entry_to_event(entry: dict) -> JoyEvent:
     """Convert a fixture/script entry (1-based, SC-style) to a ``JoyEvent``."""
     kind = entry["kind"]
@@ -476,8 +551,8 @@ def _backend_from_env() -> JoystickBackend:
         return PygameBackend()
     path = DEFAULT_MOCK_DEVICES if value.lower() in ("1", "true", "yes", "on") else value
     try:
-        backend = MockBackend.from_file(path)
-    except (OSError, ValueError, KeyError) as e:
+        backend = MockBackend.from_path(path)
+    except (OSError, ValueError, KeyError, SyntaxError) as e:
         logger.error(f"Could not load mock joysticks from {path!r} ({e}); using real joysticks")
         return PygameBackend()
     logger.warning(f"Using MOCK joysticks from {path}: {[d.name for d in backend.devices]}")
