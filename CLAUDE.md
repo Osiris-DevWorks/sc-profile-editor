@@ -58,7 +58,7 @@ Edits propagate **in real time** to both the Controls Table and the Device View 
 
 **Theme system (`src/gui/theme.py`)** — Ported from sibling project `smart-citizen` for visual cohesion. Themes are applied by swapping the `QPalette` on the `QApplication`; widgets relying on `WindowText`/`Text` palette roles re-color automatically. Secondary/dim labels opt in via `setProperty("role", "secondary")` and an app-level QSS rule installed by `apply_theme`. The branded `Hyperspace Race Expanded` font (`assets/fonts/HyperspaceRace-ExpandedBold.otf`) is registered at startup via `load_application_fonts()` — the family name Qt reports is the prefixed `"FONTSPRING DEMO - …"` string, which is what the title bar matches.
 
-**Input detection (`src/utils/input_detector.py`)** — Joystick (pygame), keyboard with modifier support (pynput), mouse (pynput). Runs in a thread with a 10-second timeout; communicates with the UI via Qt signals. Used by the Remap Dialog.
+**Input detection (`src/utils/input_detector.py`)** — Joystick (pygame), keyboard with modifier support (pynput), mouse (pynput). Runs in a thread with a 10-second timeout; communicates with the UI via Qt signals. Used by the Remap Dialog. Joysticks are read through `src/utils/joystick_backend.py` (pygame by default); `--mock-joysticks [file.json]` / `SCPE_MOCK_JOYSTICKS` swaps in virtual sticks plus a Virtual Joysticks panel, so device and Remap work can be tested with no hardware (see `docs/DEVELOPMENT.md`).
 
 **Settings persistence** — `QSettings` writes to the Windows registry under this user. Window geometry, last-opened profile, and view options are auto-saved. The current app version is read at runtime from bundled `VERSION.TXT` via `src/utils/version.py`.
 

@@ -1,7 +1,8 @@
 """
 Input detection module for capturing joystick, keyboard, and mouse inputs
 
-This module uses python-dinput for joystick/gamepad detection and pynput
+This module reads joysticks through utils.joystick_backend (pygame, or a
+mock backend for machines with no sticks attached) and uses pynput
 for keyboard and mouse input detection.
 """
 
@@ -172,190 +173,46 @@ class InputDetectorThread(QThread):
             self.running = False
 
     def _detect_joystick(self, detected_event, result_dict):
-        """Detect joystick input in a separate thread using pygame"""
+        """Detect joystick input in a separate thread.
+
+        Events come from the active joystick backend (pygame, or the mock
+        backend when SCPE_MOCK_JOYSTICKS / --mock-joysticks is set) and are
+        turned into SC input codes by ``translate_event``.
+        """
+        from utils.joystick_backend import get_backend, translate_event
+
+        backend = get_backend()
         try:
-            import pygame
-            import os
-
-            # Initialize pygame and joystick module
-            pygame.init()
-            pygame.joystick.init()
-
-            # Create a display window for proper event handling
-            # Windows requires an active display context for joystick events
-            try:
-                import os
-                import sys
-
-                # Create a minimal window positioned off-screen
-                pygame.display.set_mode((1, 1))
-
-                # Try to move window off-screen on Windows
-                if sys.platform == 'win32':
-                    try:
-                        import ctypes
-                        hwnd = pygame.display.get_surface()
-                        if hwnd:
-                            # Get the window handle and move it off-screen
-                            win32_hwnd = ctypes.windll.user32.FindWindowW(None, "pygame window")
-                            if win32_hwnd:
-                                # Move window to coordinates (-10000, -10000) - far off-screen
-                                ctypes.windll.user32.SetWindowPos(win32_hwnd, 0, -10000, -10000, 1, 1, 0x0001)
-                                logger.debug("Moved pygame window off-screen")
-                    except Exception as e:
-                        logger.debug(f"Could not move window off-screen: {e}")
-
-                logger.info("Created pygame display window for joystick event handling")
-            except Exception as e:
-                logger.error(f"Could not create pygame display: {e}", exc_info=True)
-                # Continue anyway, but events might not be detected
-                logger.warning("Continuing without pygame display - joystick events may not be detected")
-
-            # Get list of joysticks
-            joystick_count = pygame.joystick.get_count()
-
-            if joystick_count == 0:
-                logger.warning("No joysticks detected")
-                return
-
-            logger.info(f"Found {joystick_count} joystick(s)")
-
-            # Initialize all joysticks
-            joysticks = []
-            for i in range(joystick_count):
-                try:
-                    joy = pygame.joystick.Joystick(i)
-                    joy.init()
-                    joysticks.append((i + 1, joy))  # 1-indexed for SC
-                    logger.info(f"Initialized joystick {i + 1}: {joy.get_name()}")
-                except Exception as e:
-                    logger.warning(f"Could not initialize joystick {i}: {e}")
-
-            if not joysticks:
-                logger.warning("No joysticks could be initialized")
-                return
-
-            # Track previous axis values to avoid duplicates
-            previous_axis_state = {}
-
-            # Joystick detection loop
-            start_time = time.time()
-
-            while self.running and (time.time() - start_time) * 1000 < self.timeout_ms:
-                try:
-                    # Pump events on Windows - required for joystick events to be detected
-                    pygame.event.pump()
-
-                    # Process pygame events for button presses
-                    for event in pygame.event.get():
-                        if event.type == pygame.JOYBUTTONDOWN:
-                            # Debug: log raw event attributes
-                            logger.debug(f"JOYBUTTONDOWN event: joy={getattr(event, 'joy', 'MISSING')}, button={getattr(event, 'button', 'MISSING')}")
-
-                            # Safely get joystick and button numbers with validation
-                            try:
-                                js_num = event.joy + 1  # Convert to 1-indexed
-                                button_num = event.button + 1  # pygame uses 0-indexed buttons
-
-                                # Validate button_num is reasonable (should be 1-32 typically)
-                                if button_num < 1 or button_num > 100:
-                                    logger.warning(f"Suspicious button number detected: {button_num - 1} (raw) -> {button_num} (1-indexed) for js{js_num}")
-
-                                input_code = f"js{js_num}_button{button_num}"
-                                # Filter ignored inputs
-                                if input_code in self.ignored_inputs:
-                                    logger.debug(f"Ignoring filtered button input: {input_code}")
-                                    continue
-                                result_dict["code"] = input_code
-                                result_dict["description"] = f"Joystick {js_num} Button {button_num}"
-                                logger.info(f"Button detected: {input_code} - {result_dict['description']}")
-                                detected_event.set()
-                                return
-                            except AttributeError as e:
-                                logger.error(f"Error accessing event.button or event.joy: {e}", exc_info=True)
-                                continue
-
-                        elif event.type == pygame.JOYHATMOTION:
-                            # Hat/POV switch
-                            js_num = event.joy + 1  # Convert to 1-indexed
-                            hat_num = event.hat + 1
-                            x, y = event.value
-
-                            # Map hat motion to directions
-                            if y == 1:
-                                direction = "up"
-                            elif y == -1:
-                                direction = "down"
-                            elif x == 1:
-                                direction = "right"
-                            elif x == -1:
-                                direction = "left"
-                            else:
-                                continue  # No motion
-
-                            input_code = f"js{js_num}_hat{hat_num}_{direction}"
-                            # Filter ignored inputs
-                            if input_code in self.ignored_inputs:
-                                logger.debug(f"Ignoring filtered hat input: {input_code}")
-                                continue
-                            result_dict["code"] = input_code
-                            result_dict["description"] = f"Joystick {js_num} Hat {hat_num} {direction.upper()}"
-                            detected_event.set()
-                            return
-
-                        elif event.type == pygame.JOYAXISMOTION:
-                            # Analog axis/stick movement
-                            js_num = event.joy + 1  # Convert to 1-indexed
-                            axis_num = event.axis
-                            value = event.value
-
-                            # Map axis number to name
-                            axis_names = {
-                                0: "x",       # X axis (left stick horizontal)
-                                1: "y",       # Y axis (left stick vertical)
-                                2: "z",       # Z axis (right stick horizontal or throttle)
-                                3: "rotz",    # Rotation Z (right stick vertical)
-                                4: "rotx",    # Rotation X (twist)
-                                5: "roty",    # Rotation Y
-                                6: "slider1", # Slider 1
-                                7: "slider2", # Slider 2
-                            }
-
-                            axis_name = axis_names.get(axis_num, f"axis{axis_num}")
-
-                            # Only detect significant movements (threshold: 0.5)
-                            threshold = 0.5
-                            if abs(value) > threshold:
-                                # Track state to avoid duplicates
-                                state_key = (js_num, axis_name)
-                                if state_key not in previous_axis_state or abs(previous_axis_state[state_key]) <= threshold:
-                                    previous_axis_state[state_key] = value
-                                    direction = "+" if value > 0 else "-"
-                                    input_code = f"js{js_num}_{axis_name}"
-                                    # Filter ignored inputs
-                                    if input_code in self.ignored_inputs:
-                                        logger.debug(f"Ignoring filtered axis input: {input_code}")
-                                    else:
-                                        result_dict["code"] = input_code
-                                        result_dict["description"] = f"Joystick {js_num} {axis_name.upper()} ({direction})"
-                                        detected_event.set()
-                                        return
-                            else:
-                                # Reset state when axis returns below threshold
-                                state_key = (js_num, axis_name)
-                                if state_key in previous_axis_state:
-                                    previous_axis_state[state_key] = value
-
-                    time.sleep(0.01)  # 10ms polling for pygame events
-
-                except Exception as e:
-                    logger.debug(f"Error in joystick detection loop: {e}")
-                    time.sleep(0.01)
-
+            count = backend.open()
         except ImportError:
             logger.error("pygame not installed. Joystick detection unavailable. Install with: pip install pygame")
+            return
         except Exception as e:
-            logger.error(f"Error in joystick detection: {e}", exc_info=True)
+            logger.error(f"Error starting joystick detection ({backend.name}): {e}", exc_info=True)
+            return
+
+        try:
+            if count == 0:
+                logger.warning("No joysticks detected")
+                return
+            logger.info(f"Listening on {count} joystick(s) via {backend.name} backend")
+
+            axis_state = {}
+            start_time = time.time()
+            while self.running and (time.time() - start_time) * 1000 < self.timeout_ms:
+                try:
+                    for event in backend.poll():
+                        result = translate_event(event, axis_state, self.ignored_inputs)
+                        if result:
+                            result_dict["code"], result_dict["description"] = result
+                            logger.info(f"Joystick input detected: {result[0]} - {result[1]}")
+                            detected_event.set()
+                            return
+                except Exception as e:
+                    logger.debug(f"Error in joystick detection loop: {e}")
+                time.sleep(0.01)  # 10ms polling
+        finally:
+            backend.close()
 
     def _on_keyboard_press(self, key, detected_event, result_dict, listener=None):
         """Handle keyboard key press (callback from pynput)"""
@@ -776,54 +633,10 @@ class InputDetector:
             devices.append({"type": "keyboard", "instance": 1, "name": "Keyboard"})
             devices.append({"type": "mouse", "instance": 1, "name": "Mouse"})
 
-            # Add joysticks using pygame
+            # Joysticks come from the active backend (pygame, or mock).
             try:
-                import pygame
-                pygame.init()
-
-                # Quit and reinitialize joystick module to detect hot-swapped devices
-                pygame.joystick.quit()
-                pygame.joystick.init()
-
-                joystick_count = pygame.joystick.get_count()
-                instance_counter = 0
-
-                for i in range(joystick_count):
-                    try:
-                        joy = pygame.joystick.Joystick(i)
-                        joy.init()
-                        instance_counter += 1
-
-                        # Capture VID/PID via SDL joystick GUID. The VID/PID
-                        # lets us synthesize the DirectInput product GUID and
-                        # match against the GUID SC writes into profile XML —
-                        # more reliable than name-string matching, especially
-                        # for devices whose name varies between SDL builds.
-                        vid_pid = None
-                        try:
-                            from utils.directinput_guid import parse_sdl_joystick_guid
-                            sdl_guid = joy.get_guid()
-                            vid_pid = parse_sdl_joystick_guid(sdl_guid)
-                            if vid_pid:
-                                logger.debug(
-                                    f"Joystick {instance_counter} ({joy.get_name()}): "
-                                    f"VID=0x{vid_pid[0]:04X} PID=0x{vid_pid[1]:04X} (SDL GUID: {sdl_guid})"
-                                )
-                        except Exception as e:
-                            logger.debug(f"Could not extract VID/PID for joystick {i}: {e}")
-
-                        devices.append({
-                            "type": "joystick",
-                            "instance": instance_counter,
-                            "name": joy.get_name(),
-                            "vid_pid": vid_pid,
-                        })
-                    except Exception as e:
-                        logger.debug(f"Could not initialize joystick {i}: {e}")
-                        # Skip unavailable joysticks instead of adding them to the list
-
-            except ImportError:
-                logger.warning("pygame not available, joystick detection skipped")
+                from utils.joystick_backend import get_backend, joystick_infos_to_devices
+                devices.extend(joystick_infos_to_devices(get_backend().list_joysticks()))
             except Exception as e:
                 logger.error(f"Error detecting joysticks: {e}", exc_info=True)
 

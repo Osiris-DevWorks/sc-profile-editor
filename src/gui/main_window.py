@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                               QLineEdit, QComboBox, QGroupBox, QCheckBox, QTabWidget,
                               QStyledItemDelegate, QDialog, QTextBrowser, QInputDialog,
                               QListWidget, QListWidgetItem, QSystemTrayIcon, QMenu)
-from PyQt6.QtCore import Qt, QSortFilterProxyModel, QTimer, QUrl, QEvent
+from PyQt6.QtCore import Qt, QSortFilterProxyModel, QTimer, QUrl, QEvent, pyqtSignal
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QDesktopServices, QPixmap, QCursor, QIcon, QFont
 from PyQt6.QtGui import QAction
 import sys
@@ -85,6 +85,9 @@ class SelectAllDelegate(QStyledItemDelegate):
 
 class MainWindow(QMainWindow):
     """Main application window for SC Profile Editor"""
+
+    # Emitted with the file path once a profile has parsed, before it is displayed.
+    profile_loaded = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -728,6 +731,10 @@ class MainWindow(QMainWindow):
             parser = ProfileParser(file_path, use_bundled_defaults=True)
             self.current_profile = parser.parse()
             self.current_profile_path = file_path
+            # Before display_profile(): listeners such as the mock-joystick
+            # panel swap the "connected" devices here, so the disconnected-
+            # device check below sees the right set.
+            self.profile_loaded.emit(file_path)
 
             # Save as last opened profile
             self.settings.set_last_profile_path(file_path)
