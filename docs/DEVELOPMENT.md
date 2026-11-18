@@ -39,7 +39,7 @@ Logging level is set in `src/main.py` — flip `logging.INFO` → `logging.DEBUG
 
 ## Testing
 
-There is no UI test harness. Unit tests cover the parser, DirectInput GUID parsing, label parsing, and joystick input translation / the mock backend; all run without hardware.
+There is no UI test harness. Unit tests cover the parser, DirectInput GUID parsing, label parsing, joystick input translation / the mock backend, and the Check Profile logic; all run without hardware.
 
 ```bash
 pytest tests/
@@ -87,6 +87,14 @@ A **Virtual Joysticks** window opens next to the main window. Open a binding, pr
 ```
 
 Copy `product` straight from an `<options type="joystick" Product="…">` line in an SC profile (or give `"vid"`/`"pid"` as hex strings) to mimic your own sticks. The optional `script` replays events each time detection starts; tests use it to run the real detection loop against recorded sequences (`tests/test_joystick_backend.py`, `recorded_session.json`).
+
+**Check Profile without hardware.** In mock mode the virtual sticks are "this PC" for the Check Profile dialog, in panel order. To see a device-numbering mismatch, start with a devices file that lists the sticks in a different order from the profile:
+
+```bash
+python src/main.py --mock-joysticks tests/fixtures/mock_devices/check_profile_swapped.json
+```
+
+then open `tests/fixtures/profiles/check_profile_problems.xml` and click **Check Profile**: FSM.GA and T-Rudder show as swapped, along with one example of every other check. The logic lives in `src/utils/profile_checker.py` (pure, no Qt) and `src/utils/system_devices.py` (DirectInput order on Windows, pygame elsewhere, mock sticks in mock mode); `tests/test_profile_checker.py` covers it.
 
 The devices file's order is the js order: the first device is `js1`. Mock mode is a developer flag only; release builds behave exactly as before unless it is passed.
 
