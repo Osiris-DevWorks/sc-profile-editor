@@ -1,0 +1,8 @@
+{
+  "_comment": "Same sticks as tests/fixtures/profiles/check_profile_problems.xml, but the PC lists the T-Rudder first. Run: python src/main.py --mock-joysticks tests/fixtures/mock_devices/check_profile_swapped.json, open that profile, press Check Profile: FSM.GA and T-Rudder show as swapped.",
+  "devices": [
+    {"name": " VKBSim T-Rudder   ", "product": "{011F231D-0000-0000-0000-504944564944}", "buttons": 0, "hats": 0, "axes": 3},
+    {"name": " VKBSim NXT  FSM.GA   ", "product": "{2220231D-0000-0000-0000-504944564944}", "buttons": 64, "hats": 2, "axes": 6},
+    {"name": " VKBsim Gladiator EVO L    ", "product": "{0201231D-0000-0000-0000-504944564944}", "buttons": 34, "hats": 1, "axes": 6}
+  ]
+}

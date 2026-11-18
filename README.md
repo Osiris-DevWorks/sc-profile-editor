@@ -180,6 +180,19 @@ All export buttons are in the top header. Exports respect your current view (def
 
 All exports use the **"Show Detailed"** setting - uncheck it for simplified exports, check it for complete details.
 
+### Checking a Profile for Problems
+
+Click **"Check Profile"** in the top header (enabled once a profile is loaded). SCPE looks for problems the game won't warn you about:
+
+- **Device numbering** — compares the profile's js1, js2, … with the order this PC numbers your sticks right now. If they differ, bindings meant for one stick land on another in game. The dialog shows both side by side; re-plug the sticks and press **Check again** until every slot matches.
+- **Sticks missing or added** — a profile stick that isn't connected, or a connected stick the profile doesn't know (which can push the others to higher numbers).
+- **View actions forced to "press"** — look behind, view yaw and similar are hold actions; a forced "press" can leave the camera stuck.
+- **One button switching several modes** — e.g. set salvage mode and toggle mining mode on the same button.
+- **Tuning saved under an old device ID** — deadzone/saturation stored for an ID no stick in the profile has, so the game ignores it.
+- **Partly bound hats**, **bindings on buttons a stick doesn't have**, and **js1 never cleared** (so the game's default joystick bindings still apply on it).
+
+Unsaved edits are included in the check. On Windows, SCPE reads the stick order from DirectInput, the same source Star Citizen uses.
+
 ### Filtering and Searching Bindings
 
 The **Controls Table** has multiple ways to find and organize what you're looking for:
