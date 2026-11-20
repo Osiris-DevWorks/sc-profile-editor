@@ -94,7 +94,7 @@ Copy `product` straight from an `<options type="joystick" Product="…">` line i
 python src/main.py --mock-joysticks tests/fixtures/mock_devices/check_profile_swapped.json
 ```
 
-then open `tests/fixtures/profiles/check_profile_problems.xml` and click **Check Profile**: FSM.GA and T-Rudder show as swapped, along with one example of every other check. The logic lives in `src/utils/profile_checker.py` (pure, no Qt) and `src/utils/system_devices.py` (DirectInput order on Windows, pygame elsewhere, mock sticks in mock mode); `tests/test_profile_checker.py` covers it.
+then open `tests/fixtures/profiles/check_profile_problems.xml` and click **Check Profile**: FSM.GA and T-Rudder show as swapped, along with one example of every other check. The logic lives in `src/utils/profile_checker.py` (pure, no Qt) and `src/utils/system_devices.py` (DirectInput order on Windows, pygame elsewhere, mock sticks in mock mode); `tests/test_profile_checker.py` covers it. Fixes live in `src/utils/profile_fixer.py` (`tests/test_profile_fixer.py`); in that mock setup **Fix all safe ones** renumbers the profile so the table goes all ✓.
 
 The devices file's order is the js order: the first device is `js1`. Mock mode is a developer flag only; release builds behave exactly as before unless it is passed.
 

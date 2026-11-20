@@ -13,7 +13,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QBrush
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
                              QTableWidget, QTableWidgetItem, QTextBrowser, QHeaderView,
-                             QGroupBox)
+                             QGroupBox, QInputDialog, QMessageBox)
 
 from utils.profile_checker import CheckReport, check_profile, ERROR, WARNING, INFO
 from utils.system_devices import list_system_joysticks
@@ -37,11 +37,17 @@ def _fmt_id(vid_pid) -> str:
 
 
 class ProfileCheckDialog(QDialog):
-    def __init__(self, xml_path_provider: Callable[[], Optional[str]], profile_label: str, parent=None):
+    def __init__(self, xml_path_provider: Callable[[], Optional[str]], profile_label: str, parent=None,
+                 apply_fixes: Optional[Callable] = None):
         """``xml_path_provider`` returns the XML file to check (the main
-        window writes unsaved edits to a temp file first)."""
+        window writes unsaved edits to a temp file first).
+
+        ``apply_fixes(xml_path, fixes, choices) -> [str]`` applies fixes and
+        reloads the profile in the main window; without it the dialog only
+        reports."""
         super().__init__(parent)
         self._xml_path_provider = xml_path_provider
+        self._apply_fixes = apply_fixes
         self.setWindowTitle(f"Check Profile — {profile_label}")
         self.resize(900, 680)
 
@@ -73,9 +79,23 @@ class ProfileCheckDialog(QDialog):
 
         self.findings_view = QTextBrowser()
         self.findings_view.setOpenExternalLinks(False)
+        self.findings_view.setOpenLinks(False)
+        self.findings_view.anchorClicked.connect(self._on_fix_link)
         layout.addWidget(self.findings_view, 3)
 
+        self.fix_note = QLabel()
+        self.fix_note.setProperty("role", "secondary")
+        self.fix_note.setWordWrap(True)
+        self.fix_note.setVisible(False)
+        layout.addWidget(self.fix_note)
+
         buttons = QHBoxLayout()
+        self.fix_all_btn = QPushButton("Fix all safe ones")
+        self.fix_all_btn.setToolTip("Apply every fix that needs no choices from you. Your file isn't "
+                                    "changed until you Save Profile.")
+        self.fix_all_btn.clicked.connect(self._fix_all_safe)
+        self.fix_all_btn.setVisible(apply_fixes is not None)
+        buttons.addWidget(self.fix_all_btn)
         buttons.addStretch()
         recheck_btn = QPushButton("Check again")
         recheck_btn.setToolTip("Re-read the connected joysticks and the profile, e.g. after re-plugging a stick")
@@ -141,10 +161,80 @@ class ProfileCheckDialog(QDialog):
             self.summary_label.setText("Found " + ", ".join(parts) + ".")
 
         chunks = []
-        for f in report.findings:
+        for i, f in enumerate(report.findings):
+            link = ""
+            if f.fix and self._apply_fixes:
+                link = f"<br><a href='fix:{i}'>🔧 {html.escape(f.fix.get('label', 'Fix'))}</a>"
             chunks.append(
                 f"<p style='margin: 0 0 10px 0;'>"
                 f"{_SEVERITY_ICON.get(f.severity, '')} <b>{html.escape(f.title)}</b>"
                 f" <span style='opacity:0.7'>({_SEVERITY_LABEL.get(f.severity, f.severity)})</span><br>"
-                f"{html.escape(f.detail)}</p>")
+                f"{html.escape(f.detail)}{link}</p>")
         self.findings_view.setHtml("".join(chunks) or "<p>Nothing to report.</p>")
+        n_safe = len(self._safe_fixes())
+        self.fix_all_btn.setEnabled(n_safe > 0)
+        self.fix_all_btn.setText(f"Fix all safe ones ({n_safe})" if n_safe else "Fix all safe ones")
+
+    # -- fixing -----------------------------------------------------------
+
+    def _safe_fixes(self):
+        if not self.report:
+            return []
+        out, seen_renumber = [], False
+        for f in self.report.findings:
+            if not f.fix or not f.fix.get("safe"):
+                continue
+            if f.fix["kind"] == "renumber":
+                if seen_renumber:
+                    continue
+                seen_renumber = True
+            out.append(f.fix)
+        return out
+
+    def _on_fix_link(self, url):
+        text = url.toString()
+        if not text.startswith("fix:") or not self.report:
+            return
+        try:
+            finding = self.report.findings[int(text[4:])]
+        except (ValueError, IndexError):
+            return
+        fix = finding.fix
+        choices = {}
+        if fix["kind"] == "keep_one":
+            actions = [b["action"] for b in fix["bindings"]]
+            keep, ok = QInputDialog.getItem(
+                self, "Keep one", f"Which action should {fix['input']} keep? The others are unbound.",
+                actions, 0, False)
+            if not ok:
+                return
+            choices[0] = keep
+        elif fix.get("confirm"):
+            if QMessageBox.question(self, "Fix", fix["confirm"]) != QMessageBox.StandardButton.Yes:
+                return
+        self._run_fixes([fix], choices)
+
+    def _fix_all_safe(self):
+        fixes = self._safe_fixes()
+        if not fixes:
+            return
+        extra = [f["confirm"] for f in fixes if f.get("confirm")]
+        msg = f"Apply {len(fixes)} fix{'es' if len(fixes) != 1 else ''}?"
+        if extra:
+            msg += "\n\nThis includes:\n• " + "\n• ".join(extra)
+        msg += "\n\nNothing is written to your file until you Save Profile."
+        if QMessageBox.question(self, "Fix all safe ones", msg) != QMessageBox.StandardButton.Yes:
+            return
+        self._run_fixes(fixes, {})
+
+    def _run_fixes(self, fixes, choices):
+        try:
+            path = self._xml_path_provider()
+            changes = self._apply_fixes(path, fixes, choices)
+        except Exception as e:
+            logger.error(f"Applying fixes failed: {e}", exc_info=True)
+            QMessageBox.warning(self, "Fix", f"Couldn't apply the fix:\n{e}")
+            return
+        self.fix_note.setText("Fixed: " + "; ".join(changes) + ". Save Profile to keep the changes.")
+        self.fix_note.setVisible(True)
+        self.run_check()

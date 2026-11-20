@@ -191,6 +191,8 @@ Click **"Check Profile"** in the top header (enabled once a profile is loaded). 
 - **Tuning saved under an old device ID** — deadzone/saturation stored for an ID no stick in the profile has, so the game ignores it.
 - **Partly bound hats**, **bindings on buttons a stick doesn't have**, and **js1 never cleared** (so the game's default joystick bindings still apply on it).
 
+**Fixing what it finds.** Most problems have a 🔧 link under them, and **Fix all safe ones** applies every fix that doesn't need a choice from you, including **renumbering the profile's sticks to match this PC** so each binding follows its stick. For one button switching several modes, you pick which action keeps it; cleared view actions can be put back on the free hat directions. Fixes are loaded as unsaved changes: review them in the table, then **Save Profile** to keep them. Your original file is never overwritten by a fix.
+
 Unsaved edits are included in the check. On Windows, SCPE reads the stick order from DirectInput, the same source Star Citizen uses.
 
 ### Filtering and Searching Bindings

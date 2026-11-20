@@ -54,6 +54,10 @@ class Finding:
     title: str
     detail: str
     inputs: List[str] = field(default_factory=list)
+    # How utils.profile_fixer can repair it, or None when only the user can.
+    # {"kind": ..., "safe": bool, ...}; "safe" fixes need no choices and are
+    # applied by "Fix all safe ones".
+    fix: Optional[dict] = None
 
 
 @dataclass
@@ -95,6 +99,7 @@ class _ProfileDevice:
     instance: int
     name: str
     vid_pid: Optional[Tuple[int, int]]
+    product: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -129,7 +134,7 @@ def _read_devices(root: ET.Element) -> Dict[int, _ProfileDevice]:
         product = opt.get("Product") or ""
         if not product.strip():
             continue
-        devices[instance] = _ProfileDevice(instance, _clean_name(product), parse_di_product_guid(product))
+        devices[instance] = _ProfileDevice(instance, _clean_name(product), parse_di_product_guid(product), product)
     return devices
 
 
@@ -184,15 +189,36 @@ def _check_forced_press(bindings: List[_Binding]) -> List[Finding]:
             "View and look actions are hold actions in the game. Forcing \"press\" overrides that, "
             "so the camera can stay turned after you let go. Set the activation mode back to "
             "(Game default).",
-            [b.input]))
+            [b.input], _clear_mode_fix(b, safe=True)))
     for b in hold:
         findings.append(Finding(
             "forced_press", INFO,
             f"{b.action} on {b.input} is forced to \"press\"",
             "This action is meant to be held. If it behaves oddly, set its activation mode back to "
             "(Game default).",
-            [b.input]))
+            [b.input], _clear_mode_fix(b, safe=False)))
     return findings
+
+
+def _clear_mode_fix(b: _Binding, safe: bool) -> dict:
+    return {"kind": "clear_activation_mode", "safe": safe, "label": "Set to game default",
+            "actionmap": b.actionmap, "action": b.action, "input": b.input}
+
+
+# Which hat direction a cleared view action most likely sat on.
+_HAT_GUESS = [
+    (re.compile(r"(yaw|look)_left$"), "left"),
+    (re.compile(r"(yaw|look)_right$"), "right"),
+    (re.compile(r"(pitch|look)_up$"), "up"),
+    (re.compile(r"(pitch|look)_down$|look_behind$"), "down"),
+]
+
+
+def _guess_direction(action: str) -> Optional[str]:
+    for pattern, direction in _HAT_GUESS:
+        if pattern.search(action):
+            return direction
+    return None
 
 
 def _check_partial_hats(bindings: List[_Binding], devices: Dict[int, _ProfileDevice]) -> List[Finding]:
@@ -200,6 +226,7 @@ def _check_partial_hats(bindings: List[_Binding], devices: Dict[int, _ProfileDev
     # Actions cleared to "jsN_ " that still carry an activation mode: a
     # binding that used to be there and was deleted.
     cleared: Dict[int, List[str]] = defaultdict(list)
+    cleared_maps: Dict[Tuple[int, str], str] = {}
     for b in bindings:
         parts = _js_parts(b.input)
         if not parts:
@@ -207,6 +234,7 @@ def _check_partial_hats(bindings: List[_Binding], devices: Dict[int, _ProfileDev
         if not parts[1]:
             if b.activation_mode and _VIEW_ACTION_RE.search(b.action):
                 cleared[parts[0]].append(b.action)
+                cleared_maps[(parts[0], b.action)] = b.actionmap
             continue
         m = _HAT_RE.match(parts[1])
         if m:
@@ -225,11 +253,23 @@ def _check_partial_hats(bindings: List[_Binding], devices: Dict[int, _ProfileDev
                        f"which suggests they used to be on this hat: {', '.join(lost)}.")
         else:
             detail += " If the other directions used to do something, they were cleared."
+        fix = None
+        assign = []
+        for action in lost:
+            direction = _guess_direction(action)
+            if direction in free and direction not in [a["direction"] for a in assign]:
+                assign.append({"actionmap": cleared_maps[(js, action)], "action": action,
+                               "direction": direction, "input": f"js{js}_hat{hat}_{direction}"})
+        if assign:
+            fix = {"kind": "restore_hat", "safe": False, "label": "Put them back on the hat",
+                   "assign": assign,
+                   "confirm": "Bind " + ", ".join(f"{a['action']} to {a['input']}" for a in assign)
+                              + " (with the game's default activation)?"}
         findings.append(Finding(
             "partial_hat", WARNING if lost else INFO,
             f"Hat {hat} on {where}: {', '.join(free)} unbound",
             detail,
-            [f"js{js}_hat{hat}_{d}" for d in free]))
+            [f"js{js}_hat{hat}_{d}" for d in free], fix))
     return findings
 
 
@@ -256,7 +296,11 @@ def _check_mode_switch_clash(bindings: List[_Binding]) -> List[Finding]:
                 + (f" ({mode})" if mode else "")
                 + ". One press fires all of them, so you end up in whichever mode the game applies "
                   "last. Move all but one to a free button.",
-                [group[0].input]))
+                [group[0].input],
+                {"kind": "keep_one", "safe": False, "label": "Choose which one keeps it",
+                 "input": group[0].input,
+                 "bindings": [{"actionmap": b.actionmap, "action": b.action}
+                              for b in group if b.action in actions]}))
     return findings
 
 
@@ -285,7 +329,9 @@ def _check_stale_tuning(root: ET.Element, devices: Dict[int, _ProfileDevice]) ->
                 f"but your stick now reports as \"{target.name}\" ({_fmt_vid_pid(target.vid_pid)}, "
                 f"js{target.instance}). The game ignores tuning for IDs that aren't present. "
                 "Move the settings to the new ID or set them again in game.",
-                []))
+                [],
+                {"kind": "move_tuning", "safe": True, "label": f"Move to {target.name}",
+                 "from_name": name_attr, "to_name": target.product}))
         else:
             findings.append(Finding(
                 "stale_tuning", INFO,
@@ -370,6 +416,8 @@ def _check_system(bindings: List[_Binding], devices: Dict[int, _ProfileDevice],
                               (sdev.name or "").strip() if sdev else "",
                               sdev.vid_pid if sdev else None, status))
 
+    renumber = _renumber_fix(devices, sys_slots_by_id, used_slots)
+
     # One finding per profile stick that won't be where the profile expects it.
     for slot, pdev in sorted(devices.items()):
         sdev = sys_by_slot.get(slot)
@@ -389,8 +437,8 @@ def _check_system(bindings: List[_Binding], devices: Dict[int, _ProfileDevice],
                 f"the {n_bind} js{slot} binding{'s' if n_bind != 1 else ''} meant for {pdev.name} will go to "
                 f"{other} instead. Before you play, get the PC to list the sticks in the profile's order "
                 f"(usually by re-plugging them, or using the same USB ports as when the profile was made), "
-                f"then press Check again.",
-                []))
+                f"then press Check again. Or let SCPE renumber the profile to match this PC.",
+                [], renumber))
         else:
             findings.append(Finding(
                 "device_missing", WARNING,
@@ -436,12 +484,51 @@ def _check_system(bindings: List[_Binding], devices: Dict[int, _ProfileDevice],
             name = (sdev.name or "").strip()
             findings.append(Finding(
                 "no_such_input", WARNING,
-                f"{len(too_high)} binding{'s' if len(too_high) != 1 else ''} on js{slot} ({name}) use inputs it doesn't have",
+                f"{len(too_high)} binding{'s' if len(too_high) != 1 else ''} on js{slot} ({name}) "
+                f"{'use' if len(too_high) != 1 else 'uses'} inputs it doesn't have",
                 f"{name} has {sdev.buttons} button{'s' if sdev.buttons != 1 else ''} and "
                 f"{sdev.hats} hat{'s' if sdev.hats != 1 else ''}, so these bindings never fire: "
                 f"{', '.join(codes[:12])}{' …' if len(codes) > 12 else ''}.",
-                codes))
+                codes,
+                {"kind": "unbind", "safe": True, "label": "Remove them",
+                 "bindings": [{"actionmap": b.actionmap, "action": b.action, "input": b.input}
+                              for b in too_high]}))
     return findings, rows
+
+
+def _renumber_fix(devices: Dict[int, _ProfileDevice], sys_slots_by_id: Dict[Tuple[int, int], List[int]],
+                  used_slots: set) -> Optional[dict]:
+    """jsN -> jsM so every profile stick lands on the slot this PC gives it.
+
+    Only offered when every identified profile stick is connected exactly
+    once; with a stick missing or two identical ones there's no single
+    right answer.
+    """
+    ided = {slot: d for slot, d in devices.items() if d.vid_pid}
+    if not ided:
+        return None
+    mapping: Dict[int, int] = {}
+    for slot, d in ided.items():
+        now = sys_slots_by_id.get(d.vid_pid, [])
+        if len(now) != 1:
+            return None
+        mapping[slot] = now[0]
+    if all(old == new for old, new in mapping.items()):
+        return None
+    # Other slots the profile uses (no identified stick) keep their number
+    # unless a renumbered stick takes it; then they move to a free one.
+    others = sorted((set(devices) | set(used_slots)) - set(ided))
+    taken = set(mapping.values())
+    for slot in others:
+        if slot not in taken:
+            mapping[slot] = slot
+        else:
+            mapping[slot] = next(n for n in range(1, 100) if n not in taken and n not in others)
+        taken.add(mapping[slot])
+    pretty = ", ".join(f"js{o}→js{n}" for o, n in sorted(mapping.items()) if o != n)
+    return {"kind": "renumber", "safe": True, "label": "Renumber profile to match this PC",
+            "mapping": {str(o): n for o, n in mapping.items() if o != n},
+            "confirm": f"Renumber the profile's sticks ({pretty}) so each binding follows its stick?"}
 
 
 # ---------------------------------------------------------------------------

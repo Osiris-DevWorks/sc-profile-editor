@@ -741,6 +741,7 @@ class MainWindow(QMainWindow):
             parser = ProfileParser(file_path, use_bundled_defaults=True)
             self.current_profile = parser.parse()
             self.current_profile_path = file_path
+            self._save_dir_hint = None
             # Before display_profile(): listeners such as the mock-joystick
             # panel swap the "connected" devices here, so the disconnected-
             # device check below sees the right set.
@@ -2453,8 +2454,41 @@ class MainWindow(QMainWindow):
         from gui.profile_check_dialog import ProfileCheckDialog
         with tempfile.TemporaryDirectory(prefix="scpe-check-") as temp_dir:
             dialog = ProfileCheckDialog(lambda: self._profile_xml_for_check(temp_dir),
-                                        self.current_profile.profile_name, self)
+                                        self.current_profile.profile_name, self,
+                                        apply_fixes=self._apply_profile_fixes)
             dialog.exec()
+
+    def _apply_profile_fixes(self, xml_path: str, fixes, choices):
+        """Apply Check Profile fixes and load the result as an unsaved,
+        modified profile. The original file is never written; the user
+        reviews the changes and saves as usual. Returns what changed."""
+        import tempfile
+        from utils.profile_fixer import apply_fixes
+
+        profile = self.current_profile
+        original = profile.source_xml_path or self.current_profile_path
+        original_dir = os.path.dirname(original) if original else ""
+        if getattr(self, "_save_dir_hint", None):
+            original_dir = self._save_dir_hint
+        last_path = self.settings.get_last_profile_path() or original
+
+        fix_dir = tempfile.mkdtemp(prefix="scpe-fixed-")
+        out = os.path.join(fix_dir, os.path.basename(original) if original else "profile.xml")
+        changes = apply_fixes(xml_path, fixes, out, choices)
+
+        self.load_profile_from_path(out)
+        if not self.current_profile or self.current_profile_path != out:
+            raise RuntimeError("The fixed profile could not be loaded")
+        # Keep pointing "last opened" and Save at the user's real folder,
+        # not the temp copy.
+        if last_path:
+            self.settings.set_last_profile_path(last_path)
+        self._save_dir_hint = original_dir
+        self.current_profile.mark_modified()
+        self.on_profile_modified()
+        self.statusBar().showMessage(
+            f"Applied {len(changes)} fix{'es' if len(changes) != 1 else ''}. Review, then Save Profile to keep them.")
+        return changes
 
     def save_profile(self):
         """Save the modified profile to XML"""
@@ -2490,6 +2524,9 @@ class MainWindow(QMainWindow):
         sc_profiles_dir = self.settings.get_sc_profiles_directory()
         if sc_profiles_dir and os.path.exists(sc_profiles_dir):
             suggested_dir = sc_profiles_dir
+        elif getattr(self, "_save_dir_hint", None) and os.path.isdir(self._save_dir_hint):
+            # Profile was rebuilt from a temp copy by Check Profile's fixes.
+            suggested_dir = self._save_dir_hint
         elif self.current_profile.source_xml_path:
             suggested_dir = os.path.dirname(self.current_profile.source_xml_path)
 
