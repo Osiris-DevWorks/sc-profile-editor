@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-20
+
 ### Fixed
 - **Hat/button bindings stuck in "hold" actions (e.g. look left/right/behind)** — The Remap dialog forced `activationMode="press"` onto every non-axis binding it saved. Star Citizen defines the view yaw / look-behind actions as `hold` in `defaultProfile.xml`, so the explicit `press` overrode that and the camera stayed locked after the hat was released. The dialog now defaults to **(Game default)**, which writes no `activationMode` attribute at all, and only emits one when the user explicitly picks `press`, `release`, `hold`, `double_tap` or `tap`. Existing explicit modes in a profile are preserved (case-insensitively).
 - **Unit tests failed on a clean checkout** — `tests/test_parser.py` pointed at a gitignored personal profile; it now uses the committed `layout_osiris-vkb-2025-10-25_exported.xml` fixture.
