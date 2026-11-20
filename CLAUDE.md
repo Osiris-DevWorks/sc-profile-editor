@@ -56,6 +56,8 @@ Edits propagate **in real time** to both the Controls Table and the Device View 
 
 **DirectInput product-GUID matching (`src/utils/directinput_guid.py`)** — SC profile XML stores joysticks with a `Product` attribute like `{PIDVID-0000-0000-0000-504944564944}` (the trailing constant is "PIDVID" in ASCII; the first 8 hex chars encode `(PID << 16) | VID`). This module parses VID/PID out of that GUID so connected pygame joysticks (whose `get_guid()` returns SDL's joystick-GUID format) can be matched to profile entries without ever calling DirectInput. Pure parsing, zero runtime deps. This powers the Config tab's device-to-joystick mapping.
 
+**Check Profile (`src/utils/profile_checker.py`, `src/utils/system_devices.py`, `src/gui/profile_check_dialog.py`)** — Reads the raw profile XML (exported layout or live `actionmaps.xml`, which wraps everything in `<ActionProfiles>`) and reports problems as findings with severities. The device-numbering check compares each `<options type="joystick" instance="N" Product="…">` VID/PID with the Nth connected stick; `system_devices.py` gets that order from DirectInput on Windows (what SC uses), pygame elsewhere (approximate), or the mock backend. Unsaved edits are checked via a temp XML export. Findings carry a `fix` dict; `src/utils/profile_fixer.py` applies them to the XML (renumber always last), writes a temp copy, and the main window loads it as a modified profile with Save pointed back at the original folder.
+
 **Theme system (`src/gui/theme.py`)** — Ported from sibling project `smart-citizen` for visual cohesion. Themes are applied by swapping the `QPalette` on the `QApplication`; widgets relying on `WindowText`/`Text` palette roles re-color automatically. Secondary/dim labels opt in via `setProperty("role", "secondary")` and an app-level QSS rule installed by `apply_theme`. The branded `Hyperspace Race Expanded` font (`assets/fonts/HyperspaceRace-ExpandedBold.otf`) is registered at startup via `load_application_fonts()` — the family name Qt reports is the prefixed `"FONTSPRING DEMO - …"` string, which is what the title bar matches.
 
 **Input detection (`src/utils/input_detector.py`)** — Joystick (pygame), keyboard with modifier support (pynput), mouse (pynput). Runs in a thread with a 10-second timeout; communicates with the UI via Qt signals. Used by the Remap Dialog. Joysticks are read through `src/utils/joystick_backend.py` (pygame by default); `--mock-joysticks [file.json]` / `SCPE_MOCK_JOYSTICKS` swaps in virtual sticks plus a Virtual Joysticks panel, so device and Remap work can be tested with no hardware (see `docs/DEVELOPMENT.md`).
@@ -90,7 +92,7 @@ docs/                 CHANGELOG, DEVELOPMENT, RELEASE_PROCESS, CREATING_PDF_TEMP
 scripts/              ad-hoc utility scripts (NOT build scripts — see Build below)
                       includes generate_pdf_template.py used by the Add-Device-from-Template flow
 deprecated/           old SVG/PNG/OCR system removed in v0.4.0; ignore unless excavating history
-tests/                pytest unit tests: test_parser.py, test_directinput_guid.py, test_parse_joy_label.py
+tests/                pytest unit tests (parser, DI GUIDs, joy labels, joystick backend, profile checker)
 ABOUT.md              rendered in the About tab at runtime (bundled into the exe)
 README.md             end-user guide (also rendered in-app)
 VERSION.TXT           single source of truth for version (read by src/utils/version.py)

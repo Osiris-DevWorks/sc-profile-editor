@@ -2,7 +2,7 @@
 
 A desktop application for editing and exporting Star Citizen control profiles in human-readable formats. Create visual diagrams of your controller layouts and export your bindings to PDF, Word, CSV, and annotated device graphics.
 
-![Version](https://img.shields.io/badge/version-0.8.2-blue)
+![Version](https://img.shields.io/github/v/release/Osiris-DevWorks/sc-profile-editor?label=version&color=blue)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 
 ## Download & Installation
@@ -180,6 +180,21 @@ All export buttons are in the top header. Exports respect your current view (def
 
 All exports use the **"Show Detailed"** setting - uncheck it for simplified exports, check it for complete details.
 
+### Checking a Profile for Problems
+
+Click **"Check Profile"** in the top header (enabled once a profile is loaded). SCPE looks for problems the game won't warn you about:
+
+- **Device numbering** — compares the profile's js1, js2, … with the order this PC numbers your sticks right now. If they differ, bindings meant for one stick land on another in game. The dialog shows both side by side; re-plug the sticks and press **Check again** until every slot matches.
+- **Sticks missing or added** — a profile stick that isn't connected, or a connected stick the profile doesn't know (which can push the others to higher numbers).
+- **View actions forced to "press"** — look behind, view yaw and similar are hold actions; a forced "press" can leave the camera stuck.
+- **One button switching several modes** — e.g. set salvage mode and toggle mining mode on the same button.
+- **Tuning saved under an old device ID** — deadzone/saturation stored for an ID no stick in the profile has, so the game ignores it.
+- **Partly bound hats**, **bindings on buttons a stick doesn't have**, and **js1 never cleared** (so the game's default joystick bindings still apply on it).
+
+**Fixing what it finds.** Most problems have a 🔧 link under them, and **Fix all safe ones** applies every fix that doesn't need a choice from you, including **renumbering the profile's sticks to match this PC** so each binding follows its stick. For one button switching several modes, you pick which action keeps it; cleared view actions can be put back on the free hat directions. Fixes are loaded as unsaved changes: review them in the table, then **Save Profile** to keep them. Your original file is never overwritten by a fix.
+
+Unsaved edits are included in the check. On Windows, SCPE reads the stick order from DirectInput, the same source Star Citizen uses.
+
 ### Filtering and Searching Bindings
 
 The **Controls Table** has multiple ways to find and organize what you're looking for:
@@ -254,7 +269,7 @@ The application uses a three-tier label priority system:
 
 The application includes PDF templates for 20+ devices:
 - **VKB:** Gladiator (EVO/SCG variants), Gunfighter (MCG/SCG), Space Sim Module, STECS Throttle, Throttle Quadrants, F16 MFD
-- **VPC:** MongoosT-50CM3
+- **VPC:** Alpha Prime grip (left/right, on a MongoosT-50CM3 base)
 - **Thrustmaster:** T.16000M, TWCS Throttle
 
 For devices without templates, you can still use the Controls Table, CSV, PDF, and Word exports.

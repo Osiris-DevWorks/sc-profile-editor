@@ -1,0 +1,60 @@
+<ActionMaps version="1" optionsVersion="2" rebindVersion="2" profileName="CheckProfileProblems">
+ <CustomisationUIHeader label="CheckProfileProblems" description="Fixture for tests/test_profile_checker.py: one of each problem the Check profile feature looks for." image="">
+  <devices>
+   <keyboard instance="1"/>
+   <mouse instance="1"/>
+   <joystick instance="1"/>
+   <joystick instance="2"/>
+   <joystick instance="3"/>
+  </devices>
+ </CustomisationUIHeader>
+ <deviceoptions name=" VKBsim Gladiator EVO L SEM   {0205231D-0000-0000-0000-504944564944}">
+  <option input="x" deadzone="0.03"/>
+ </deviceoptions>
+ <deviceoptions name="T.16000M  {B10A044F-0000-0000-0000-504944564944}">
+  <option input="x" deadzone="0.02"/>
+ </deviceoptions>
+ <options type="keyboard" instance="1" Product="Keyboard  {6F1D2B61-D5A0-11CF-BFC7-444553540000}"/>
+ <options type="joystick" instance="1" Product=" VKBSim NXT  FSM.GA   {2220231D-0000-0000-0000-504944564944}"/>
+ <options type="joystick" instance="2" Product=" VKBSim T-Rudder   {011F231D-0000-0000-0000-504944564944}"/>
+ <options type="joystick" instance="3" Product=" VKBsim Gladiator EVO L    {0201231D-0000-0000-0000-504944564944}"/>
+ <options type="joystick" instance="4"/>
+ <modifiers/>
+ <actionmap name="seat_general">
+  <action name="v_set_salvage_mode">
+   <rebind input="js3_button27"/>
+  </action>
+  <action name="v_toggle_mining_mode">
+   <rebind input="js3_button27"/>
+  </action>
+  <action name="v_set_scan_mode">
+   <rebind input="js3_button29"/>
+  </action>
+  <action name="v_toggle_scan_mode">
+   <rebind input="js3_button29"/>
+  </action>
+  <action name="v_view_look_behind">
+   <rebind input="js3_hat1_down" activationMode="press"/>
+  </action>
+  <action name="v_view_yaw_left">
+   <rebind input="js3_ " activationMode="press"/>
+  </action>
+  <action name="v_view_yaw_right">
+   <rebind input="js3_ " activationMode="press"/>
+  </action>
+  <action name="v_target_toggle_pin_index_1_hold">
+   <rebind input="js3_button18" activationMode="press"/>
+  </action>
+ </actionmap>
+ <actionmap name="spaceship_movement">
+  <action name="v_strafe_up">
+   <rebind input="js2_button3"/>
+  </action>
+  <action name="v_afterburner">
+   <rebind input="js2_ "/>
+  </action>
+  <action name="v_boost">
+   <rebind input="js1_button1"/>
+  </action>
+ </actionmap>
+</ActionMaps>
