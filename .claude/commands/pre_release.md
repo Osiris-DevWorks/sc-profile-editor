@@ -26,7 +26,7 @@ Follow `.claude/commands/test_coverage_check.md`. Present findings grouped by se
 
 ## 2. Docs sync check
 
-Follow `.claude/commands/docs_sync_check.md`. Present findings grouped by severity and end with the verdict line. This is also where `docs/CHANGELOG.md` `[Unreleased]` is brought up to date with the branch's user-visible changes; draft the missing entries in the file's style (`**Bold summary** — detail (issue #N)`). Doc edits land via a normal PR to the release branch.
+Follow `.claude/commands/docs_sync_check.md`. Present findings grouped by severity and end with the verdict line. This is also where `docs/CHANGELOG.md` `[Unreleased]` is brought up to date with the branch's user-visible changes; draft the missing entries in the file's style (`**Bold summary** — detail (issue #N)`). Doc edits are pushed straight to the release branch as one commit.
 
 **CHECKPOINT — ready for the next check?** Wait for the user.
 
@@ -88,11 +88,13 @@ Verdict: **Clean** (every substantial contributor acknowledged), **Minor issues*
 ## 6. Tester installer build on the release PR
 
 1. Find the release PR: `gh pr list --base main --head release/X.Y.Z --state open --json number,title`.
-2. If none exists, open it now with title `Release X.Y.Z` and the CHANGELOG section as the body. **Opening the PR is not merging it.**
+2. If none exists, open it now with title `Release X.Y.Z` and a body of the CHANGELOG section followed by this release's sections of `docs/TEST_PLAN.md` as a checklist. If it exists, refresh the test plan in its body. **Opening the PR is not merging it.**
 3. Add the label: `gh pr edit <N> --add-label build-installer`. `installer-preview.yml` builds `SCProfileEditor-vX.Y.Z-Setup.exe` and comments the download link on the PR; later pushes to the PR rebuild automatically. If the label was already present from an earlier round, remove and re-add it, or dispatch the workflow manually, so a build runs on the current head.
 4. Report the run (`gh run list --limit 1`) and the artifact name (`scprofileeditor-installer-{SHA}`, 30-day retention).
 
-**CHECKPOINT — confirm before opening the PR and adding the label; both are visible on GitHub and start CI builds.** Wait for the user.
+5. Run `/code-review` on the release PR. This is the release's one code review; fix what it finds with more commits on the release branch (they rebuild the installer).
+
+Amr calling the release is the approval to open the PR and add the label; no separate checkpoint.
 
 ## 7. Issue close-on-verify pass
 
