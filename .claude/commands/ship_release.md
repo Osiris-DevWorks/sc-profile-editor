@@ -25,7 +25,7 @@ Ships whichever `release/X.Y.Z` branch the user is on. Stop on the first failure
 
 1. Rename `## [Unreleased]` content into `## [X.Y.Z] - YYYY-MM-DD` (today's date) and leave a fresh empty `## [Unreleased]` above it.
 2. Verify locally: `python scripts/release_notes.py X.Y.Z` prints the section.
-3. Land it via a PR to the release branch (branch protection blocks direct pushes), then pull.
+3. Commit it and push it straight to the release branch. If the ruleset refuses the push, stop and tell Amr; don't open a PR to get around it.
 
 **CHECKPOINT — CHANGELOG section confirmed. Build a local installer for smoke-testing?**
 
@@ -46,7 +46,7 @@ Output: `dist\SCProfileEditor-vX.Y.Z-Setup.exe`. Do not attach it to a GitHub re
 
 The push to `main` triggers `release.yml`, which reads `VERSION.TXT`, auto-tags `vX.Y.Z`, runs the tests, builds the installer, publishes the GitHub Release with the CHANGELOG section as its body, and posts the Discord notification.
 
-1. Confirm the release PR (`release/X.Y.Z` → `main`) is green and approved.
+1. Confirm the release PR (`release/X.Y.Z` → `main`) is green, its `/code-review` findings are dealt with, and Amr has run the test plan and said to merge.
 2. Merge it with a merge commit (`gh pr merge <N> --merge`), never squash: the release branch history is the record.
 
 **CHECKPOINT — merged. Watch the `Release` workflow (`gh run watch`) and confirm the installer is attached to the release and the Discord post landed.**
@@ -63,7 +63,7 @@ Per `docs/RELEASE_PROCESS.md`: in `../osiris-devworks-website/src/data/projects.
 
 ## 6. Open the next integration branch
 
-Ask: *"Open the next branch now? `patch` gives you `release/X.Y.(Z+1)` for bug fixes. Reply `patch`, `minor`, `major`, or `skip`."* On a bump arg, defer to `/start_release`.
+Ask: *"Open the next branch now? `patch` gives you `release/X.Y.(Z+1)` for bug fixes. Reply `patch`, `minor`, `major`, or `skip`."* On a bump arg, defer to `/start_release`. On the new branch, clear the shipped release's sections from `docs/TEST_PLAN.md` (leave the `## Next release` heading) and push that as one commit.
 
 ## Final report
 

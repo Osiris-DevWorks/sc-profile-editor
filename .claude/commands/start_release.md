@@ -46,7 +46,7 @@ Stop on the first failure of any step.
    - `patch` → *"Patch branches accept only bug fixes and minor polish. Flag any feature work as scope-mismatch."*
    - `minor` → *"Minor branches accept features and additional device support."*
    - `major` → *"Major branches accept breaking changes."*
-   - *"Branch is local only — push with `git push -u origin NEW_BRANCH` when ready. PRs target this branch, not main."*
+   - *"Branch is local only — push with `git push -u origin NEW_BRANCH` when ready. Features are pushed straight to this branch as one squashed commit each; contributor PRs target it too, never main."*
 
 ## Notes
 

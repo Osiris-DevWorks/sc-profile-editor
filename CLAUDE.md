@@ -2,6 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Osiris DevWorks development pipeline (universal)
+
+This section is identical in every Osiris DevWorks repo's CLAUDE.md. Change it in all of them at once. The line just below it says how this repo applies it. Where an older section of this file conflicts with it, this section wins.
+
+The goal is little friction and few GitHub Actions runs: checks and code review run once per release, not once per feature.
+
+1. **Grill the idea.** When Amr brings a new idea, ask questions until it is ready to build. Ask every question as a multiple-choice decision card (`request_decision`, or `AskUserQuestion` in the CLI) with a recommended option, never as questions in prose. A few cards at a time is fine.
+2. **Mock up any UI.** When a feature adds or changes UI, show an HTML Artifact mockup during grilling. Build it from the app's real colors, fonts, spacing and layout, read from the source, and show the current screen next to the changed one. Grilling isn't done until Amr approves the mockup.
+3. **Grilling sign-off is the approval.** Once Amr says the idea is ready, build it without further check-ins: no step-by-step plan approvals, no code-block reviews, and no commit-message review. Ask again only if the work hits a choice that grilling did not settle.
+4. **Push straight to the integration branch, with no feature PR.** Run the repo's tests, lint and type check in your own session. Update this repo's test plan, if it has one, with concrete pass/fail items for the feature. Then push **one squashed commit per feature** to the integration branch, with a message like `#123: short summary` (`Fixes #123` in the body when it closes the issue). A feature branch is fine while you work; only the squashed result lands. Never force-push the integration branch.
+5. **Release: one PR, all checks, one review.** When Amr calls a release, open one PR from the integration branch to production. Every pre-release check and the code review run on that PR, once. Fix what they find with more commits on the integration branch. Amr runs the test plan (on preview builds or staging) and merges, or tells you to merge.
+6. **Hotfixes.** For an urgent production fix, branch off production, open a PR straight to production (full checks and review run on it), and once it merges, merge production back into the integration branch.
+7. **Outside PRs.** Contributor and Dependabot PRs get CI only, with no Claude review bot. Dependabot is grouped and runs monthly.
+8. **Workflow triggers.** Keep workflows off feature work: no `push` triggers on integration branches except where a deploy needs one, and the Claude review workflow runs only on PRs into production. Don't add a workflow that runs on every push without Amr's OK.
+
+**How this repo applies it: desktop app.** The integration branch is the active `release/X.Y.Z` (opened by `/start_release`) and production is `main`. The test plan is `docs/TEST_PLAN.md`: each feature push adds its own `### #issue: short name` section of pass/fail items under the release's heading, and `/pre_release` copies the release's sections into the release PR body. Amr runs it on the `build-installer` preview build of the release PR before it merges. The code review is a `/code-review` pass on that PR during `/pre_release`. See `docs/RELEASE_PROCESS.md`.
+
 ---
 
 ## Session Protocol
@@ -11,7 +28,7 @@ At the start of each session, ask:
 
 Wait for an explicit response before taking action.
 
-For non-trivial implementation tasks, use `EnterPlanMode` to design and align on the approach before coding. For multi-step work, use `TaskCreate`/`TaskUpdate`. Cross-session context lives in the memory system at:
+For a new idea, align on the approach by grilling it with decision cards (see the pipeline section above); once Amr says it is ready, build without further plan approvals. For multi-step work, use `TaskCreate`/`TaskUpdate`. Cross-session context lives in the memory system at:
 `C:\Users\aabou\.claude\projects\C--Users-aabou-PycharmProjects-OsirisDevworks-sc-profile-editor\memory\`
 
 ---
@@ -160,13 +177,15 @@ On every release, also update the SC Profile Editor entry in `../osiris-devworks
 
 ## Development workflow
 
-1. **Plan** non-trivial changes in `EnterPlanMode` and align before coding.
-2. **Implement** in focused chunks; check in between logical blocks.
-3. **Test manually** — there's no UI test harness. At minimum: load a profile, verify the table populates, toggle Standard ↔ Detailed view, check that Device View and exports still work. Test with hardware when touching input detection.
-4. **Document** alongside the change: update `docs/CHANGELOG.md` under `[Unreleased]`. Update `README.md` only when user-visible behavior changes.
-5. **Commit** with a clear message that explains the *why*. Show the message before committing.
+The pipeline section at the top is the workflow. In this repo:
 
-Test plans for past releases live in `test_plan.md` and `TEST_PLAN_v0.8.2.md` — useful as reference for what coverage looks like, but they are historical, not living checklists.
+1. **Grill** the idea with decision cards, with an HTML mockup of any changed screen, until Amr says it is ready.
+2. **Implement** on a short-lived local branch off the active `release/X.Y.Z`.
+3. **Test**: `pytest tests/`, then by hand, since there's no UI test harness. At minimum: load a profile, verify the table populates, toggle Standard ↔ Detailed view, check that Device View and exports still work. Test with hardware (or `--mock-joysticks`) when touching input detection.
+4. **Document** alongside the change: update `docs/CHANGELOG.md` under `[Unreleased]`, add the feature's pass/fail section to `docs/TEST_PLAN.md`, and update `README.md` only when user-visible behavior changes.
+5. **Push** one squashed commit (`#123: short summary`, `Fixes #123` in the body) straight to `release/X.Y.Z`. No feature PR, and no commit-message review.
+
+`test_plan.md` and `TEST_PLAN_v0.8.2.md` at the repo root are historical; `docs/TEST_PLAN.md` is the living one.
 
 ---
 

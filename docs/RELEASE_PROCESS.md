@@ -8,7 +8,9 @@ SC Profile Editor uses the same release model as its sibling project `smart-citi
 
 - After a release ships, the next `release/X.Y.Z` branch opens off `main` and `VERSION.TXT` bumps on it (`/start_release patch|minor|major`). That branch is the integration target until it ships.
 - **The version in the branch name signals scope.** A patch branch (e.g. `release/0.10.2`) takes bug fixes and minor polish only; features and new device support wait for the next minor.
-- **PRs target the active `release/X.Y.Z`, not `main`.** `main` only ever receives the release-branch merge.
+- **Features are pushed straight to the active `release/X.Y.Z`**, one squashed commit each (`#123: short summary`), with no feature PR, and each adds its pass/fail section to `docs/TEST_PLAN.md`. Contributor PRs also target it and get CI only. `main` only ever receives the release-branch merge and hotfix PRs.
+- **Checks and code review run once, on the release PR.** `/pre_release` runs the full gate there, including a `/code-review` pass; fixes land as more commits on the release branch.
+- **Hotfixes** branch off `main` and go through a PR into `main`; once merged, `main` is merged back into the active release branch.
 - When the branch is stable, add the **`build-installer` label** to the release PR. `installer-preview.yml` builds `SCProfileEditor-vX.Y.Z-Setup.exe` as a 30-day artifact and comments the download link on the PR so testers can verify before anything reaches `main`.
 - **Merging `release/X.Y.Z` → `main` is the release trigger.** Until then nothing on the release branch is "released".
 
@@ -17,7 +19,7 @@ Don't propose tagging or merging to `main` mid-integration; the user drives that
 ## Branch protection (GitHub settings, set once by the owner)
 
 - **`main`**: classic branch protection, PR required. Already in place.
-- **`release/*`**: a "Protect release branches" ruleset targeting `refs/heads/release/*` — require a pull request, require one approving review from the code owner (`.github/CODEOWNERS` gives `*` to `@Osiris-DevWorks`), block force-pushes and deletion. The owner (admin) bypasses it for the `/start_release` kickoff push.
+- **`release/*`**: a "Protect release branches" ruleset targeting `refs/heads/release/*` that blocks force-pushes and deletion. Amr's and Claude's feature pushes must be allowed straight onto the branch, either because the ruleset no longer requires a pull request or because they are bypass actors. Contributor PRs still need one approving review from the code owner (`.github/CODEOWNERS` gives `*` to `@Osiris-DevWorks`). If a push is refused by the ruleset, stop and tell Amr; don't open a PR to get around it.
 - **Secrets**: `DISCORD_RELEASE_WEBHOOK_URL` for the release announcement (optional; the release still publishes without it).
 - **Labels**: create `build-installer` once in the repo's label list.
 
@@ -38,9 +40,9 @@ Don't propose tagging or merging to `main` mid-integration; the user drives that
 ## Release cycle
 
 1. **Open the branch** — `/start_release patch` (or `minor`/`major`) on a clean, current `main`. Push it: `git push -u origin release/X.Y.Z`.
-2. **Integrate** — normal PRs against `release/X.Y.Z`. Keep `docs/CHANGELOG.md` `[Unreleased]` current as changes land.
-3. **Gate** — `/pre_release`: tests, CHANGELOG/doc currency, security review, open the release PR (`release/X.Y.Z` → `main`) and label it `build-installer`, then close tester-verified issues.
-4. **Ship** — `/ship_release`: rename `[Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` (land via PR; `release.yml` fails without this section), build and smoke-test a local installer, then merge the release PR with a merge commit. The push to `main` runs `release.yml`.
+2. **Integrate** — push one squashed commit per feature to `release/X.Y.Z`. Keep `docs/CHANGELOG.md` `[Unreleased]` and `docs/TEST_PLAN.md` current as changes land.
+3. **Gate** — `/pre_release`: tests, CHANGELOG/doc currency, security review, open the release PR (`release/X.Y.Z` → `main`) with the test plan in its body, label it `build-installer`, run `/code-review` on it, then close tester-verified issues.
+4. **Ship** — `/ship_release`: rename `[Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` (pushed straight to the release branch; `release.yml` fails without this section), build and smoke-test a local installer, then merge the release PR with a merge commit. The push to `main` runs `release.yml`.
 5. **After** — watch the `Release` run, download the published installer once and smoke-test it, update the SC Profile Editor tile in `../osiris-devworks-website/src/data/projects.ts` (static `version` fallback, `features`, `status`, screenshots) and push that repo's `main`, then `/start_release patch` for the next cycle.
 
 ## Manual fallbacks
